@@ -32,6 +32,21 @@ setTimeout(() => {
     console.error('MCP smoke test failed: ini_brain_get_context was not listed.');
     process.exit(1);
   }
+  const tools = parseResponse(stdout, 2)?.result?.tools || [];
+  const statusTool = tools.find(tool => tool.name === 'ini_brain_status');
+  const generateTool = tools.find(tool => tool.name === 'ini_brain_generate_agent_guide');
+  if (statusTool?.annotations?.readOnlyHint !== true || statusTool?.annotations?.destructiveHint !== false) {
+    console.error(stdout);
+    console.error(stderr);
+    console.error('MCP smoke test failed: read-only tool annotations are missing.');
+    process.exit(1);
+  }
+  if (generateTool?.annotations?.readOnlyHint !== false || generateTool?.annotations?.destructiveHint !== false) {
+    console.error(stdout);
+    console.error(stderr);
+    console.error('MCP smoke test failed: local-write tool annotations are missing.');
+    process.exit(1);
+  }
   const status = parseResponse(stdout, 3);
   const statusText = status?.result?.content?.[0]?.text;
   const statusPayload = statusText ? JSON.parse(statusText) : null;

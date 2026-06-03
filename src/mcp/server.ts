@@ -40,14 +40,14 @@ class McpError extends Error {
 }
 
 const TOOLS = [
-  { name: 'ini_brain_status', description: 'Show workspace and INI Brain status.', inputSchema: { type: 'object', properties: workspaceProperty() } },
-  { name: 'ini_brain_get_context', description: 'Build compact task context from project brain and runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string' }, budgetChars: { type: 'number' } }, required: ['task'] } },
-  { name: 'ini_brain_search_memory', description: 'Search local runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), query: { type: 'string' }, limit: { type: 'number' } }, required: ['query'] } },
-  { name: 'ini_brain_save_memory', description: 'Save durable project memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), content: { type: 'string' }, kind: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, concepts: { type: 'array', items: { type: 'string' } }, importance: { type: 'number' } }, required: ['content'] } },
-  { name: 'ini_brain_project_profile', description: 'Return project map and memory profile.', inputSchema: { type: 'object', properties: workspaceProperty() } },
-  { name: 'ini_brain_generate_agent_guide', description: 'Scan project and regenerate AGENTS.md plus .brain workflow files.', inputSchema: { type: 'object', properties: workspaceProperty() } },
-  { name: 'ini_brain_suggest_skills', description: 'Return deterministic skill suggestions based on scanned project files.', inputSchema: { type: 'object', properties: workspaceProperty() } },
-  { name: 'ini_brain_generate_workflow', description: 'Return current workflow guidance from .brain.', inputSchema: { type: 'object', properties: workspaceProperty() } }
+  { name: 'ini_brain_status', description: 'Show workspace and INI Brain status.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_get_context', description: 'Build compact task context from project brain and runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string' }, budgetChars: { type: 'number' } }, required: ['task'] }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_search_memory', description: 'Search local runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), query: { type: 'string' }, limit: { type: 'number' } }, required: ['query'] }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_save_memory', description: 'Save durable project memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), content: { type: 'string' }, kind: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, concepts: { type: 'array', items: { type: 'string' } }, importance: { type: 'number' } }, required: ['content'] }, annotations: localWriteAnnotations() },
+  { name: 'ini_brain_project_profile', description: 'Return project map and memory profile.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_generate_agent_guide', description: 'Scan project and regenerate AGENTS.md plus .brain workflow files.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: localWriteAnnotations() },
+  { name: 'ini_brain_suggest_skills', description: 'Return deterministic skill suggestions based on scanned project files.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_generate_workflow', description: 'Return current workflow guidance from .brain.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() }
 ] as const;
 
 class IniBrainMcpServer {
@@ -223,6 +223,24 @@ function workspaceProperty(): Record<string, unknown> {
       type: 'string',
       description: 'Optional project root override. Usually omitted because INI Brain auto-detects the active workspace.'
     }
+  };
+}
+
+function readOnlyAnnotations(): Record<string, boolean> {
+  return {
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false
+  };
+}
+
+function localWriteAnnotations(): Record<string, boolean> {
+  return {
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: false,
+    openWorldHint: false
   };
 }
 
