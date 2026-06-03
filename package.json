@@ -1,0 +1,145 @@
+{
+  "name": "ini-brain-ai-universal",
+  "displayName": "INI Brain AI Universal",
+  "description": "Local-first project memory, MCP context, and automatic AI agent onboarding for VS Code, Codex, Cline, Antigravity, and generic MCP clients.",
+  "version": "2.0.1",
+  "publisher": "ini-brain",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Machine Learning",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:iniBrain.sidebar",
+    "onCommand:iniBrain.scanProject",
+    "onCommand:iniBrain.rebuildBrain",
+    "onCommand:iniBrain.guidedSetup",
+    "onCommand:iniBrain.generateAgentGuide",
+    "onCommand:iniBrain.generateSkillsWorkflow",
+    "onCommand:iniBrain.saveMemory",
+    "onCommand:iniBrain.searchMemory",
+    "onCommand:iniBrain.showProjectProfile",
+    "onCommand:iniBrain.copyMcpConfig",
+    "onCommand:iniBrain.installIntegrations",
+    "onCommand:iniBrain.configureProvider"
+  ],
+  "main": "./dist/extension.js",
+  "bin": {
+    "ini-brain-mcp": "./dist/mcp/server.js"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "iniBrain.scanProject",
+        "title": "INI Brain: Scan Project"
+      },
+      {
+        "command": "iniBrain.rebuildBrain",
+        "title": "INI Brain: Rebuild Brain"
+      },
+      {
+        "command": "iniBrain.guidedSetup",
+        "title": "INI Brain: Guided Setup"
+      },
+      {
+        "command": "iniBrain.generateAgentGuide",
+        "title": "INI Brain: Generate Agent Guide"
+      },
+      {
+        "command": "iniBrain.generateSkillsWorkflow",
+        "title": "INI Brain: Generate Skills and Workflow"
+      },
+      {
+        "command": "iniBrain.saveMemory",
+        "title": "INI Brain: Save Memory"
+      },
+      {
+        "command": "iniBrain.searchMemory",
+        "title": "INI Brain: Search Memory"
+      },
+      {
+        "command": "iniBrain.showProjectProfile",
+        "title": "INI Brain: Show Project Profile"
+      },
+      {
+        "command": "iniBrain.copyMcpConfig",
+        "title": "INI Brain: Copy MCP Config"
+      },
+      {
+        "command": "iniBrain.installIntegrations",
+        "title": "INI Brain: Install Integrations"
+      },
+      {
+        "command": "iniBrain.configureProvider",
+        "title": "INI Brain: Configure AI Provider"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "iniBrain",
+          "title": "INI Brain AI",
+          "icon": "resources/brain.svg"
+        }
+      ]
+    },
+    "views": {
+      "iniBrain": [
+        {
+          "id": "iniBrain.sidebar",
+          "name": "Brain",
+          "type": "webview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "INI Brain AI Universal",
+      "properties": {
+        "iniBrain.apiBaseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1/",
+          "description": "OpenAI-compatible API base URL used for optional AI-assisted project analysis."
+        },
+        "iniBrain.modelName": {
+          "type": "string",
+          "default": "gpt-4.1",
+          "description": "Model name used for optional AI-assisted suggestions."
+        },
+        "iniBrain.autoScan": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically initialize or refresh INI Brain context when a workspace opens."
+        },
+        "iniBrain.maxContextFiles": {
+          "type": "number",
+          "default": 16,
+          "minimum": 1,
+          "maximum": 80,
+          "description": "Maximum relevant files included in generated task context."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "smoke:mcp": "node scripts/mcp-smoke.cjs",
+    "package": "vsce package --no-dependencies",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^2.32.0",
+    "typescript": "^5.5.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ini-brain/ini-brain-ai-universal.git"
+  }
+}
