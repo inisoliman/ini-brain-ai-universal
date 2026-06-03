@@ -18,7 +18,12 @@ npm run compile
 node C:/path/to/ini-brain-ai-universal/dist/mcp/server.js
 ```
 
-Required environment:
+Workspace detection:
+
+- If the MCP client starts the server from the project root, no environment variable is required.
+- If the MCP client starts servers from a central folder, set `INI_BRAIN_WORKSPACE` or pass the optional `workspace` argument in tool calls.
+
+Optional environment:
 
 ```text
 INI_BRAIN_WORKSPACE=C:/path/to/your/project
@@ -32,9 +37,6 @@ INI_BRAIN_WORKSPACE=C:/path/to/your/project
     "ini-brain-ai": {
       "command": "node",
       "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
       "disabled": false,
       "autoApprove": []
     }
@@ -82,7 +84,12 @@ npm run compile
 node C:/path/to/ini-brain-ai-universal/dist/mcp/server.js
 ```
 
-متغير البيئة المطلوب:
+اكتشاف المشروع:
+
+- إذا كان عميل MCP يشغل السيرفر من جذر المشروع فلا تحتاج إلى متغير بيئة.
+- إذا كان العميل يشغل السيرفر من مجلد مركزي، اضبط `INI_BRAIN_WORKSPACE` أو مرر وسيط `workspace` الاختياري في استدعاءات الأدوات.
+
+متغير البيئة الاختياري:
 
 ```text
 INI_BRAIN_WORKSPACE=C:/path/to/your/project
@@ -96,9 +103,6 @@ INI_BRAIN_WORKSPACE=C:/path/to/your/project
     "ini-brain-ai": {
       "command": "node",
       "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
       "disabled": false,
       "autoApprove": []
     }

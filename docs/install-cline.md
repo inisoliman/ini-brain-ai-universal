@@ -26,15 +26,14 @@ Merge this server config:
     "ini-brain-ai": {
       "command": "node",
       "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
       "disabled": false,
       "autoApprove": []
     }
   }
 }
 ```
+
+If Cline starts MCP servers outside the project folder, add `INI_BRAIN_WORKSPACE` for that specific project or pass the optional `workspace` tool argument.
 
 Reload Cline MCP servers or reload VS Code.
 
@@ -76,15 +75,14 @@ npm run compile
     "ini-brain-ai": {
       "command": "node",
       "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
       "disabled": false,
       "autoApprove": []
     }
   }
 }
 ```
+
+إذا كان Cline يشغل سيرفرات MCP خارج مجلد المشروع، أضف `INI_BRAIN_WORKSPACE` لهذا المشروع فقط أو مرر وسيط الأداة الاختياري `workspace`.
 
 أعد تحميل سيرفرات Cline MCP أو أعد تحميل VS Code.
 

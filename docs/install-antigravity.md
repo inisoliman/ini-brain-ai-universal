@@ -22,9 +22,6 @@ If your Antigravity installation exposes MCP server settings, add:
     "ini-brain-ai": {
       "command": "node",
       "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
       "disabled": false,
       "autoApprove": []
     }
@@ -32,11 +29,12 @@ If your Antigravity installation exposes MCP server settings, add:
 }
 ```
 
-If the UI uses a different shape, keep the same command, args, and environment variable:
+If the UI uses a different shape, keep the same command and args:
 
 - command: `node`
 - args: `C:/path/to/ini-brain-ai-universal/dist/mcp/server.js`
-- env: `INI_BRAIN_WORKSPACE=C:/path/to/your/project`
+
+Only add `INI_BRAIN_WORKSPACE` when the host starts MCP servers outside the project folder and cannot pass the optional `workspace` tool argument.
 
 ## Recommended Agent Instruction
 
@@ -80,9 +78,6 @@ npm run compile
     "ini-brain-ai": {
       "command": "node",
       "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
       "disabled": false,
       "autoApprove": []
     }
@@ -90,11 +85,12 @@ npm run compile
 }
 ```
 
-إذا كانت الواجهة تستخدم صيغة مختلفة، حافظ على نفس الأمر والوسائط ومتغير البيئة:
+إذا كانت الواجهة تستخدم صيغة مختلفة، حافظ على نفس الأمر والوسائط:
 
 - command: `node`
 - args: `C:/path/to/ini-brain-ai-universal/dist/mcp/server.js`
-- env: `INI_BRAIN_WORKSPACE=C:/path/to/your/project`
+
+أضف `INI_BRAIN_WORKSPACE` فقط إذا كان المضيف يشغل سيرفرات MCP خارج مجلد المشروع ولا يستطيع تمرير وسيط الأداة الاختياري `workspace`.
 
 ## تعليمات الوكيل المقترحة
 

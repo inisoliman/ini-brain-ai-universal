@@ -10,6 +10,7 @@ Codex can benefit from INI Brain in two layers:
 ## Build The MCP Server
 
 ```powershell
+git clone https://github.com/inisoliman/ini-brain-ai-universal.git
 cd ini-brain-ai-universal
 npm install
 npm run compile
@@ -23,23 +24,24 @@ ini-brain-ai-universal/dist/mcp/server.js
 
 ## Add MCP Config
 
-Use the MCP configuration format supported by your Codex installation and point it to the server:
+For a Superpowers-style global install, configure Codex once without a fixed project path:
 
-```json
-{
-  "mcpServers": {
-    "ini-brain-ai": {
-      "command": "node",
-      "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
-      "disabled": false,
-      "autoApprove": []
-    }
-  }
-}
+```powershell
+codex mcp add ini-brain-ai -- node "C:\path\to\ini-brain-ai-universal\dist\mcp\server.js"
 ```
+
+Or add the same server manually:
+
+```toml
+[mcp_servers.ini-brain-ai]
+command = 'node'
+args = ['C:\path\to\ini-brain-ai-universal\dist\mcp\server.js']
+startup_timeout_sec = 120
+```
+
+Do not set `INI_BRAIN_WORKSPACE` for the global Codex install unless you intentionally want to pin INI Brain to one project. Without that variable, INI Brain resolves the active project automatically from the MCP process working directory and known workspace environment variables.
+
+If the `codex` command is not in PowerShell `PATH`, run Codex through its full installed path or edit `C:\Users\<you>\.codex\config.toml` manually.
 
 ## Recommended Codex Prompt
 
@@ -68,6 +70,7 @@ Before editing, read AGENTS.md. Then call ini_brain_get_context for my task. Sea
 ## بناء سيرفر MCP
 
 ```powershell
+git clone https://github.com/inisoliman/ini-brain-ai-universal.git
 cd ini-brain-ai-universal
 npm install
 npm run compile
@@ -81,23 +84,24 @@ ini-brain-ai-universal/dist/mcp/server.js
 
 ## إضافة إعداد MCP
 
-استخدم صيغة إعداد MCP المدعومة في نسخة Codex لديك، واجعلها تشير إلى السيرفر:
+للتثبيت العام مثل Superpowers، اضبط Codex مرة واحدة بدون مسار مشروع ثابت:
 
-```json
-{
-  "mcpServers": {
-    "ini-brain-ai": {
-      "command": "node",
-      "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
-      "env": {
-        "INI_BRAIN_WORKSPACE": "C:/path/to/your/project"
-      },
-      "disabled": false,
-      "autoApprove": []
-    }
-  }
-}
+```powershell
+codex mcp add ini-brain-ai -- node "C:\path\to\ini-brain-ai-universal\dist\mcp\server.js"
 ```
+
+أو أضف نفس السيرفر يدويًا:
+
+```toml
+[mcp_servers.ini-brain-ai]
+command = 'node'
+args = ['C:\path\to\ini-brain-ai-universal\dist\mcp\server.js']
+startup_timeout_sec = 120
+```
+
+لا تضبط `INI_BRAIN_WORKSPACE` في تثبيت Codex العام إلا إذا كنت تريد ربط INI Brain بمشروع واحد فقط. بدون هذا المتغير سيكتشف INI Brain المشروع النشط تلقائيًا من مسار تشغيل MCP ومتغيرات بيئة workspace المعروفة.
+
+إذا كان أمر `codex` غير متاح في PowerShell، شغّل Codex من مساره الكامل أو عدّل ملف `C:\Users\<you>\.codex\config.toml` يدويًا.
 
 ## البرومبت المقترح لـ Codex
 

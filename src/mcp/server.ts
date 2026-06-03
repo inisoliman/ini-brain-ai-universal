@@ -7,8 +7,8 @@ import { ContextBuilder } from '../core/contextBuilder';
 import { MemoryStore, parseCsvList } from '../core/memoryStore';
 import { ProjectScanner } from '../core/projectScanner';
 import { MemoryKind } from '../core/types';
+import { resolveWorkspace } from './workspace';
 
-const WORKSPACE = process.env.INI_BRAIN_WORKSPACE || process.cwd();
 const JSON_RPC_VERSION = '2.0';
 
 const ErrorCode = {
@@ -40,14 +40,14 @@ class McpError extends Error {
 }
 
 const TOOLS = [
-  { name: 'ini_brain_status', description: 'Show workspace and INI Brain status.', inputSchema: { type: 'object', properties: {} } },
-  { name: 'ini_brain_get_context', description: 'Build compact task context from project brain and runtime memory.', inputSchema: { type: 'object', properties: { task: { type: 'string' }, budgetChars: { type: 'number' } }, required: ['task'] } },
-  { name: 'ini_brain_search_memory', description: 'Search local runtime memory.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, limit: { type: 'number' } }, required: ['query'] } },
-  { name: 'ini_brain_save_memory', description: 'Save durable project memory.', inputSchema: { type: 'object', properties: { content: { type: 'string' }, kind: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, concepts: { type: 'array', items: { type: 'string' } }, importance: { type: 'number' } }, required: ['content'] } },
-  { name: 'ini_brain_project_profile', description: 'Return project map and memory profile.', inputSchema: { type: 'object', properties: {} } },
-  { name: 'ini_brain_generate_agent_guide', description: 'Scan project and regenerate AGENTS.md plus .brain workflow files.', inputSchema: { type: 'object', properties: {} } },
-  { name: 'ini_brain_suggest_skills', description: 'Return deterministic skill suggestions based on scanned project files.', inputSchema: { type: 'object', properties: {} } },
-  { name: 'ini_brain_generate_workflow', description: 'Return current workflow guidance from .brain.', inputSchema: { type: 'object', properties: {} } }
+  { name: 'ini_brain_status', description: 'Show workspace and INI Brain status.', inputSchema: { type: 'object', properties: workspaceProperty() } },
+  { name: 'ini_brain_get_context', description: 'Build compact task context from project brain and runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string' }, budgetChars: { type: 'number' } }, required: ['task'] } },
+  { name: 'ini_brain_search_memory', description: 'Search local runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), query: { type: 'string' }, limit: { type: 'number' } }, required: ['query'] } },
+  { name: 'ini_brain_save_memory', description: 'Save durable project memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), content: { type: 'string' }, kind: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, concepts: { type: 'array', items: { type: 'string' } }, importance: { type: 'number' } }, required: ['content'] } },
+  { name: 'ini_brain_project_profile', description: 'Return project map and memory profile.', inputSchema: { type: 'object', properties: workspaceProperty() } },
+  { name: 'ini_brain_generate_agent_guide', description: 'Scan project and regenerate AGENTS.md plus .brain workflow files.', inputSchema: { type: 'object', properties: workspaceProperty() } },
+  { name: 'ini_brain_suggest_skills', description: 'Return deterministic skill suggestions based on scanned project files.', inputSchema: { type: 'object', properties: workspaceProperty() } },
+  { name: 'ini_brain_generate_workflow', description: 'Return current workflow guidance from .brain.', inputSchema: { type: 'object', properties: workspaceProperty() } }
 ] as const;
 
 class IniBrainMcpServer {
@@ -57,7 +57,7 @@ class IniBrainMcpServer {
   async run(): Promise<void> {
     process.stdin.on('data', chunk => this.onData(Buffer.from(chunk)));
     process.stdin.on('error', error => console.error('[INI Brain MCP] stdin error', error));
-    console.error(`[INI Brain MCP] running locally for ${WORKSPACE}`);
+    console.error(`[INI Brain MCP] running locally for ${getWorkspace({})}`);
   }
 
   private onData(chunk: Buffer): void {
@@ -111,21 +111,26 @@ class IniBrainMcpServer {
 
   private async dispatch(method: string, params: Record<string, unknown>): Promise<unknown> {
     if (method === 'initialize') {
-      return { protocolVersion: '2024-11-05', capabilities: { tools: {} }, serverInfo: { name: 'ini-brain-ai-universal', version: '2.0.1' } };
+      return {
+        protocolVersion: '2024-11-05',
+        capabilities: { tools: {} },
+        serverInfo: { name: 'ini-brain-ai-universal', version: '2.0.1' },
+        instructions: 'INI Brain resolves the active project automatically from the MCP process working directory or workspace environment variables. If a host starts MCP servers outside the project, pass a workspace argument or set INI_BRAIN_WORKSPACE.'
+      };
     }
     if (method === 'tools/list') return { tools: TOOLS };
     if (method !== 'tools/call') throw new McpError(ErrorCode.MethodNotFound, `Unknown method: ${method}`);
     const name = typeof params.name === 'string' ? params.name : '';
     const args = (params.arguments || {}) as Record<string, unknown>;
     switch (name) {
-      case 'ini_brain_status': return text(await status(), true);
+      case 'ini_brain_status': return text(await status(args), true);
       case 'ini_brain_get_context': return text(await getContext(args), false);
       case 'ini_brain_search_memory': return text(await searchMemory(args), true);
       case 'ini_brain_save_memory': return text(await saveMemory(args), true);
-      case 'ini_brain_project_profile': return text(await projectProfile(), true);
-      case 'ini_brain_generate_agent_guide': return text(await generateAgentGuide(), true);
-      case 'ini_brain_suggest_skills': return text(await suggestSkills(), true);
-      case 'ini_brain_generate_workflow': return text(await readText(path.join(WORKSPACE, '.brain', 'workflow.md'), 'Run ini_brain_generate_agent_guide first.'), false);
+      case 'ini_brain_project_profile': return text(await projectProfile(args), true);
+      case 'ini_brain_generate_agent_guide': return text(await generateAgentGuide(args), true);
+      case 'ini_brain_suggest_skills': return text(await suggestSkills(args), true);
+      case 'ini_brain_generate_workflow': return text(await readText(path.join(getWorkspace(args), '.brain', 'workflow.md'), 'Run ini_brain_generate_agent_guide first.'), false);
       default: throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
   }
@@ -141,13 +146,14 @@ class IniBrainMcpServer {
   }
 }
 
-async function status(): Promise<Record<string, unknown>> {
-  const profile = await new MemoryStore(WORKSPACE).buildProfile();
+async function status(args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const workspace = getWorkspace(args);
+  const profile = await new MemoryStore(workspace).buildProfile();
   return {
-    workspace: WORKSPACE,
-    brainDir: path.join(WORKSPACE, '.brain'),
-    hasBrain: await exists(path.join(WORKSPACE, '.brain', 'metadata.json')),
-    hasAgentGuide: await exists(path.join(WORKSPACE, 'AGENTS.md')),
+    workspace,
+    brainDir: path.join(workspace, '.brain'),
+    hasBrain: await exists(path.join(workspace, '.brain', 'metadata.json')),
+    hasAgentGuide: await exists(path.join(workspace, 'AGENTS.md')),
     memories: profile.totalMemories,
     generatedAt: new Date().toISOString()
   };
@@ -155,19 +161,22 @@ async function status(): Promise<Record<string, unknown>> {
 
 async function getContext(args: Record<string, unknown>): Promise<string> {
   if (typeof args.task !== 'string' || !args.task.trim()) throw new McpError(ErrorCode.InvalidParams, 'task is required');
+  const workspace = getWorkspace(args);
   const budgetChars = typeof args.budgetChars === 'number' ? Math.max(1000, Math.min(25000, Math.floor(args.budgetChars))) : 12000;
-  return new ContextBuilder(WORKSPACE).build(args.task, budgetChars);
+  return new ContextBuilder(workspace).build(args.task, budgetChars);
 }
 
 async function searchMemory(args: Record<string, unknown>): Promise<Record<string, unknown>> {
   if (typeof args.query !== 'string' || !args.query.trim()) throw new McpError(ErrorCode.InvalidParams, 'query is required');
+  const workspace = getWorkspace(args);
   const limit = typeof args.limit === 'number' ? Math.max(1, Math.min(25, Math.floor(args.limit))) : 10;
-  return { query: args.query, results: await new MemoryStore(WORKSPACE).search(args.query, limit) };
+  return { workspace, query: args.query, results: await new MemoryStore(workspace).search(args.query, limit) };
 }
 
 async function saveMemory(args: Record<string, unknown>): Promise<Record<string, unknown>> {
   if (typeof args.content !== 'string' || !args.content.trim()) throw new McpError(ErrorCode.InvalidParams, 'content is required');
-  const entry = await new MemoryStore(WORKSPACE).save({
+  const workspace = getWorkspace(args);
+  const entry = await new MemoryStore(workspace).save({
     content: args.content,
     kind: isMemoryKind(args.kind) ? args.kind : 'note',
     files: Array.isArray(args.files) ? args.files.map(String) : parseCsvList(typeof args.files === 'string' ? args.files : undefined),
@@ -175,30 +184,46 @@ async function saveMemory(args: Record<string, unknown>): Promise<Record<string,
     importance: typeof args.importance === 'number' ? args.importance : 7,
     source: 'agent'
   });
-  return { saved: true, entry };
+  return { workspace, saved: true, entry };
 }
 
-async function projectProfile(): Promise<Record<string, unknown>> {
+async function projectProfile(args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const workspace = getWorkspace(args);
   return {
-    workspace: WORKSPACE,
-    projectMap: await readJson(path.join(WORKSPACE, '.brain', 'project_map.json'), null),
-    memoryProfile: await new MemoryStore(WORKSPACE).buildProfile(),
-    architecture: (await readText(path.join(WORKSPACE, '.brain', 'architecture.md'), '')).slice(0, 6000)
+    workspace,
+    projectMap: await readJson(path.join(workspace, '.brain', 'project_map.json'), null),
+    memoryProfile: await new MemoryStore(workspace).buildProfile(),
+    architecture: (await readText(path.join(workspace, '.brain', 'architecture.md'), '')).slice(0, 6000)
   };
 }
 
-async function generateAgentGuide(): Promise<Record<string, unknown>> {
-  const scan = await new ProjectScanner(WORKSPACE).scan();
-  const brain = await new BrainStore(WORKSPACE).writeScan(scan);
-  const result = await new AgentGuideGenerator(WORKSPACE).generate(brain);
-  return { generated: true, stats: scan.stats, result };
+async function generateAgentGuide(args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const workspace = getWorkspace(args);
+  const scan = await new ProjectScanner(workspace).scan();
+  const brain = await new BrainStore(workspace).writeScan(scan);
+  const result = await new AgentGuideGenerator(workspace).generate(brain);
+  return { workspace, generated: true, stats: scan.stats, result };
 }
 
-async function suggestSkills(): Promise<Record<string, unknown>> {
-  const brain = await new BrainStore(WORKSPACE).readBrain();
+async function suggestSkills(args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const workspace = getWorkspace(args);
+  const brain = await new BrainStore(workspace).readBrain();
   if (!brain) return { skills: [], note: 'Run ini_brain_generate_agent_guide first.' };
-  const skills = await readText(path.join(WORKSPACE, '.brain', 'skills.md'), '');
-  return { skillsMarkdown: skills };
+  const skills = await readText(path.join(workspace, '.brain', 'skills.md'), '');
+  return { workspace, skillsMarkdown: skills };
+}
+
+function getWorkspace(args: Record<string, unknown>): string {
+  return resolveWorkspace({ explicitWorkspace: typeof args.workspace === 'string' ? args.workspace : undefined });
+}
+
+function workspaceProperty(): Record<string, unknown> {
+  return {
+    workspace: {
+      type: 'string',
+      description: 'Optional project root override. Usually omitted because INI Brain auto-detects the active workspace.'
+    }
+  };
 }
 
 function text(payload: unknown, pretty: boolean): { content: Array<{ type: 'text'; text: string }> } {

@@ -128,6 +128,8 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
+    "test:workspace": "node scripts/workspace-detection-smoke.cjs",
+    "test:mcp-config": "node scripts/mcp-config-smoke.cjs",
     "smoke:mcp": "node scripts/mcp-smoke.cjs",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
@@ -140,6 +142,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ini-brain/ini-brain-ai-universal.git"
+    "url": "https://github.com/inisoliman/ini-brain-ai-universal.git"
   }
 }

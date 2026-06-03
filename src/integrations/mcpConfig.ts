@@ -1,12 +1,10 @@
 import { McpServerConfig } from '../core/types';
 
 export function buildMcpServerConfig(root: string, serverScript: string): McpServerConfig {
+  void root;
   return {
     command: 'node',
     args: [serverScript],
-    env: {
-      INI_BRAIN_WORKSPACE: root
-    },
     disabled: false,
     autoApprove: []
   };
