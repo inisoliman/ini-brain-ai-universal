@@ -47,6 +47,23 @@
 - `ini_brain_explain`: لشرح ملف قبل تعديله.
 - `ini_brain_impact`: لمعرفة الملفات المتأثرة قبل أي تعديل.
 
+### 4. حُرّاس الجودة (Quality Guards) — مدمجون تلقائياً 🛡️
+عند أي scan/auto-brief يتم نسخ ثلاثة حُرّاس صارمين إلى المشروع تلقائياً:
+
+| الحارس | الوظيفة |
+|---|---|
+| **`clean-code-guard`** | 19 قاعدة Clean Code + SOLID + DRY + KISS + قواعد ضد هلوسة الـ LLM (لا تخترع APIs، لا تبتلع الأخطاء، لا تكتب fixtures مزيّفة، إلخ). |
+| **`test-guard`** | 8 قواعد لاختبارات حقيقية (لا اختبار يمر دائماً، لا تعطيل اختبارات لإنجاح suite، تغطية الحدود). |
+| **`karpathy-guidelines`** | إرشادات Andrej Karpathy السلوكية: فكّر قبل أن تبرمج، البساطة أولاً، تغييرات جراحية، أهداف قابلة للتحقق. |
+
+تُنسخ الحُرّاس إلى:
+- `<project>/.brain/skills/` (للسياق المحلي)
+- `<project>/.clinerules/skills/` و `.cline/skills/` (لـ Cline يقرأها تلقائياً)
+- `<project>/.codex/skills/<id>/SKILL.md` (لـ Codex يقرأها كـ skills)
+- `<project>/.brain/quality_gates.md` يضمها في قسم "Built-in Quality Guards"
+
+النتيجة: أي وكيل (Codex/Claude/Cline/Cursor) يلتزم بنفس قواعد الجودة العالية في كل المشاريع.
+
 ---
 
 ## ⚡ التثبيت التلقائي (موصى به)
