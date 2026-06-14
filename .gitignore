@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.brain/
+.vscode/
+*.log
+project_request.md
+AGENTS.local.md

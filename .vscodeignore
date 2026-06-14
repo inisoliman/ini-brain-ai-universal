@@ -1,0 +1,11 @@
+src/**
+.vscode/**
+.brain/**
+docs/superpowers/**
+scripts/**
+*.map
+**/*.map
+node_modules/**
+package-lock.json
+AGENTS.local.md
+project_request.md
