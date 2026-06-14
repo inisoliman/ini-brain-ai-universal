@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { BrainData, FileRecord } from './types';
+import { GUARD_SKILLS, buildGuardsQualitySection, renderGuardSkillFile } from './guardSkills';
 
 interface SkillDefinition {
   id: string;
@@ -40,7 +41,19 @@ export class AgentGuideGenerator {
     const skills = detectSkills(data);
     const workflow = buildWorkflow(skills);
     const skillsIndex = buildSkillsIndex(skills);
-    const quality = buildQualityGates(data);
+    const quality = buildQualityGates(data) + '\n\n' + buildGuardsQualitySection();
+    const guardWrites: Promise<void>[] = [];
+    for (const guard of GUARD_SKILLS) {
+      const rendered = renderGuardSkillFile(guard);
+      guardWrites.push(
+        fs.writeFile(path.join(skillsDir, `${guard.id}.md`), rendered, 'utf8'),
+        fs.writeFile(path.join(clineSkillsDir, `${guard.id}.md`), rendered, 'utf8'),
+        fs.writeFile(path.join(clineRulesSkillsDir, `${guard.id}.md`), rendered, 'utf8'),
+        fs.mkdir(path.join(this.root, '.codex', 'skills', guard.id), { recursive: true }).then(() =>
+          fs.writeFile(path.join(this.root, '.codex', 'skills', guard.id, 'SKILL.md'), rendered, 'utf8')
+        )
+      );
+    }
     await Promise.all([
       this.writeAgentsFile(path.join(this.root, 'AGENTS.md'), data, skills),
       fs.writeFile(path.join(brainDir, 'workflow.md'), workflow, 'utf8'),
@@ -50,7 +63,8 @@ export class AgentGuideGenerator {
       ...skills.map(skill => fs.writeFile(path.join(clineSkillsDir, `${skill.id}.md`), formatSkill(skill), 'utf8')),
       ...skills.map(skill => fs.writeFile(path.join(clineRulesSkillsDir, `${skill.id}.md`), formatSkill(skill), 'utf8')),
       fs.writeFile(path.join(clineWorkflowsDir, 'ini-brain-project-workflow.md'), workflow, 'utf8'),
-      fs.writeFile(path.join(codexSkillsDir, 'SKILL.md'), buildCodexSkill(), 'utf8')
+      fs.writeFile(path.join(codexSkillsDir, 'SKILL.md'), buildCodexSkill(), 'utf8'),
+      ...guardWrites
     ]);
     return {
       agentsPath: 'AGENTS.md',

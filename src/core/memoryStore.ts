@@ -60,6 +60,14 @@ export class MemoryStore {
     return text.length <= budgetChars ? text : `${text.slice(0, budgetChars)}\n<!-- memory context truncated -->`;
   }
 
+  async list(limit = 20): Promise<MemoryEntry[]> {
+    const entries = await this.readAll();
+    return entries
+      .slice()
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+      .slice(0, Math.max(1, Math.min(50, Math.floor(limit))));
+  }
+
   async buildProfile(): Promise<ProjectMemoryProfile> {
     const entries = await this.readAll();
     return {

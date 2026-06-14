@@ -1,8 +1,8 @@
 {
   "name": "ini-brain-ai-universal",
   "displayName": "INI Brain AI Universal",
-  "description": "Local-first project memory, MCP context, and automatic AI agent onboarding for VS Code, Codex, Cline, Antigravity, and generic MCP clients.",
-  "version": "2.0.1",
+  "description": "Local-first project memory, MCP context, automatic background scanning, and built-in golden prompt for Codex, Claude Desktop, Cline, Antigravity, and any MCP client.",
+  "version": "2.1.0",
   "publisher": "ini-brain",
   "license": "MIT",
   "engines": {
