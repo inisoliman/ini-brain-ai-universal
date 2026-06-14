@@ -1,54 +1,99 @@
 # INI Brain AI Universal
 
-Version: 2.0.1
+> **Version 2.1.0** — Local-first project memory and context platform for AI coding agents (Codex, Claude Desktop, Cline, Antigravity, any MCP client).
 
-INI Brain AI Universal is a local-first project memory and context platform for AI coding agents.
-
-It scans any new or existing workspace, creates a durable `.brain/` knowledge base, generates `AGENTS.md`, exposes context through a local MCP server, and helps tools such as VS Code, Codex, Cline, Antigravity, and generic MCP clients understand projects without repeated explanations.
+GitHub: https://github.com/inisoliman/ini-brain-ai-universal
 
 ## What It Does
 
-- Automatically detects empty, new, old, missing, stale, and ready projects.
-- Creates and refreshes `.brain/` project memory.
-- Generates `AGENTS.md`, workflows, skills, and quality gates.
-- Stores local runtime memories in `.brain/memories.json`.
-- Exposes MCP tools for context, search, save, and project profile.
-- Keeps external AI providers optional.
-- Stores API keys in host secret storage where available.
+INI Brain AI Universal scans any new or existing workspace, creates a durable `.brain/` knowledge base, generates `AGENTS.md`, exposes context through a local MCP server, and ships a built-in **golden prompt + quality guards** so every coding agent follows the same disciplined workflow.
 
-## Project Status
+- 🧠 Auto-builds `.brain/` (project map, dependencies, compact context, memory).
+- 🤖 13 MCP tools (status, get_context, auto_brief, search/save/list memory, project_profile, onboarding, explain, impact, generate_agent_guide, suggest_skills, generate_workflow).
+- 🛡️ Three built-in **Quality Guards** (`clean-code-guard`, `test-guard`, `karpathy-guidelines`) auto-deployed to `.brain/skills/`, `.cline/skills/`, `.clinerules/skills/`, `.codex/skills/<id>/SKILL.md`.
+- 🌟 **Golden prompt auto-injected** via MCP `instructions` — the agent reads it on every connect, no manual prompt copying.
+- 🔄 **Background scan & watcher** — `.brain/` and `AGENTS.md` stay fresh automatically when files change.
+- 🔒 100% local. No API key is written to repository files. External AI provider features are optional.
 
-This folder is the modern universal version of INI Brain AI and is ready to become the clean GitHub repository for the next release line.
+## What's New In 2.1.0
 
-## Repository
+| Feature | Effect |
+|---|---|
+| `ini_brain_auto_brief` tool | One call returns AGENTS.md + compact context + decisions + memories + protocol. |
+| `ini_brain_onboarding` / `explain` / `impact` | LLM-free project insights ported from the advanced edition. |
+| `AutoBackground` service | First MCP touch triggers a background scan; `fs.watch` keeps `.brain/` fresh on every file change. |
+| Golden prompt in `instructions` | Codex/Claude/Cline read the protocol the moment they connect. |
+| Quality Guards skills | `clean-code-guard`, `test-guard`, `karpathy-guidelines` are written to every project automatically. |
 
-GitHub repository: https://github.com/inisoliman/ini-brain-ai-universal.git
-
-## Automatic In Every Project
-
-For Codex, install the MCP server once in the global Codex config without a fixed `INI_BRAIN_WORKSPACE` value. INI Brain then resolves the active project from the MCP process working directory and known workspace environment variables. Every MCP tool also accepts an optional `workspace` argument as a fallback for hosts that start MCP servers outside the project folder.
-
-## Install For VS Code
-
-See [docs/install-vscode.md](docs/install-vscode.md).
-
-Short version:
+## Quick Install (One Command)
 
 ```powershell
-npm install
-npm run compile
-npm run package
-code --install-extension .\ini-brain-ai-universal-2.0.1.vsix --force
+git clone https://github.com/inisoliman/ini-brain-ai-universal.git
+cd ini-brain-ai-universal
+powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1
 ```
 
-## Install For Codex
+The auto-installer:
+1. Verifies Node.js.
+2. Runs `npm install` and `npm run compile`.
+3. Adds the MCP server to `~/.codex/config.toml`.
+4. Adds the MCP server to Claude Desktop (`%APPDATA%\Claude\claude_desktop_config.json`).
+5. Adds the MCP server to Cline (`%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`).
 
-See [docs/install-codex.md](docs/install-codex.md).
+Skip flags: `-SkipBuild -SkipCodex -SkipClaude -SkipCline`.
 
-Recommended Codex habit:
+## Manual Install
 
-```md
-Before editing, read AGENTS.md. If the INI Brain MCP server is configured, call ini_brain_get_context for my task, search memory when previous decisions may matter, and save durable findings with ini_brain_save_memory after finishing.
+### Step 1 — Build the MCP server
+
+```powershell
+git clone https://github.com/inisoliman/ini-brain-ai-universal.git
+cd ini-brain-ai-universal
+npm install
+npm run compile
+```
+
+The MCP entrypoint will be at `ini-brain-ai-universal/dist/mcp/server.js`.
+
+### Step 2 — Codex CLI
+
+```powershell
+codex mcp add ini-brain-ai -- node "C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"
+```
+
+Or edit `~/.codex/config.toml` directly:
+
+```toml
+[mcp_servers.ini-brain-ai]
+command = 'node'
+args = ['C:/path/to/ini-brain-ai-universal/dist/mcp/server.js']
+startup_timeout_sec = 120
+```
+
+### Step 3 — Claude Desktop
+
+Edit `%APPDATA%\Claude\claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "ini-brain-ai": {
+      "command": "node",
+      "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+
+Then **Quit Claude Desktop completely** (also from the system tray) and reopen.
+
+### Step 4 — VS Code (optional)
+
+```powershell
+npm run package
+code --install-extension .\ini-brain-ai-universal-2.1.0.vsix --force
 ```
 
 ## Install For Cline
@@ -109,57 +154,90 @@ Example:
 
 ---
 
-# الترجمة العربية
+# 🇪🇬 الترجمة العربية
 
-الإصدار: 2.0.1
+> **الإصدار 2.1.0** — نظام محلي لذاكرة وسياق المشاريع لأي وكيل ذكاء اصطناعي يدعم MCP (Codex / Claude Desktop / Cline / Antigravity).
 
-INI Brain AI Universal هو نظام محلي لبناء ذاكرة وسياق للمشاريع حتى تستفيد منه أدوات الذكاء الاصطناعي البرمجية.
+📂 **المستودع:** https://github.com/inisoliman/ini-brain-ai-universal
 
-يقوم بفحص أي مشروع جديد أو قديم، وينشئ مجلد `.brain/` كقاعدة معرفة دائمة، ويولّد ملف `AGENTS.md`، ويوفر سيرفر MCP محلي، حتى تستطيع أدوات مثل VS Code وCodex وCline وAntigravity وأي عميل MCP فهم المشروع بدون إعادة شرح متكررة.
+📘 **الدليل العربي الكامل:** [docs/install-arabic-guide.md](docs/install-arabic-guide.md)
+🪙 **هل توفر التوكينات أم تستهلكها؟:** [docs/tokens-faq.md](docs/tokens-faq.md)
 
 ## ماذا يفعل؟
 
-- يكتشف تلقائيًا المشاريع الفارغة والجديدة والقديمة والناقصة والقديمة السياق والجاهزة.
-- ينشئ ويحدّث ذاكرة المشروع داخل `.brain/`.
-- يولّد `AGENTS.md` وملفات workflow وskills وquality gates.
-- يحفظ الذاكرة المحلية في `.brain/memories.json`.
-- يوفر أدوات MCP للسياق والبحث والحفظ وملف المشروع.
-- يجعل مزود الذكاء الاصطناعي الخارجي اختياريًا.
-- يخزن مفاتيح API في التخزين الآمن الخاص بالبيئة عندما يكون متاحًا.
+- 🧠 يبني `.brain/` تلقائياً (خريطة المشروع، التبعيات، السياق المضغوط، الذاكرة).
+- 🤖 يوفر **13 أداة MCP** لأي عميل ذكي.
+- 🛡️ ينشر **3 حُرّاس جودة تلقائياً**: `clean-code-guard`, `test-guard`, `karpathy-guidelines` في `.brain/skills/`, `.cline/skills/`, `.codex/skills/`.
+- 🌟 **يحقن البرومبت الذهبي تلقائياً** عبر MCP `instructions` — لا تحتاج كتابته في كل محادثة.
+- 🔄 **فحص في الخلفية + watcher** يحدّث `.brain/` و `AGENTS.md` تلقائياً عند تغيّر الملفات.
+- 🔒 محلي 100%. لا تُكتب مفاتيح API في ملفات المشروع.
 
-## حالة المشروع
+## ✨ الجديد في 2.1.0
 
-هذا المجلد هو النسخة الحديثة والعامة من INI Brain AI، وهو مناسب ليصبح مستودع GitHub النظيف للإصدار الجديد.
+| الميزة | التأثير |
+|---|---|
+| `ini_brain_auto_brief` | استدعاء واحد يعطيك AGENTS.md + السياق + القرارات + الذكريات + البروتوكول. |
+| `onboarding` / `explain` / `impact` | تحليل مشروع بدون LLM (entry points، blast radius، شرح ملف). |
+| `AutoBackground` | فحص تلقائي عند بدء MCP + watcher على الملفات. |
+| البرومبت الذهبي في `instructions` | الوكيل يقرأه فور الاتصال. |
+| حُرّاس الجودة | تنتشر في كل مشروع تلقائياً. |
 
-## المستودع
-
-رابط GitHub: https://github.com/inisoliman/ini-brain-ai-universal.git
-
-## العمل التلقائي مع كل مشروع
-
-مع Codex يتم تثبيت سيرفر MCP مرة واحدة في إعدادات Codex العامة بدون قيمة ثابتة لـ `INI_BRAIN_WORKSPACE`. بعد ذلك يكتشف INI Brain المشروع النشط من مسار تشغيل MCP ومتغيرات بيئة workspace المعروفة. وكل أداة MCP تقبل أيضًا وسيط `workspace` اختياريًا كحل احتياطي إذا كان العميل يشغل السيرفر خارج مجلد المشروع.
-
-## التثبيت على VS Code
-
-راجع [docs/install-vscode.md](docs/install-vscode.md).
-
-الأوامر المختصرة:
+## 🚀 التثبيت السريع (أمر واحد)
 
 ```powershell
-npm install
-npm run compile
-npm run package
-code --install-extension .\ini-brain-ai-universal-2.0.1.vsix --force
+git clone https://github.com/inisoliman/ini-brain-ai-universal.git
+cd ini-brain-ai-universal
+powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1
 ```
 
-## التثبيت على Codex
+السكربت يقوم بـ:
+1. التحقق من Node.js
+2. `npm install` + `npm run compile`
+3. إضافة السيرفر إلى `~/.codex/config.toml`
+4. إضافته إلى Claude Desktop
+5. إضافته إلى Cline (إن كان مثبتاً)
 
-راجع [docs/install-codex.md](docs/install-codex.md).
+معاملات التخطّي: `-SkipBuild -SkipCodex -SkipClaude -SkipCline`.
 
-أفضل عادة مع Codex:
+## 🔧 التثبيت اليدوي
 
-```md
-Before editing, read AGENTS.md. If the INI Brain MCP server is configured, call ini_brain_get_context for my task, search memory when previous decisions may matter, and save durable findings with ini_brain_save_memory after finishing.
+### 1) بناء سيرفر MCP
+
+```powershell
+git clone https://github.com/inisoliman/ini-brain-ai-universal.git
+cd ini-brain-ai-universal
+npm install
+npm run compile
+```
+
+### 2) Codex CLI
+
+```powershell
+codex mcp add ini-brain-ai -- node "C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"
+```
+
+### 3) Claude Desktop
+عدّل `%APPDATA%\Claude\claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "ini-brain-ai": {
+      "command": "node",
+      "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+ثم **أغلق Claude بالكامل** (من شريط المهام) ثم افتحه.
+
+### 4) VS Code (اختياري)
+
+```powershell
+npm run package
+code --install-extension .\ini-brain-ai-universal-2.1.0.vsix --force
 ```
 
 ## التثبيت على Cline
