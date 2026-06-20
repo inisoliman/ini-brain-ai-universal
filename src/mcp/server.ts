@@ -9,6 +9,9 @@ import { InsightBuilder } from '../core/insightBuilder';
 import { MemoryStore, parseCsvList } from '../core/memoryStore';
 import { ProjectScanner } from '../core/projectScanner';
 import { MemoryKind } from '../core/types';
+import { graphTools } from './tools/graphTools';
+import { methodologyTools } from './tools/methodologyTools';
+import { savingsTools } from './tools/savingsTools';
 import { resolveWorkspace } from './workspace';
 
 const GOLDEN_PROMPT = [
@@ -45,11 +48,32 @@ interface JsonRpcResponse {
   error?: { code: number; message: string; data?: unknown };
 }
 
+interface ToolDefinition {
+  description: string;
+  inputSchema: Record<string, unknown>;
+  handler: (args: any, root: string) => unknown | Promise<unknown>;
+}
+
 class McpError extends Error {
   constructor(readonly code: number, message: string, readonly data?: unknown) {
     super(message);
   }
 }
+
+const EXTRA_TOOLS: Record<string, ToolDefinition> = {
+  ...savingsTools,
+  ...graphTools,
+  ...methodologyTools
+};
+
+const EXTRA_TOOL_LIST = Object.entries(EXTRA_TOOLS).map(([name, tool]) => ({
+  name,
+  description: tool.description,
+  inputSchema: withWorkspaceInput(tool.inputSchema),
+  annotations: name === 'ini_brain_graph_build' || name === 'ini_brain_spec_create'
+    ? localWriteAnnotations()
+    : readOnlyAnnotations()
+}));
 
 const TOOLS = [
   { name: 'ini_brain_auto_brief', description: 'AUTO-CALL THIS FIRST in every new task. Loads AGENTS.md, compact context, decisions, recent memories and the INI Brain protocol so the agent can plan before editing.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string', description: 'Optional current user task for memory matching.' } } }, annotations: readOnlyAnnotations() },
@@ -64,7 +88,8 @@ const TOOLS = [
   { name: 'ini_brain_impact', description: 'Analyze the ripple effect (blast radius) of changing a list of files using the dependency graph.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), files: { type: 'array', items: { type: 'string' } } }, required: ['files'] }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_generate_agent_guide', description: 'Scan project and regenerate AGENTS.md plus .brain workflow files. Usually unnecessary because a background scan keeps these fresh.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: localWriteAnnotations() },
   { name: 'ini_brain_suggest_skills', description: 'Return deterministic skill suggestions based on scanned project files.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
-  { name: 'ini_brain_generate_workflow', description: 'Return current workflow guidance from .brain.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() }
+  { name: 'ini_brain_generate_workflow', description: 'Return current workflow guidance from .brain.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
+  ...EXTRA_TOOL_LIST
 ] as const;
 
 class IniBrainMcpServer {
@@ -140,7 +165,7 @@ class IniBrainMcpServer {
       return {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'ini-brain-ai-universal', version: '2.1.0' },
+        serverInfo: { name: 'ini-brain-ai-universal', version: '3.0.0' },
         instructions: GOLDEN_PROMPT
       };
     }
@@ -166,7 +191,11 @@ class IniBrainMcpServer {
       case 'ini_brain_generate_agent_guide': return text(await generateAgentGuide(args), true);
       case 'ini_brain_suggest_skills': return text(await suggestSkills(args), true);
       case 'ini_brain_generate_workflow': return text(await readText(path.join(getWorkspace(args), '.brain', 'workflow.md'), 'Run ini_brain_generate_agent_guide first.'), false);
-      default: throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+      default:
+        if (Object.prototype.hasOwnProperty.call(EXTRA_TOOLS, name)) {
+          return text(await EXTRA_TOOLS[name].handler(args, ws), true);
+        }
+        throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
   }
 
@@ -346,6 +375,19 @@ function workspaceProperty(): Record<string, unknown> {
     workspace: {
       type: 'string',
       description: 'Optional project root override. Usually omitted because INI Brain auto-detects the active workspace.'
+    }
+  };
+}
+
+function withWorkspaceInput(inputSchema: Record<string, unknown>): Record<string, unknown> {
+  const properties = typeof inputSchema.properties === 'object' && inputSchema.properties !== null
+    ? inputSchema.properties as Record<string, unknown>
+    : {};
+  return {
+    ...inputSchema,
+    properties: {
+      ...workspaceProperty(),
+      ...properties
     }
   };
 }

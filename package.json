@@ -1,8 +1,8 @@
 {
   "name": "ini-brain-ai-universal",
   "displayName": "INI Brain AI Universal",
-  "description": "Local-first project memory, MCP context, automatic background scanning, and built-in golden prompt for Codex, Claude Desktop, Cline, Antigravity, and any MCP client.",
-  "version": "2.1.0",
+  "description": "Local-first AI productivity platform: project memory, token savings (Caveman+Ponytail), Spec-Driven Development, knowledge graph, and universal adapter for Claude/Codex/Cline/Cursor/Windsurf/Antigravity/Gemini/Copilot/OpenCode/Kimi/Kiro and any MCP client.",
+  "version": "3.0.0",
   "publisher": "ini-brain",
   "license": "MIT",
   "engines": {
@@ -15,18 +15,7 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onView:iniBrain.sidebar",
-    "onCommand:iniBrain.scanProject",
-    "onCommand:iniBrain.rebuildBrain",
-    "onCommand:iniBrain.guidedSetup",
-    "onCommand:iniBrain.generateAgentGuide",
-    "onCommand:iniBrain.generateSkillsWorkflow",
-    "onCommand:iniBrain.saveMemory",
-    "onCommand:iniBrain.searchMemory",
-    "onCommand:iniBrain.showProjectProfile",
-    "onCommand:iniBrain.copyMcpConfig",
-    "onCommand:iniBrain.installIntegrations",
-    "onCommand:iniBrain.configureProvider"
+    "onView:iniBrain.sidebar"
   ],
   "main": "./dist/extension.js",
   "bin": {
@@ -34,50 +23,45 @@
   },
   "contributes": {
     "commands": [
-      {
-        "command": "iniBrain.scanProject",
-        "title": "INI Brain: Scan Project"
-      },
-      {
-        "command": "iniBrain.rebuildBrain",
-        "title": "INI Brain: Rebuild Brain"
-      },
-      {
-        "command": "iniBrain.guidedSetup",
-        "title": "INI Brain: Guided Setup"
-      },
-      {
-        "command": "iniBrain.generateAgentGuide",
-        "title": "INI Brain: Generate Agent Guide"
-      },
-      {
-        "command": "iniBrain.generateSkillsWorkflow",
-        "title": "INI Brain: Generate Skills and Workflow"
-      },
-      {
-        "command": "iniBrain.saveMemory",
-        "title": "INI Brain: Save Memory"
-      },
-      {
-        "command": "iniBrain.searchMemory",
-        "title": "INI Brain: Search Memory"
-      },
-      {
-        "command": "iniBrain.showProjectProfile",
-        "title": "INI Brain: Show Project Profile"
-      },
-      {
-        "command": "iniBrain.copyMcpConfig",
-        "title": "INI Brain: Copy MCP Config"
-      },
-      {
-        "command": "iniBrain.installIntegrations",
-        "title": "INI Brain: Install Integrations"
-      },
-      {
-        "command": "iniBrain.configureProvider",
-        "title": "INI Brain: Configure AI Provider"
-      }
+      { "command": "iniBrain.scanProject", "title": "INI Brain: Scan Project" },
+      { "command": "iniBrain.rebuildBrain", "title": "INI Brain: Rebuild Brain" },
+      { "command": "iniBrain.guidedSetup", "title": "INI Brain: Guided Setup" },
+      { "command": "iniBrain.generateAgentGuide", "title": "INI Brain: Generate Agent Guide" },
+      { "command": "iniBrain.generateSkillsWorkflow", "title": "INI Brain: Generate Skills and Workflow" },
+      { "command": "iniBrain.saveMemory", "title": "INI Brain: Save Memory" },
+      { "command": "iniBrain.searchMemory", "title": "INI Brain: Search Memory" },
+      { "command": "iniBrain.showProjectProfile", "title": "INI Brain: Show Project Profile" },
+      { "command": "iniBrain.copyMcpConfig", "title": "INI Brain: Copy MCP Config" },
+      { "command": "iniBrain.installIntegrations", "title": "INI Brain: Install Integrations" },
+      { "command": "iniBrain.configureProvider", "title": "INI Brain: Configure AI Provider" },
+
+      { "command": "iniBrain.enableCaveman", "title": "INI Brain: Enable Caveman Mode (output -70%)" },
+      { "command": "iniBrain.disableCaveman", "title": "INI Brain: Disable Caveman Mode" },
+      { "command": "iniBrain.enablePonytail", "title": "INI Brain: Enable Ponytail Mode (code -54%)" },
+      { "command": "iniBrain.disablePonytail", "title": "INI Brain: Disable Ponytail Mode" },
+      { "command": "iniBrain.enableClaudeLean", "title": "INI Brain: Enable Claude Lean Rules" },
+      { "command": "iniBrain.disableClaudeLean", "title": "INI Brain: Disable Claude Lean Rules" },
+      { "command": "iniBrain.enableAllSavings", "title": "INI Brain: Enable All Savings (recommended)" },
+      { "command": "iniBrain.disableAllSavings", "title": "INI Brain: Disable All Savings" },
+      { "command": "iniBrain.switchSavingsLevel", "title": "INI Brain: Switch Savings Level (lite/full/ultra)" },
+      { "command": "iniBrain.showTokenDashboard", "title": "INI Brain: Show Token Savings Dashboard" },
+      { "command": "iniBrain.measureFileTokens", "title": "INI Brain: Measure Current File Tokens" },
+
+      { "command": "iniBrain.specCreate", "title": "INI Brain: Create Spec (SDD)" },
+      { "command": "iniBrain.specPlan", "title": "INI Brain: Generate Plan from Spec" },
+      { "command": "iniBrain.specTasks", "title": "INI Brain: Break Spec into Tasks" },
+      { "command": "iniBrain.specImplement", "title": "INI Brain: Open Next Task to Implement" },
+
+      { "command": "iniBrain.buildKnowledgeGraph", "title": "INI Brain: Build Knowledge Graph" },
+      { "command": "iniBrain.showKnowledgeGraph", "title": "INI Brain: Show Knowledge Graph" },
+      { "command": "iniBrain.findImpact", "title": "INI Brain: Find Impact (Blast Radius)" },
+
+      { "command": "iniBrain.installAllAgents", "title": "INI Brain: Install Skills for All Agents" },
+      { "command": "iniBrain.removeAllAgents", "title": "INI Brain: Remove Skills from All Agents" },
+
+      { "command": "iniBrain.checkUpstream", "title": "INI Brain: Check Upstream Updates" },
+      { "command": "iniBrain.applyUpstream", "title": "INI Brain: Apply Upstream Updates" },
+      { "command": "iniBrain.configureAutoUpdate", "title": "INI Brain: Configure Auto-Update" }
     ],
     "viewsContainers": {
       "activitybar": [
@@ -121,6 +105,65 @@
           "minimum": 1,
           "maximum": 80,
           "description": "Maximum relevant files included in generated task context."
+        },
+        "iniBrain.caveman.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Caveman compression skill (reduces AI output verbosity ~70%)."
+        },
+        "iniBrain.caveman.mode": {
+          "type": "string",
+          "enum": ["lite", "full", "ultra", "wenyan"],
+          "default": "full",
+          "description": "Caveman compression level."
+        },
+        "iniBrain.ponytail.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Ponytail lazy-senior-dev skill (reduces generated code ~54%)."
+        },
+        "iniBrain.ponytail.mode": {
+          "type": "string",
+          "enum": ["lite", "full", "ultra"],
+          "default": "full",
+          "description": "Ponytail strictness level."
+        },
+        "iniBrain.claudeLean.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Claude lean response rules (no preamble, no sycophancy)."
+        },
+        "iniBrain.specKit.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable local Spec-Driven Development workflow."
+        },
+        "iniBrain.graph.autoBuild": {
+          "type": "boolean",
+          "default": false,
+          "description": "Auto-build knowledge graph on scan."
+        },
+        "iniBrain.adapter.installOnEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Deploy skills to all detected agents when a skill is enabled."
+        },
+        "iniBrain.autoUpdate.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Periodically check upstream repos for skill updates."
+        },
+        "iniBrain.autoUpdate.intervalHours": {
+          "type": "number",
+          "default": 168,
+          "minimum": 24,
+          "maximum": 720,
+          "description": "Interval between upstream checks in hours (default: 1 week)."
+        },
+        "iniBrain.autoUpdate.requireApproval": {
+          "type": "boolean",
+          "default": true,
+          "description": "Always ask before applying upstream updates."
         }
       }
     }
@@ -131,6 +174,10 @@
     "test:workspace": "node scripts/workspace-detection-smoke.cjs",
     "test:mcp-config": "node scripts/mcp-config-smoke.cjs",
     "smoke:mcp": "node scripts/mcp-smoke.cjs",
+    "smoke:savings": "node scripts/savings-smoke.cjs",
+    "smoke:adapters": "node scripts/adapters-smoke.cjs",
+    "smoke:updater": "node scripts/updater-smoke.cjs",
+    "smoke:all": "npm run smoke:mcp && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
   },

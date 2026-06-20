@@ -1,5 +1,30 @@
 # INI Brain AI Universal
 
+## What's New in 3.0.0
+
+- **Caveman Mode** - output tokens -70%
+- **Ponytail Mode** - generated code -54%
+- **Claude Lean** - no preamble, no sycophancy
+- **Spec-Kit Lite** - local SDD workflow
+- **Knowledge Graph** - visual project map
+- **12 Agent Adapters** - Claude/Codex/Cline/Cursor/Windsurf/Antigravity/Gemini/Copilot/OpenCode/Kimi/Kiro + universal
+- **Auto-Update** - tracks 7 upstream sources
+- **Bilingual Docs** - Arabic + English
+
+See: [docs/features/ar/overview.md](docs/features/ar/overview.md) | [docs/features/en/overview.md](docs/features/en/overview.md)
+
+## Acknowledgements
+
+MIT-licensed projects integrated:
+- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
+- [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
+- [drona23/claude-token-efficient](https://github.com/drona23/claude-token-efficient)
+- [github/spec-kit](https://github.com/github/spec-kit)
+- [obra/superpowers](https://github.com/obra/superpowers)
+- [safishamsi/graphify](https://github.com/safishamsi/graphify)
+- [alexgreensh/token-optimizer](https://github.com/alexgreensh/token-optimizer)
+
+
 > **Version 2.1.0** — Local-first project memory and context platform for AI coding agents (Codex, Claude Desktop, Cline, Antigravity, any MCP client).
 
 GitHub: https://github.com/inisoliman/ini-brain-ai-universal

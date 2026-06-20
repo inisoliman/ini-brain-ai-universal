@@ -1,6 +1,9 @@
 src/**
 .vscode/**
 .brain/**
+.cline/**
+.clinerules/**
+.codex/**
 docs/superpowers/**
 scripts/**
 *.map
