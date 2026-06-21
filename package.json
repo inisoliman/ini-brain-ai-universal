@@ -2,7 +2,7 @@
   "name": "ini-brain-ai-universal",
   "displayName": "INI Brain AI Universal",
   "description": "Local-first AI productivity platform: project memory, token savings (Caveman+Ponytail), Spec-Driven Development, knowledge graph, and universal adapter for Claude/Codex/Cline/Cursor/Windsurf/Antigravity/Gemini/Copilot/OpenCode/Kimi/Kiro and any MCP client.",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "publisher": "ini-brain",
   "license": "MIT",
   "engines": {
@@ -243,10 +243,12 @@
     "test:workspace": "node scripts/workspace-detection-smoke.cjs",
     "test:mcp-config": "node scripts/mcp-config-smoke.cjs",
     "smoke:mcp": "node scripts/mcp-smoke.cjs",
+    "smoke:memory": "node scripts/memory-smoke.cjs",
     "smoke:savings": "node scripts/savings-smoke.cjs",
     "smoke:adapters": "node scripts/adapters-smoke.cjs",
     "smoke:updater": "node scripts/updater-smoke.cjs",
-    "smoke:all": "npm run smoke:mcp && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater",
+    "audit:public": "node scripts/public-release-audit.cjs",
+    "smoke:all": "npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
   },

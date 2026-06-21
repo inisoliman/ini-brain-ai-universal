@@ -1,18 +1,31 @@
-# INI Brain AI Universal — Overview
+# INI Brain AI Universal - Overview
 
-A local VS Code extension combining 7 powerful features:
-1. **Project Memory** — decisions, bugs, workflows.
-2. **Caveman** — compresses AI responses ~70%.
-3. **Ponytail** — reduces generated code ~54%.
-4. **Claude Lean** — strict behavior rules.
-5. **Spec-Kit Lite** — local SDD workflow.
-6. **Knowledge Graph** — visual project map.
-7. **Auto-Update** — tracks upstream sources.
+A local VS Code extension and MCP server for project memory, context engineering, token savings, Spec-Driven Development, knowledge graphs, agent adapters, and quality guards.
 
-Works with 12 AI agents. Expected savings: 60-80% of AI API costs.
+## Core Features
 
-Quick start:
-1. Install `.vsix`.
-2. `INI Brain: Guided Setup`.
-3. `INI Brain: Enable All Savings`.
-4. `INI Brain: Install Skills for All Agents`.
+1. **Project Memory:** durable local decisions, bugs, workflows, preferences, and notes.
+2. **Memory Lifecycle:** metadata, expiry, pinned memories, dry-run compaction, and memory stats.
+3. **Caveman:** compresses AI responses.
+4. **Ponytail:** reduces generated code size.
+5. **Claude Lean:** strict behavior rules.
+6. **Spec-Kit Lite:** local SDD workflow.
+7. **Knowledge Graph:** visual project map and impact analysis.
+8. **Auto-Update:** tracks approved upstream skill sources.
+9. **Frontend Design Guard:** layout, accessibility, contrast, responsive, state, and screenshot checks for UI work.
+
+## Supported Agents
+
+Claude Code, Codex, Cline, Cursor, Windsurf, Antigravity, Gemini, Copilot, OpenCode, Kimi, Kiro, and generic MCP clients.
+
+## Privacy Boundary
+
+INI Brain is local-first. Workspace memory and generated context stay inside `.brain/` unless you explicitly copy or send them to another tool. AgentMemory and Impeccable are used as conceptual inspiration only; they are not bundled runtime dependencies.
+
+## Quick Start
+
+1. Install the VSIX.
+2. Run `INI Brain: Guided Setup`.
+3. Run `INI Brain: Enable All Savings` if you want compression workflows.
+4. Run `INI Brain: Install Skills for All Agents`.
+5. Ask your MCP client to call `ini_brain_auto_brief` before editing.

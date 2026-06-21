@@ -6,6 +6,7 @@ import { AutoBackground } from '../core/autoBackground';
 import { BrainStore } from '../core/brainStore';
 import { ContextBuilder } from '../core/contextBuilder';
 import { InsightBuilder } from '../core/insightBuilder';
+import { compactMemories, getMemoryStats } from '../core/memoryCompactor';
 import { MemoryStore, parseCsvList } from '../core/memoryStore';
 import { ProjectScanner } from '../core/projectScanner';
 import { MemoryKind } from '../core/types';
@@ -80,8 +81,10 @@ const TOOLS = [
   { name: 'ini_brain_status', description: 'Show workspace and INI Brain status.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_get_context', description: 'Build compact task context from project brain and runtime memory. Call before editing.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string' }, budgetChars: { type: 'number' } }, required: ['task'] }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_search_memory', description: 'Search local runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), query: { type: 'string' }, limit: { type: 'number' } }, required: ['query'] }, annotations: readOnlyAnnotations() },
-  { name: 'ini_brain_save_memory', description: 'Save durable project memory after a task.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), content: { type: 'string' }, kind: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, concepts: { type: 'array', items: { type: 'string' } }, importance: { type: 'number' } }, required: ['content'] }, annotations: localWriteAnnotations() },
+  { name: 'ini_brain_save_memory', description: 'Save durable project memory after a task.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), content: { type: 'string' }, kind: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, concepts: { type: 'array', items: { type: 'string' } }, importance: { type: 'number' }, confidence: { type: 'number' }, expiresAt: { type: 'string' }, pinned: { type: 'boolean' }, origin: { type: 'string' } }, required: ['content'] }, annotations: localWriteAnnotations() },
   { name: 'ini_brain_list_memories', description: 'List the most recent durable memories.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), limit: { type: 'number' } } }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_memory_stats', description: 'Return local memory lifecycle stats, including pinned, expired, and kind counts.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_memory_compact', description: 'Preview or apply safe local memory compaction. Defaults to dry-run preview; pass apply=true to write deduped/retained memories.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), apply: { type: 'boolean', description: 'When true, apply the compaction after returning a dry-run preview.' } } }, annotations: localWriteAnnotations() },
   { name: 'ini_brain_project_profile', description: 'Return project map and memory profile.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_onboarding', description: 'Generate a project onboarding guide (start-here files, entry points, complexity hotspots) without an LLM.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_explain', description: 'Explain a single file: exports, dependencies, dependents and summary.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), path: { type: 'string', description: 'Project-relative file path.' } }, required: ['path'] }, annotations: readOnlyAnnotations() },
@@ -165,7 +168,7 @@ class IniBrainMcpServer {
       return {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'ini-brain-ai-universal', version: '3.0.0' },
+        serverInfo: { name: 'ini-brain-ai-universal', version: '3.1.0' },
         instructions: GOLDEN_PROMPT
       };
     }
@@ -184,6 +187,8 @@ class IniBrainMcpServer {
       case 'ini_brain_search_memory': return text(await searchMemory(args), true);
       case 'ini_brain_save_memory': return text(await saveMemory(args), true);
       case 'ini_brain_list_memories': return text(await listMemories(args), true);
+      case 'ini_brain_memory_stats': return text(await memoryStats(args), true);
+      case 'ini_brain_memory_compact': return text(await memoryCompact(args), true);
       case 'ini_brain_project_profile': return text(await projectProfile(args), true);
       case 'ini_brain_onboarding': return text(await onboarding(args), false);
       case 'ini_brain_explain': return text(await explain(args), false);
@@ -246,7 +251,11 @@ async function saveMemory(args: Record<string, unknown>): Promise<Record<string,
     files: Array.isArray(args.files) ? args.files.map(String) : parseCsvList(typeof args.files === 'string' ? args.files : undefined),
     concepts: Array.isArray(args.concepts) ? args.concepts.map(String) : parseCsvList(typeof args.concepts === 'string' ? args.concepts : undefined),
     importance: typeof args.importance === 'number' ? args.importance : 7,
-    source: 'agent'
+    source: 'agent',
+    confidence: typeof args.confidence === 'number' ? args.confidence : undefined,
+    expiresAt: typeof args.expiresAt === 'string' ? args.expiresAt : undefined,
+    pinned: args.pinned === true,
+    origin: typeof args.origin === 'string' ? args.origin : 'mcp'
   });
   return { workspace, saved: true, entry };
 }
@@ -340,6 +349,23 @@ async function listMemories(args: Record<string, unknown>): Promise<Record<strin
   const limit = typeof args.limit === 'number' ? args.limit : 20;
   const memories = await new MemoryStore(workspace).list(limit);
   return { workspace, total: memories.length, memories };
+}
+
+async function memoryStats(args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const workspace = getWorkspace(args);
+  return { workspace, stats: await getMemoryStats(workspace) };
+}
+
+async function memoryCompact(args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const workspace = getWorkspace(args);
+  const preview = await compactMemories(workspace, { dryRun: true });
+  if (args.apply !== true) return { workspace, applied: false, preview };
+  return {
+    workspace,
+    applied: true,
+    preview,
+    result: await compactMemories(workspace, { dryRun: false })
+  };
 }
 
 async function onboarding(args: Record<string, unknown>): Promise<string> {

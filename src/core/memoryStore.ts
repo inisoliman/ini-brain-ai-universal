@@ -18,6 +18,10 @@ export class MemoryStore {
     concepts?: string[];
     importance?: number;
     source?: MemoryEntry['source'];
+    confidence?: number;
+    expiresAt?: string;
+    pinned?: boolean;
+    origin?: string;
   }): Promise<MemoryEntry> {
     const memories = await this.readAll();
     const now = new Date().toISOString();
@@ -29,6 +33,10 @@ export class MemoryStore {
       concepts: input.concepts || [],
       importance: clamp(input.importance || 7, 1, 10),
       source: input.source || 'manual',
+      confidence: clampDecimal(input.confidence ?? 1, 0, 1),
+      expiresAt: validIsoDate(input.expiresAt) ? input.expiresAt : undefined,
+      pinned: input.pinned === true,
+      origin: cleanOrigin(input.origin) || 'local',
       createdAt: now,
       updatedAt: now,
       accessCount: 0
@@ -40,7 +48,9 @@ export class MemoryStore {
 
   async search(query: string, limit = 10): Promise<MemorySearchResult[]> {
     const queryTokens = tokenize(query);
+    const now = new Date().toISOString();
     const results = (await this.readAll())
+      .filter(entry => !isExpired(entry, now) || entry.pinned)
       .map(entry => scoreEntry(entry, queryTokens))
       .filter(result => result.score > 0)
       .sort((a, b) => b.score - a.score)
@@ -68,6 +78,14 @@ export class MemoryStore {
       .slice(0, Math.max(1, Math.min(50, Math.floor(limit))));
   }
 
+  async listAll(): Promise<MemoryEntry[]> {
+    return this.readAll();
+  }
+
+  async replaceAll(entries: MemoryEntry[]): Promise<void> {
+    await this.writeAll(entries.map((entry, index) => normalizeMemoryEntry(entry, index)).filter(isPresent));
+  }
+
   async buildProfile(): Promise<ProjectMemoryProfile> {
     const entries = await this.readAll();
     return {
@@ -83,7 +101,7 @@ export class MemoryStore {
   private async readAll(): Promise<MemoryEntry[]> {
     try {
       const parsed = JSON.parse(await fs.readFile(this.file, 'utf8')) as MemoryEntry[];
-      return Array.isArray(parsed) ? parsed.filter(isMemoryEntry) : [];
+      return Array.isArray(parsed) ? parsed.map(normalizeMemoryEntry).filter(isPresent) : [];
     } catch {
       return [];
     }
@@ -117,16 +135,59 @@ export function scoreEntry(entry: MemoryEntry, queryTokens: string[]): MemorySea
   return {
     entry,
     matches,
-    score: matches.length * 10 + entry.importance + Math.min(entry.accessCount, 10)
+    score: matches.length * 10 + entry.importance + Math.min(entry.accessCount, 10) + Math.round((entry.confidence ?? 1) * 5) + (entry.pinned ? 3 : 0)
   };
 }
 
-function isMemoryEntry(value: unknown): value is MemoryEntry {
-  return Boolean(value) && typeof value === 'object' && typeof (value as MemoryEntry).id === 'string' && typeof (value as MemoryEntry).content === 'string';
+export function isExpired(entry: MemoryEntry, nowIso = new Date().toISOString()): boolean {
+  return Boolean(entry.expiresAt && entry.expiresAt < nowIso);
+}
+
+function normalizeMemoryEntry(value: unknown, index = 0): MemoryEntry | null {
+  if (!value || typeof value !== 'object') return null;
+  const raw = value as Partial<MemoryEntry>;
+  if (typeof raw.content !== 'string' || !raw.content.trim()) return null;
+  const now = new Date().toISOString();
+  return {
+    id: typeof raw.id === 'string' && raw.id.trim() ? raw.id : `mem_legacy_${index}`,
+    kind: raw.kind && memoryKinds.includes(raw.kind) ? raw.kind : 'note',
+    content: raw.content.trim(),
+    files: Array.isArray(raw.files) ? raw.files.map(String).filter(Boolean) : [],
+    concepts: Array.isArray(raw.concepts) ? raw.concepts.map(String).filter(Boolean) : [],
+    importance: clamp(typeof raw.importance === 'number' ? raw.importance : 7, 1, 10),
+    source: isMemorySource(raw.source) ? raw.source : 'manual',
+    confidence: clampDecimal(typeof raw.confidence === 'number' ? raw.confidence : 1, 0, 1),
+    expiresAt: validIsoDate(raw.expiresAt) ? raw.expiresAt : undefined,
+    pinned: raw.pinned === true,
+    origin: cleanOrigin(raw.origin) || 'legacy',
+    createdAt: validIsoDate(raw.createdAt) ? raw.createdAt : now,
+    updatedAt: validIsoDate(raw.updatedAt) ? raw.updatedAt : (validIsoDate(raw.createdAt) ? raw.createdAt : now),
+    accessCount: clamp(typeof raw.accessCount === 'number' ? raw.accessCount : 0, 0, Number.MAX_SAFE_INTEGER)
+  };
 }
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, Math.floor(value)));
+}
+
+function clampDecimal(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function isMemorySource(value: unknown): value is MemoryEntry['source'] {
+  return typeof value === 'string' && ['manual', 'ai', 'agent', 'system'].includes(value);
+}
+
+function validIsoDate(value: unknown): value is string {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value));
+}
+
+function cleanOrigin(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim().slice(0, 120) : undefined;
+}
+
+function isPresent<T>(value: T | null): value is T {
+  return value !== null;
 }
 
 function countValues(values: string[]): Array<[string, number]> {

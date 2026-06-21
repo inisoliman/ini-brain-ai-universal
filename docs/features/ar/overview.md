@@ -1,22 +1,31 @@
-# INI Brain AI Universal — نظرة عامة
+# INI Brain AI Universal - نظرة عامة
 
-## ما هي الإضافة؟
-إضافة VS Code محلية تجمع 7 ميزات قوية:
-1. **ذاكرة المشروع:** تحفظ القرارات والـ bugs والـworkflows.
-2. **Caveman:** يضغط ردود الـAI ~70٪.
-3. **Ponytail:** يقلّل الكود المولّد ~54٪.
-4. **Claude Lean:** قواعد سلوك صارمة لـClaude.
-5. **Spec-Kit Lite:** منهجية SDD محلية.
-6. **Knowledge Graph:** رسم مرئي لتبعيات المشروع.
-7. **Auto-Update:** يتابع تحديثات المصادر تلقائياً.
+إضافة محلية لـ VS Code وخادم MCP تساعد وكلاء الذكاء الاصطناعي على فهم المشروع من خلال ذاكرة محلية، سياق مضغوط، مهارات جودة، خرائط معرفة، وتكامل مع عدة وكلاء.
 
-## يعمل مع 12 وكيل AI:
-Claude Code, Codex, Cline, Cursor, Windsurf, Antigravity, Gemini, Copilot, OpenCode, Kimi, Kiro + أي MCP client.
+## الميزات الأساسية
 
-## التوفير المتوقع: 60–80٪ من تكاليف الـAI.
+1. **ذاكرة المشروع:** قرارات، أخطاء، تفضيلات، ملاحظات، وخطوات عمل محفوظة محلياً.
+2. **دورة حياة الذاكرة:** ثقة، انتهاء صلاحية، تثبيت ذكريات مهمة، تنظيف آمن، وإحصاءات.
+3. **Caveman:** ضغط ردود الذكاء الاصطناعي.
+4. **Ponytail:** تقليل حجم الكود المولد.
+5. **Claude Lean:** قواعد سلوك مختصرة وصارمة.
+6. **Spec-Kit Lite:** منهجية مواصفات وخطط ومهام محلية.
+7. **Knowledge Graph:** خريطة مرئية للمشروع وتحليل التأثير.
+8. **Auto-Update:** متابعة مصادر المهارات المعتمدة بعد موافقة المستخدم.
+9. **Frontend Design Guard:** مراجعة الواجهات من ناحية التخطيط، الوصول، التباين، التجاوب، الحالات، ولقطات الشاشة.
 
-## ابدأ:
-1. ثبّت `.vsix`.
-2. `INI Brain: Guided Setup`.
-3. `INI Brain: Enable All Savings`.
-4. `INI Brain: Install Skills for All Agents`.
+## الوكلاء المدعومون
+
+Claude Code, Codex, Cline, Cursor, Windsurf, Antigravity, Gemini, Copilot, OpenCode, Kimi, Kiro وأي عميل MCP عام.
+
+## الخصوصية
+
+الإضافة تعمل محلياً أولاً. ذاكرة المشروع والسياق الناتج يبقيان داخل `.brain/` ما لم تقم أنت بنسخهما أو إرسالهما لأداة أخرى. AgentMemory وImpeccable مصدر إلهام فقط، وليسا اعتمادين يعملان داخل الإضافة.
+
+## البداية السريعة
+
+1. ثبت ملف VSIX.
+2. شغل `INI Brain: Guided Setup`.
+3. شغل `INI Brain: Enable All Savings` إذا أردت ميزات الضغط.
+4. شغل `INI Brain: Install Skills for All Agents`.
+5. اطلب من عميل MCP استدعاء `ini_brain_auto_brief` قبل التعديل.

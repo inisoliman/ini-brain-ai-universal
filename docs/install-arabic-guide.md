@@ -1,167 +1,68 @@
- # 📘 دليل تثبيت INI Brain AI على Codex و Claude (نسخة عربية)
+# دليل تثبيت INI Brain AI Universal
 
-> **خلاصة سريعة:** الإضافة جاهزة بالفعل ومدعومة. لا تحتاج إلى إنشاء بلجن جديد — فقط ابني سيرفر MCP مرة واحدة، وأضفه لإعدادات Codex و Claude.
+الإصدار: 3.1.0
 
----
+## الفكرة
 
-## 🧠 الفكرة باختصار
+INI Brain AI Universal إضافة VS Code وخادم MCP محلي. تفحص المشروع، تنشئ `.brain/` و`AGENTS.md`، ثم توفر أدوات MCP لوكلاء مثل Codex وClaude وCline حتى يحصلوا على سياق المشروع والذاكرة قبل التعديل.
 
-`INI Brain AI Universal` ليست إضافة VS Code فقط. إنها **سيرفر MCP محلي** يتكلم مع أي عميل ذكاء اصطناعي يدعم بروتوكول MCP (وهذا ما يدعمه Codex و Claude Desktop و Cline).
-
-عند توصيله بـ Codex أو Claude يصبح لديهم **13 أداة** جديدة تلقائيًا:
-
-| الأداة | الوظيفة |
-|---|---|
-| 🌟 **`ini_brain_auto_brief`** | **(جديد)** يُستدعى تلقائياً في بداية أي مهمة - يحمل AGENTS.md + السياق + الذاكرة + البرومبت الذهبي |
-| `ini_brain_status` | حالة المشروع |
-| `ini_brain_get_context` | بناء سياق ذكي لأي مهمة |
-| `ini_brain_search_memory` | بحث في ذاكرة المشروع |
-| `ini_brain_save_memory` | حفظ ذاكرة دائمة |
-| 🆕 `ini_brain_list_memories` | عرض آخر الذكريات |
-| `ini_brain_project_profile` | ملف تعريف المشروع |
-| 🆕 `ini_brain_onboarding` | دليل بداية المشروع (entry points + hotspots) |
-| 🆕 `ini_brain_explain` | شرح ملف معين (deps، exports، dependents) |
-| 🆕 `ini_brain_impact` | تحليل تأثير تغيير ملفات (blast radius) |
-| `ini_brain_generate_agent_guide` | توليد AGENTS.md و .brain/ |
-| `ini_brain_suggest_skills` | اقتراح المهارات |
-| `ini_brain_generate_workflow` | توليد سير العمل |
-
-## ✨ ما الجديد في 2.1.0
-
-### 1. لا حاجة لكتابة البرومبت الذهبي بعد الآن!
-البرومبت يأتي تلقائياً مع كل اتصال (في `instructions` الـ MCP)، والوكيل (Codex/Claude) يقرأه قبل أي مهمة. كما يمكنك استدعاء `ini_brain_auto_brief` في بداية كل محادثة لتلقي:
-- AGENTS.md كاملاً
-- ملخص المشروع
-- آخر القرارات والمهام
-- الذكريات المرتبطة
-- البرومبت الذهبي
-
-### 2. فحص في الخلفية تلقائياً
-عند بدء سيرفر MCP يقوم بـ:
-- فحص `.brain/` — إن كان غير موجود أو أقدم من 24 ساعة، يبدأ scan في الخلفية فوراً.
-- تشغيل `fs.watch` على `src/`, `lib/`, `app/`, `pages/`, إلخ — أي تعديل ملف يُعيد توليد `.brain/` و `AGENTS.md` بعد 5 ثوانٍ.
-- كل استدعاء أداة يتأكد من حداثة السياق قبل العمل.
-
-### 3. أدوات تحليل متقدمة
-- `ini_brain_onboarding`: للمشاريع الجديدة، يعطيك entry points و complexity hotspots بدون LLM.
-- `ini_brain_explain`: لشرح ملف قبل تعديله.
-- `ini_brain_impact`: لمعرفة الملفات المتأثرة قبل أي تعديل.
-
-### 4. حُرّاس الجودة (Quality Guards) — مدمجون تلقائياً 🛡️
-عند أي scan/auto-brief يتم نسخ ثلاثة حُرّاس صارمين إلى المشروع تلقائياً:
-
-| الحارس | الوظيفة |
-|---|---|
-| **`clean-code-guard`** | 19 قاعدة Clean Code + SOLID + DRY + KISS + قواعد ضد هلوسة الـ LLM (لا تخترع APIs، لا تبتلع الأخطاء، لا تكتب fixtures مزيّفة، إلخ). |
-| **`test-guard`** | 8 قواعد لاختبارات حقيقية (لا اختبار يمر دائماً، لا تعطيل اختبارات لإنجاح suite، تغطية الحدود). |
-| **`karpathy-guidelines`** | إرشادات Andrej Karpathy السلوكية: فكّر قبل أن تبرمج، البساطة أولاً، تغييرات جراحية، أهداف قابلة للتحقق. |
-
-تُنسخ الحُرّاس إلى:
-- `<project>/.brain/skills/` (للسياق المحلي)
-- `<project>/.clinerules/skills/` و `.cline/skills/` (لـ Cline يقرأها تلقائياً)
-- `<project>/.codex/skills/<id>/SKILL.md` (لـ Codex يقرأها كـ skills)
-- `<project>/.brain/quality_gates.md` يضمها في قسم "Built-in Quality Guards"
-
-النتيجة: أي وكيل (Codex/Claude/Cline/Cursor) يلتزم بنفس قواعد الجودة العالية في كل المشاريع.
-
----
-
-## ⚡ التثبيت التلقائي (موصى به)
-
-أنشأت لك سكربت واحد يقوم بكل شيء:
+## التثبيت السريع
 
 ```powershell
-cd "C:\Users\helen\Downloads\vs\exbrain.all\ini-brain-ai-universal"
+git clone https://github.com/inisoliman/ini-brain-ai-universal.git
+cd ini-brain-ai-universal
 powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1
 ```
 
-السكربت سيقوم بـ:
-1. ✅ التحقق من Node.js
-2. ✅ `npm install` ثم `npm run compile` (يبني `dist/mcp/server.js`)
-3. ✅ إضافة السيرفر تلقائيًا إلى `~/.codex/config.toml`
-4. ✅ إضافة السيرفر تلقائيًا إلى Claude Desktop
-5. ✅ إضافة السيرفر تلقائيًا إلى Cline (إن كان مثبتًا)
-
-### معاملات اختيارية
+يمكن تخطي بعض الأهداف:
 
 ```powershell
-# تخطّي البناء (إذا كان dist/ موجود)
-.\scripts\install-all.ps1 -SkipBuild
-
-# تثبيت لـ Codex فقط
-.\scripts\install-all.ps1 -SkipClaude -SkipCline
-
-# تثبيت لـ Claude فقط
-.\scripts\install-all.ps1 -SkipCodex -SkipCline
+powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1 -SkipClaude -SkipCline
 ```
 
----
-
-## 🔧 التثبيت اليدوي
-
-### المتطلبات
-- Node.js 18+ (لديك v24 ✅)
-- Codex CLI أو Claude Desktop مثبتين
-
-### الخطوة 1: بناء السيرفر مرة واحدة
+## تثبيت VS Code
 
 ```powershell
-cd "C:\Users\helen\Downloads\vs\exbrain.all\ini-brain-ai-universal"
 npm install
 npm run compile
+npm run package
+code --install-extension .\ini-brain-ai-universal-3.1.0.vsix --force
 ```
 
-يجب أن يظهر الملف:
-```
-ini-brain-ai-universal\dist\mcp\server.js
-```
+بعد التثبيت:
 
----
+1. افتح أي مشروع.
+2. افتح لوحة **INI Brain AI**.
+3. شغل **INI Brain: Scan Project**.
+4. استخدم **Ask AI** أو **Copy MCP Config** حسب الأداة التي تعمل بها.
 
-### الخطوة 2: تثبيت على Codex CLI
+## إعداد Codex
 
-#### الطريقة (أ) - أمر تلقائي:
 ```powershell
-codex mcp add ini-brain-ai -- node "C:/Users/helen/Downloads/vs/exbrain.all/ini-brain-ai-universal/dist/mcp/server.js"
+codex mcp add ini-brain-ai -- node "C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"
 ```
 
-#### الطريقة (ب) - يدويًا:
-افتح الملف `C:\Users\helen\.codex\config.toml` (أنشئه إن لم يكن موجود) وأضف:
+أو يدوياً داخل `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.ini-brain-ai]
-command = 'node'
-args = ['C:/Users/helen/Downloads/vs/exbrain.all/ini-brain-ai-universal/dist/mcp/server.js']
+command = "node"
+args = ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"]
 startup_timeout_sec = 120
 ```
 
-ثم شغّل Codex من جذر مشروعك:
-```powershell
-cd C:\path\to\your\project
-codex
-```
+افتح Codex من جذر المشروع الذي تريد العمل عليه.
 
----
+## إعداد Cline أو Claude أو أي عميل MCP
 
-### الخطوة 3: تثبيت على Claude Desktop
-
-افتح ملف الإعدادات:
-```
-%APPDATA%\Claude\claude_desktop_config.json
-```
-
-أو من Claude Desktop: **Settings → Developer → Edit Config**
-
-أضف (أو ادمج) هذا:
+استخدم نفس الفكرة العامة:
 
 ```json
 {
   "mcpServers": {
     "ini-brain-ai": {
       "command": "node",
-      "args": [
-        "C:/Users/helen/Downloads/vs/exbrain.all/ini-brain-ai-universal/dist/mcp/server.js"
-      ],
+      "args": ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"],
       "disabled": false,
       "autoApprove": []
     }
@@ -169,125 +70,53 @@ codex
 }
 ```
 
-> ⚠️ مهم: **أغلق Claude Desktop تمامًا** (من شريط المهام أيضًا) ثم افتحه. لن تكفي إعادة التحميل العادية.
+إذا كان العميل يشغل السيرفر من مجلد مركزي وليس من جذر المشروع، أضف `INI_BRAIN_WORKSPACE` أو مرر وسيط `workspace` في استدعاءات الأدوات.
 
-بعد التشغيل ستجد أيقونة 🔨 أسفل مربع المحادثة، اضغطها لرؤية أدوات `ini_brain_*`.
+## أهم أدوات MCP
 
----
+- `ini_brain_auto_brief`
+- `ini_brain_get_context`
+- `ini_brain_search_memory`
+- `ini_brain_save_memory`
+- `ini_brain_memory_stats`
+- `ini_brain_memory_compact`
+- `ini_brain_onboarding`
+- `ini_brain_explain`
+- `ini_brain_impact`
+- `ini_brain_generate_agent_guide`
+- `ini_brain_graph_build`
+- `ini_brain_spec_create`
+- `ini_brain_savings_status`
 
-### الخطوة 4 (اختيارية): Cline داخل VS Code
+## حراس الجودة والمهارات
 
-أنشئ أو عدّل الملف:
-```
-%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json
-```
+عند تشغيل Scan Project أو Generate Agent Guide يتم إنشاء:
 
-```json
-{
-  "mcpServers": {
-    "ini-brain-ai": {
-      "command": "node",
-      "args": [
-        "C:/Users/helen/Downloads/vs/exbrain.all/ini-brain-ai-universal/dist/mcp/server.js"
-      ],
-      "disabled": false,
-      "autoApprove": []
-    }
-  }
-}
-```
+- `.brain/skills/clean-code-guard.md`
+- `.brain/skills/test-guard.md`
+- `.brain/skills/karpathy-guidelines.md`
+- `.brain/skills/frontend-design-guard.md`
+- `.codex/skills/<skill>/SKILL.md`
+- `.cline/skills/<skill>.md`
+- `.clinerules/skills/<skill>.md`
+- `.brain/quality_gates.md`
 
----
+هذه الملفات تجعل وكلاء الذكاء الاصطناعي يستخدمون نفس قواعد الجودة داخل المشروع.
 
-## ✅ التحقق من نجاح التثبيت
+## Auto Mode
 
-### في Codex:
-```
-> استدعِ أداة ini_brain_status
-```
-يجب أن يعيد لك معلومات عن المشروع الحالي.
+Auto Mode لا يكتب ملفات تلقائياً بدون موافقتك. السلوك الصحيح:
 
-### في Claude Desktop:
-1. افتح محادثة جديدة.
-2. اكتب: `استخدم ini_brain_status لإظهار حالة المشروع في C:/path/to/your/project`
-3. سيظهر طلب موافقة، اقبله.
+1. يطلب من المزود خطة وتعديلات بصيغة JSON.
+2. يعرض التعديلات المقترحة في Output.
+3. يطلب تأكيداً قبل الكتابة.
+4. يحفظ نسخة احتياطية من الملفات القديمة داخل `.brain/backups`.
 
----
-
-## 🎯 البرومبت الذهبي — أصبح تلقائياً!
-
-في الإصدار 2.1.0 لم يعد عليك كتابة أي شيء. السيرفر يرسل البرومبت الذهبي تلقائياً عبر `instructions` في رسالة `initialize` التي يقرأها العميل (Codex/Claude) عند بدء كل جلسة.
-
-البرومبت المُحقن:
-```
-INI Brain protocol for every coding task:
-1. At the START of any task, call ini_brain_auto_brief once...
-2. Before editing files, call ini_brain_get_context...
-3. Use ini_brain_search_memory whenever past decisions may matter.
-4. Use ini_brain_explain on a file before changing it...
-5. After finishing, call ini_brain_save_memory...
-```
-
-### إن لم يلتزم العميل بالبروتوكول تلقائياً، فقط اكتب:
-```
-ابدأ بـ ini_brain_auto_brief
-```
-أو بالإنجليزية:
-```
-Start with ini_brain_auto_brief
-```
-هذا الأمر القصير يكفي. الأداة بنفسها تُحمّل كل شيء (AGENTS.md + السياق + الذاكرة + البروتوكول).
-
----
-
-## 🛠️ سير العمل اليومي الكامل
-
-1. **شغّل أي عميل** (Codex/Claude/Cline) من جذر المشروع — السيرفر يكتشف المسار تلقائياً.
-2. **لا تحتاج فحصاً يدوياً** — `.brain/` و `AGENTS.md` يتم توليدهما/تحديثهما في الخلفية تلقائياً عند بدء MCP وعند تغيّر أي ملف.
-3. **اكتب مهمتك مباشرة** أو ابدأ بـ `ابدأ بـ ini_brain_auto_brief` لضمان أن العميل يقرأ السياق.
-4. **العميل سيستدعي الأدوات بنفسه** كما هو موجّه في البروتوكول الذهبي.
-5. **عند انتهاء المهمة**، اطلب: `احفظ ما تعلمناه كذاكرة دائمة` (يستدعي `ini_brain_save_memory`).
-
----
-
-## ❓ حل المشاكل
+## حل المشاكل
 
 | المشكلة | الحل |
 |---|---|
-| `dist/mcp/server.js` غير موجود | شغّل `npm run compile` داخل مجلد `ini-brain-ai-universal` |
-| Codex لا يرى الأدوات | تأكد من المسار في `~/.codex/config.toml` ثم أعد فتح Codex |
-| Claude لا يرى الأدوات | أغلق Claude **بالكامل** (Quit من system tray) وافتحه |
-| الأدوات تعمل لكن لا تجد ملفات المشروع | شغّل العميل من جذر المشروع، أو مرّر الوسيط `workspace: "C:/path/to/project"` |
-| `npm install` يفشل | تحقق من اتصال الإنترنت ومن وجود Node.js 18+ |
-
-### التشخيص السريع
-لاختبار السيرفر يدويًا:
-```powershell
-node "C:\Users\helen\Downloads\vs\exbrain.all\ini-brain-ai-universal\dist\mcp\server.js"
-```
-يجب أن يطبع `[INI Brain MCP] running locally for ...` ثم ينتظر.
-
----
-
-## 📁 المسارات المهمة
-
-| المسار | الوصف |
-|---|---|
-| `dist/mcp/server.js` | السيرفر المُجمَّع (يُشغَّل بـ node) |
-| `~/.codex/config.toml` | إعدادات Codex |
-| `%APPDATA%/Claude/claude_desktop_config.json` | إعدادات Claude Desktop |
-| `%APPDATA%/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json` | إعدادات Cline |
-| `<project>/.brain/` | ذاكرة وسياق المشروع |
-| `<project>/AGENTS.md` | دليل الوكلاء للمشروع |
-
----
-
-## 🔁 تحديث السيرفر مستقبلًا
-
-```powershell
-cd C:\Users\helen\Downloads\vs\exbrain.all\ini-brain-ai-universal
-git pull              # إن كنت من مستودع git
-npm install
-npm run compile
-```
-لا حاجة لإعادة تعديل الإعدادات — المسار ثابت.
+| `dist/mcp/server.js` غير موجود | شغل `npm run compile` |
+| Codex لا يرى الأدوات | تأكد من مسار `server.js` ثم أعد فتح Codex |
+| Cline لا يرى الأدوات | أعد تحميل MCP servers أو أعد تشغيل VS Code |
+| السياق من مشروع خاطئ | شغل العميل من جذر المشروع أو استخدم `INI_BRAIN_WORKSPACE` |

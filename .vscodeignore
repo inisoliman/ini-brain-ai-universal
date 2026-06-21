@@ -5,6 +5,7 @@ src/**
 .clinerules/**
 .codex/**
 docs/superpowers/**
+docs/plans/**
 scripts/**
 *.map
 **/*.map

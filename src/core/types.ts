@@ -62,6 +62,10 @@ export interface MemoryEntry {
   concepts: string[];
   importance: number;
   source: 'manual' | 'ai' | 'agent' | 'system';
+  confidence?: number;
+  expiresAt?: string;
+  pinned?: boolean;
+  origin?: string;
   createdAt: string;
   updatedAt: string;
   accessCount: number;

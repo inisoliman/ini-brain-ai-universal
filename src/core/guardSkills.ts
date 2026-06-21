@@ -25,14 +25,14 @@ const CLEAN_CODE_GUARD: GuardSkill = {
     '## Always-applied imperatives',
     '1. Names reveal intent. Avoid `data`, `result`, `temp`, `value`, `obj`, `handle_*`, `process_*` without a qualifier.',
     '2. Functions stay small (target <=20 lines), one level of abstraction, one thing.',
-    '3. Four arguments is the hard ceiling; never use boolean flag arguments — split into two functions.',
+    '3. Four arguments is the hard ceiling; never use boolean flag arguments - split into two functions.',
     '4. A function returns a value (query) OR has a side effect (command), never both.',
     '5. Comments explain *why*, never *what*. Delete commented-out code and step-number scaffolding.',
-    "6. Match the file's existing style — read the file and one neighbor before writing.",
+    "6. Match the file's existing style - read the file and one neighbor before writing.",
     '7. One actor per module (SRP). Extension via new code, not edits (OCP).',
     '8. Delete duplicated *knowledge*, not duplicated *text*. The wrong abstraction is worse than duplication.',
     '9. Complexity ceiling: cyclomatic <=10, nesting <=5.',
-    '10. No speculative anything — no flag/config/interface/factory without a present-day caller.',
+    '10. No speculative anything - no flag/config/interface/factory without a present-day caller.',
     '',
     '## AI-specific guardrails (highest leverage)',
     '11. Never swallow errors with broad catch-all handling. Catch only what you can recover from.',
@@ -67,10 +67,10 @@ const TEST_GUARD: GuardSkill = {
     '1. A test must be able to fail. If it cannot fail, it tests nothing.',
     '2. Test behavior and contracts, not implementation details.',
     '3. No hardcoded fixture values masquerading as assertions on real output.',
-    '4. Never disable, skip, or weaken a test to make a suite pass — fix the code or the test honestly.',
+    '4. Never disable, skip, or weaken a test to make a suite pass - fix the code or the test honestly.',
     '5. Cover boundaries: null/empty/one/many, error paths, and the documented edge cases.',
     '6. One logical assertion focus per test; name the test after the behavior it pins down.',
-    '7. Tests must be deterministic — no reliance on time, ordering, network, or randomness without control.',
+    '7. Tests must be deterministic - no reliance on time, ordering, network, or randomness without control.',
     '8. For bug fixes: write a test that reproduces the bug first, then make it pass.',
     '',
     '## Self-check',
@@ -91,7 +91,7 @@ const KARPATHY_GUIDELINES: GuardSkill = {
     '',
     '## 1. Think Before Coding',
     '- State assumptions explicitly. If uncertain, ask.',
-    '- If multiple interpretations exist, present them — do not pick silently.',
+    '- If multiple interpretations exist, present them - do not pick silently.',
     '- If a simpler approach exists, say so. If something is unclear, stop and name it.',
     '',
     '## 2. Simplicity First',
@@ -110,7 +110,38 @@ const KARPATHY_GUIDELINES: GuardSkill = {
   ].join('\n')
 };
 
-export const GUARD_SKILLS: GuardSkill[] = [KARPATHY_GUIDELINES, CLEAN_CODE_GUARD, TEST_GUARD];
+const FRONTEND_DESIGN_GUARD: GuardSkill = {
+  id: 'frontend-design-guard',
+  name: 'frontend-design-guard',
+  description: 'Review frontend, webview, dashboard, and app UI changes for layout, accessibility, responsive behavior, visual hierarchy, state coverage, and screenshot-verified quality before shipping.',
+  body: [
+    '# frontend-design-guard',
+    '',
+    'Run this after creating or changing frontend UI, webviews, dashboards, app screens, or visual components. It is framework-agnostic and complements clean-code-guard and test-guard.',
+    '',
+    '## Required Checks',
+    '1. Layout: no overlapping text, clipped controls, horizontal page overflow, unstable hover resizing, or nested cards used as page structure.',
+    '2. Accessibility: interactive controls have names, focus states, keyboard paths, semantic roles, and visible disabled/loading affordances.',
+    '3. Contrast: text, icons, focus rings, and important state colors remain readable in light/dark or configured themes.',
+    '4. Responsive behavior: verify mobile, tablet, and desktop widths; controls wrap cleanly and long labels do not escape their containers.',
+    '5. Visual hierarchy: headings match their container scale, primary actions are obvious, dense tools stay scannable, and decorative treatment does not compete with work content.',
+    '6. State coverage: loading, empty, error, disabled, success, and long-content states are represented or deliberately out of scope.',
+    '7. Screenshot verification: inspect real rendered screenshots or browser captures before calling the UI done.',
+    '',
+    '## Browser Verification',
+    '- Start the app or extension view in the smallest realistic local environment.',
+    '- Capture at least one desktop and one narrow viewport screenshot when the surface is responsive.',
+    '- Check the console for runtime errors and accessibility warnings that are visible in the chosen toolchain.',
+    '- Exercise the main interaction path, including one failure or empty state when available.',
+    '',
+    '## Self-check',
+    '- Would a first-time user know the primary action without explanatory helper copy?',
+    '- Can all visible text fit when translated or when data is longer than the happy path?',
+    '- Did verification use the real UI instead of only reading code?'
+  ].join('\n')
+};
+
+export const GUARD_SKILLS: GuardSkill[] = [KARPATHY_GUIDELINES, CLEAN_CODE_GUARD, TEST_GUARD, FRONTEND_DESIGN_GUARD];
 
 /** Render a guard skill as a SKILL.md document with frontmatter (Cline/Claude/Codex compatible). */
 export function renderGuardSkillFile(skill: GuardSkill): string {
@@ -141,3 +172,4 @@ export function buildGuardsQualitySection(): string {
   }
   return lines.join('\n');
 }
+

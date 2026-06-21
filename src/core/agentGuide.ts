@@ -72,7 +72,10 @@ export class AgentGuideGenerator {
       workflowPath: '.brain/workflow.md',
       skillsIndexPath: '.brain/skills.md',
       qualityGatesPath: '.brain/quality_gates.md',
-      generatedSkills: skills.map(skill => `.brain/skills/${skill.id}.md`)
+      generatedSkills: [
+        ...skills.map(skill => `.brain/skills/${skill.id}.md`),
+        ...GUARD_SKILLS.map(skill => `.brain/skills/${skill.id}.md`)
+      ]
     };
   }
 
