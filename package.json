@@ -15,7 +15,38 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onView:iniBrain.sidebar"
+    "onView:iniBrain.sidebar",
+    "onCommand:iniBrain.scanProject",
+    "onCommand:iniBrain.rebuildBrain",
+    "onCommand:iniBrain.guidedSetup",
+    "onCommand:iniBrain.generateAgentGuide",
+    "onCommand:iniBrain.generateSkillsWorkflow",
+    "onCommand:iniBrain.saveMemory",
+    "onCommand:iniBrain.searchMemory",
+    "onCommand:iniBrain.showProjectProfile",
+    "onCommand:iniBrain.copyMcpConfig",
+    "onCommand:iniBrain.installIntegrations",
+    "onCommand:iniBrain.configureProvider",
+    "onCommand:iniBrain.openSettings",
+    "onCommand:iniBrain.askAI",
+    "onCommand:iniBrain.copyChatTaskForCline",
+    "onCommand:iniBrain.autoMode",
+    "onCommand:iniBrain.generateProject",
+    "onCommand:iniBrain.copyContextForCline",
+    "onCommand:iniBrain.showMemoryProfile",
+    "onCommand:iniBrain.copyMcpConfigForCline",
+    "onCommand:iniBrain.installMcpForCline",
+    "onCommand:iniBrain.generateOnboarding",
+    "onCommand:iniBrain.explainFile",
+    "onCommand:iniBrain.analyzeImpact",
+    "onCommand:iniBrain.generateGuards",
+    "onCommand:iniBrain.restoreBackup",
+    "onCommand:projectBrain.scanProject",
+    "onCommand:projectBrain.rebuildBrain",
+    "onCommand:projectBrain.askAI",
+    "onCommand:projectBrain.generateProject",
+    "onCommand:projectBrain.autoMode",
+    "onCommand:projectBrain.openSettings"
   ],
   "main": "./dist/extension.js",
   "bin": {
@@ -34,6 +65,20 @@
       { "command": "iniBrain.copyMcpConfig", "title": "INI Brain: Copy MCP Config" },
       { "command": "iniBrain.installIntegrations", "title": "INI Brain: Install Integrations" },
       { "command": "iniBrain.configureProvider", "title": "INI Brain: Configure AI Provider" },
+      { "command": "iniBrain.openSettings", "title": "INI Brain: Settings" },
+      { "command": "iniBrain.askAI", "title": "INI Brain: Ask AI" },
+      { "command": "iniBrain.copyChatTaskForCline", "title": "INI Brain: Copy Chat Task for Cline" },
+      { "command": "iniBrain.autoMode", "title": "INI Brain: Auto Mode" },
+      { "command": "iniBrain.generateProject", "title": "INI Brain: Generate Project" },
+      { "command": "iniBrain.copyContextForCline", "title": "INI Brain: Copy Context for Cline" },
+      { "command": "iniBrain.showMemoryProfile", "title": "INI Brain: Show Memory Profile" },
+      { "command": "iniBrain.copyMcpConfigForCline", "title": "INI Brain: Copy MCP Config for Cline" },
+      { "command": "iniBrain.installMcpForCline", "title": "INI Brain: Install MCP for Cline" },
+      { "command": "iniBrain.generateOnboarding", "title": "INI Brain: Generate Onboarding Guide" },
+      { "command": "iniBrain.explainFile", "title": "INI Brain: Explain Current File" },
+      { "command": "iniBrain.analyzeImpact", "title": "INI Brain: Analyze Change Impact" },
+      { "command": "iniBrain.generateGuards", "title": "INI Brain: Generate Quality Guards" },
+      { "command": "iniBrain.restoreBackup", "title": "INI Brain: Restore Auto Mode Backup" },
 
       { "command": "iniBrain.enableCaveman", "title": "INI Brain: Enable Caveman Mode (output -70%)" },
       { "command": "iniBrain.disableCaveman", "title": "INI Brain: Disable Caveman Mode" },
@@ -105,6 +150,30 @@
           "minimum": 1,
           "maximum": 80,
           "description": "Maximum relevant files included in generated task context."
+        },
+        "iniBrain.showOnboardingPrompt": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show an initialization prompt for workspaces without INI Brain context."
+        },
+        "iniBrain.requestTimeoutMs": {
+          "type": "number",
+          "default": 120000,
+          "minimum": 5000,
+          "maximum": 600000,
+          "description": "Timeout in milliseconds for each optional AI provider request."
+        },
+        "iniBrain.autoModeConfirmEachChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "Preview Auto Mode changes and require confirmation before writing files."
+        },
+        "iniBrain.backupRetention": {
+          "type": "number",
+          "default": 50,
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "How many Auto Mode backups to keep in .brain/backups. Set 0 to disable pruning."
         },
         "iniBrain.caveman.enabled": {
           "type": "boolean",

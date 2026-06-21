@@ -2,6 +2,7 @@ export interface AiProviderSettings {
   apiBaseUrl: string;
   modelName: string;
   apiKey?: string;
+  requestTimeoutMs?: number;
 }
 
 export interface AiProvider {

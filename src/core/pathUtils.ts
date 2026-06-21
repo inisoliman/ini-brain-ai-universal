@@ -110,8 +110,8 @@ export function isProtectedProjectPath(relativePath: string): boolean {
   const normalized = normalizePath(relativePath);
   return normalized === '.git' ||
     normalized.startsWith('.git/') ||
-    normalized === '.brain/backups' ||
-    normalized.startsWith('.brain/backups/');
+    normalized === '.brain' ||
+    normalized.startsWith('.brain/');
 }
 
 export function safeResolve(root: string, relativePath: string): string {
