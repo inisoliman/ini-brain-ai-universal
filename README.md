@@ -29,6 +29,32 @@ INI Brain creates and refreshes these workspace assets:
 - `.brain/skills/`: generated skills and quality guards.
 - `.brain/backups/`: Auto Mode backups for overwritten files.
 - `.specify/`: optional Spec-Kit workspace for specs, plans, and tasks.
+- `.codex/skills/`, `.cline/skills/`, and `.clinerules/skills/`: lightweight mirrors for agents that support their own skill folders.
+
+## Recommended Workspace Layout
+
+Use `.brain/` and `AGENTS.md` as the source of truth. They should contain the durable project memory, compact context, workflow, quality gates, and agent operating rules.
+
+Agent-specific folders such as `.codex/`, `.cline/`, and `.clinerules/` should be generated mirrors, not separate brains. This avoids duplicated or conflicting context while still letting each tool discover the guidance format it prefers.
+
+Recommended:
+
+```text
+your-project/
+  AGENTS.md
+  .brain/
+    compact_context.md
+    memories.json
+    workflow.md
+    quality_gates.md
+    skills/
+  .codex/skills/
+  .cline/skills/
+  .clinerules/skills/
+  .specify/
+```
+
+Avoid creating independent folders like `claude-brain/`, `cline-brain/`, or `codex-brain/` with separate memory files unless you intentionally want isolated behavior. Separate brains usually drift apart over time.
 
 ## VS Code Features
 
@@ -159,6 +185,39 @@ startup_timeout_sec = 120
 
 After changing Codex MCP config, restart Codex so the server and tool list reload.
 
+### Codex Windows App
+
+The Codex Windows app, Codex CLI, and Codex IDE extension use Codex MCP configuration. If the installer updated `C:\Users\<you>\.codex\config.toml`, the Windows app should pick up `ini-brain-ai` after you restart Codex and open a project.
+
+For best automatic behavior:
+
+1. Install INI Brain once with `scripts/install-all.ps1`.
+2. Open the target project in VS Code and run **INI Brain: Scan Project** at least once.
+3. Restart the Codex Windows app.
+4. Start a new Codex thread for the target project.
+5. Confirm the MCP tool list contains `ini_brain_auto_brief`.
+
+INI Brain sends a golden operating prompt through the MCP `instructions` field, so compatible Codex clients can learn the workflow automatically. `AGENTS.md` and `.brain/` make the behavior more reliable for every new project because they provide durable project guidance even before the first tool call.
+
+If Codex does not call the tools automatically in a specific thread, use this first message:
+
+```text
+ابدأ باستخدام ini_brain_auto_brief لهذه المهمة، ثم استخدم ini_brain_get_context قبل أي تعديل. بعد الانتهاء احفظ القرارات المهمة باستخدام ini_brain_save_memory.
+```
+
+### Project-Scoped Codex Config
+
+Most users should use the global `~/.codex/config.toml` created by the installer. For teams or portable repositories, you may also add a trusted project-scoped `.codex/config.toml`:
+
+```toml
+[mcp_servers.ini-brain-ai]
+command = "node"
+args = ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"]
+startup_timeout_sec = 120
+```
+
+Keep machine-specific absolute paths out of public repositories. Use project-scoped config only when your team intentionally manages that path or replaces it during setup.
+
 ## AI Provider Settings
 
 AI-assisted VS Code features are optional. Configure them from **INI Brain: Settings** or **INI Brain: Configure AI Provider**:
@@ -180,6 +239,51 @@ No API key is written to repository files.
 4. Ask the agent to call `ini_brain_auto_brief` and `ini_brain_get_context` before editing.
 5. Save durable discoveries with `ini_brain_save_memory`.
 6. Use Explain File, Analyze Impact, Knowledge Graph, Spec-Kit, or Memory Stats when the task needs deeper context.
+
+## Ready-To-Use Agent Prompts
+
+Use these prompts in Codex, Cline, Claude Desktop, or any MCP client.
+
+### Health Check
+
+```text
+استخدم ini_brain_status وأخبرني هل INI Brain يعمل على هذا المشروع.
+```
+
+### Start A Coding Task
+
+```text
+ابدأ بـ ini_brain_auto_brief لهذه المهمة، ثم استخدم ini_brain_get_context قبل قراءة أو تعديل الملفات. افحص التأثير باستخدام ini_brain_impact عند الحاجة، وبعد الانتهاء احفظ القرارات المهمة باستخدام ini_brain_save_memory.
+```
+
+### Search Memory
+
+```text
+استخدم ini_brain_search_memory للبحث عن قرارات أو أخطاء سابقة مرتبطة بهذه المهمة: <اكتب المهمة هنا>.
+```
+
+### Spec-Kit Example
+
+```text
+ابدأ بـ ini_brain_auto_brief ثم أنشئ spec باسم:
+RankMath Settings Cleanup
+
+الوصف:
+أريد تنظيم إعدادات RankMath، مراجعة الملفات المؤثرة، عمل خطة تنفيذ، ثم تقسيمها إلى مهام صغيرة قابلة للتنفيذ بدون كسر الموقع.
+استخدم أدوات Spec-Kit المتاحة.
+```
+
+Direct tool-style request:
+
+```text
+استخدم ini_brain_spec_create لإنشاء مواصفة باسم "RankMath Settings Cleanup" بوصف: "تنظيم إعدادات RankMath ومراجعة الملفات المؤثرة وخطة تنفيذ آمنة".
+```
+
+### Memory Maintenance
+
+```text
+استخدم ini_brain_memory_stats لعرض حالة الذاكرة، ثم استخدم ini_brain_memory_compact كمعاينة dry-run فقط ولا تطبق التنظيف إلا إذا طلبت منك ذلك صراحة.
+```
 
 ## Safety Model
 
