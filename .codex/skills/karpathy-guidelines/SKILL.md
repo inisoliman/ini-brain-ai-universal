@@ -10,7 +10,7 @@ Behavioral guidelines to reduce common LLM coding mistakes. Bias toward caution 
 
 ## 1. Think Before Coding
 - State assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them — do not pick silently.
+- If multiple interpretations exist, present them - do not pick silently.
 - If a simpler approach exists, say so. If something is unclear, stop and name it.
 
 ## 2. Simplicity First

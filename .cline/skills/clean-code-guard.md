@@ -11,14 +11,14 @@ Run this as a guard pass after generating or editing code, before presenting or 
 ## Always-applied imperatives
 1. Names reveal intent. Avoid `data`, `result`, `temp`, `value`, `obj`, `handle_*`, `process_*` without a qualifier.
 2. Functions stay small (target <=20 lines), one level of abstraction, one thing.
-3. Four arguments is the hard ceiling; never use boolean flag arguments — split into two functions.
+3. Four arguments is the hard ceiling; never use boolean flag arguments - split into two functions.
 4. A function returns a value (query) OR has a side effect (command), never both.
 5. Comments explain *why*, never *what*. Delete commented-out code and step-number scaffolding.
-6. Match the file's existing style — read the file and one neighbor before writing.
+6. Match the file's existing style - read the file and one neighbor before writing.
 7. One actor per module (SRP). Extension via new code, not edits (OCP).
 8. Delete duplicated *knowledge*, not duplicated *text*. The wrong abstraction is worse than duplication.
 9. Complexity ceiling: cyclomatic <=10, nesting <=5.
-10. No speculative anything — no flag/config/interface/factory without a present-day caller.
+10. No speculative anything - no flag/config/interface/factory without a present-day caller.
 
 ## AI-specific guardrails (highest leverage)
 11. Never swallow errors with broad catch-all handling. Catch only what you can recover from.

@@ -37,6 +37,11 @@ function Write-Step($text) {
 function Write-Ok($text)      { Write-Host "    [OK] $text" -ForegroundColor Green }
 function Write-Warn2($text)   { Write-Host "    [!]  $text" -ForegroundColor Yellow }
 function Write-ErrLine($text) { Write-Host "    [X]  $text" -ForegroundColor Red }
+function Set-Utf8NoBom($Path, $Value) {
+  $dir = Split-Path -Parent $Path
+  if ($dir -and -not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir | Out-Null }
+  [System.IO.File]::WriteAllText($Path, $Value, [System.Text.UTF8Encoding]::new($false))
+}
 
 # ----- Resolve project root --------------------------------------------------
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -113,7 +118,7 @@ startup_timeout_sec = 120
 "@
 
   $newContent = ($existing.TrimEnd() + "`r`n" + $block).TrimStart()
-  Set-Content -Path $codexConfig -Value $newContent -Encoding UTF8
+  Set-Utf8NoBom -Path $codexConfig -Value $newContent
   Write-Ok "Updated: $codexConfig"
 } else {
   Write-Warn2 "Codex config skipped (SkipCodex)"
@@ -144,7 +149,7 @@ if (-not $SkipClaude) {
       autoApprove = @()
     }
     $json.mcpServers | Add-Member -NotePropertyName 'ini-brain-ai' -NotePropertyValue $entry -Force
-    ($json | ConvertTo-Json -Depth 12) | Set-Content -Path $claudeConfig -Encoding UTF8
+    Set-Utf8NoBom -Path $claudeConfig -Value ($json | ConvertTo-Json -Depth 12)
     Write-Ok "Updated: $claudeConfig"
     Write-Warn2 "Quit Claude Desktop completely (also from system tray) and reopen."
   }
@@ -177,7 +182,7 @@ if (-not $SkipCline) {
       autoApprove = @()
     }
     $json.mcpServers | Add-Member -NotePropertyName 'ini-brain-ai' -NotePropertyValue $entry -Force
-    ($json | ConvertTo-Json -Depth 12) | Set-Content -Path $clineConfig -Encoding UTF8
+    Set-Utf8NoBom -Path $clineConfig -Value ($json | ConvertTo-Json -Depth 12)
     Write-Ok "Updated: $clineConfig"
   }
 } else {

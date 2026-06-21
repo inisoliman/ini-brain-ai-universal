@@ -106,10 +106,12 @@ class IniBrainMcpServer {
     console.error(`[INI Brain MCP] running locally for ${workspace}`);
     // Background bootstrap: keep .brain/ and AGENTS.md fresh without user action.
     const auto = AutoBackground.for(workspace);
-    auto.ensureFresh().then(result => {
-      if (result.scanned) console.error(`[INI Brain MCP] background scan triggered (${result.reason})`);
-      auto.start();
-    }).catch(error => console.error('[INI Brain MCP] bootstrap error', error));
+    if (!autoBackgroundDisabled()) {
+      auto.ensureFresh().then(result => {
+        if (result.scanned) console.error(`[INI Brain MCP] background scan triggered (${result.reason})`);
+        auto.start();
+      }).catch(error => console.error('[INI Brain MCP] bootstrap error', error));
+    }
     process.on('SIGINT', () => { auto.stop(); process.exit(0); });
     process.on('SIGTERM', () => { auto.stop(); process.exit(0); });
   }
@@ -178,7 +180,7 @@ class IniBrainMcpServer {
     const args = (params.arguments || {}) as Record<string, unknown>;
     // Make sure context is fresh before any tool runs.
     const ws = getWorkspace(args);
-    void AutoBackground.for(ws).ensureFresh().catch(() => undefined);
+    if (!autoBackgroundDisabled()) void AutoBackground.for(ws).ensureFresh().catch(() => undefined);
 
     switch (name) {
       case 'ini_brain_auto_brief': return text(await autoBrief(args), false);
@@ -454,6 +456,10 @@ function toMcpError(error: unknown): McpError {
 
 function isMemoryKind(value: unknown): value is MemoryKind {
   return typeof value === 'string' && ['fact', 'decision', 'preference', 'bug', 'workflow', 'session', 'note'].includes(value);
+}
+
+function autoBackgroundDisabled(): boolean {
+  return process.env.INI_BRAIN_DISABLE_AUTO_BACKGROUND === '1';
 }
 
 async function exists(file: string): Promise<boolean> {

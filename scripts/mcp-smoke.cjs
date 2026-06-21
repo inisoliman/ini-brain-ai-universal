@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '..');
 const server = path.join(root, 'dist', 'mcp', 'server.js');
 const child = spawn(process.execPath, [server], {
   cwd: root,
-  env: { ...process.env, INI_BRAIN_WORKSPACE: '' },
+  env: { ...process.env, INI_BRAIN_WORKSPACE: '', INI_BRAIN_DISABLE_AUTO_BACKGROUND: '1' },
   stdio: ['pipe', 'pipe', 'pipe']
 });
 

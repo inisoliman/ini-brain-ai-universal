@@ -5,6 +5,7 @@ import { AgentGuideGenerator } from './core/agentGuide';
 import { BrainStore } from './core/brainStore';
 import { ContextBuilder } from './core/contextBuilder';
 import { InsightBuilder } from './core/insightBuilder';
+import { readJsonFile, writeJsonFile } from './core/jsonUtils';
 import { MemoryStore, formatMemoryLine, parseCsvList } from './core/memoryStore';
 import { safeResolve } from './core/pathUtils';
 import { ProjectScanner } from './core/projectScanner';
@@ -660,12 +661,7 @@ async function readDirectoryIfExists(dir: string): Promise<string[]> {
 }
 
 async function readJsonIfExists<T>(file: string, fallback: T): Promise<T> {
-  try {
-    return JSON.parse(await fs.readFile(file, 'utf8')) as T;
-  } catch (error) {
-    if (isErrorCode(error, 'ENOENT')) return fallback;
-    throw error;
-  }
+  return readJsonFile(file, fallback);
 }
 
 async function readTextIfExists(file: string, fallback: string): Promise<string> {
@@ -781,7 +777,6 @@ async function installMcpForCline(root: string, sidebar: SidebarProvider): Promi
   const settingsPath = getClineMcpSettingsPath();
   const ok = await vscode.window.showWarningMessage(`Install/update INI Brain MCP in Cline settings?\n\n${settingsPath}`, { modal: true }, 'Install');
   if (ok !== 'Install') return;
-  await fs.mkdir(path.dirname(settingsPath), { recursive: true });
   const current = await readJson<Record<string, unknown>>(settingsPath, {});
   const currentServers = current.mcpServers && typeof current.mcpServers === 'object' && !Array.isArray(current.mcpServers)
     ? current.mcpServers as Record<string, unknown>
@@ -799,7 +794,7 @@ async function installMcpForCline(root: string, sidebar: SidebarProvider): Promi
       }
     }
   };
-  await fs.writeFile(settingsPath, JSON.stringify(next, null, 2), 'utf8');
+  await writeJsonFile(settingsPath, next);
   sidebar.log(`INI Brain MCP installed for Cline: ${settingsPath}`);
   vscode.window.showInformationMessage('INI Brain MCP installed for Cline. Reload Cline MCP servers or reload VS Code.');
 }
