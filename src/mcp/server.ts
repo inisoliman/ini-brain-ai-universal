@@ -23,6 +23,7 @@ const GOLDEN_PROMPT = [
   '3. Use ini_brain_search_memory whenever past decisions or bugs may matter.',
   '4. Use ini_brain_explain on a file before changing it, and ini_brain_impact on the changed file list before finalizing.',
   '5. After finishing, call ini_brain_save_memory to persist durable decisions, fixes, or workflow insights.',
+  'For new projects or large features, run the Spec-Kit flow automatically: /constitution -> /specify -> /clarify -> /plan -> /tasks -> /implement. For small fixes, use the lighter INI Brain context workflow.',
   'A background scan keeps .brain/ and AGENTS.md fresh automatically. You never need to ask the user to run a scan.'
 ].join('\n');
 
@@ -73,7 +74,12 @@ const EXTRA_TOOL_LIST = Object.entries(EXTRA_TOOLS).map(([name, tool]) => ({
   name,
   description: tool.description,
   inputSchema: withWorkspaceInput(tool.inputSchema),
-  annotations: name === 'ini_brain_graph_build' || name === 'ini_brain_spec_create' || name === 'ini_brain_code_index'
+  annotations: name === 'ini_brain_graph_build' ||
+    name === 'ini_brain_spec_create' ||
+    name === 'ini_brain_spec_clarify' ||
+    name === 'ini_brain_spec_plan' ||
+    name === 'ini_brain_spec_tasks' ||
+    name === 'ini_brain_code_index'
     ? localWriteAnnotations()
     : readOnlyAnnotations()
 }));

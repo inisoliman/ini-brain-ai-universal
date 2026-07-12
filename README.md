@@ -132,6 +132,25 @@ Code Intelligence tools:
 - `ini_brain_code_changes`
 - `ini_brain_code_query`
 
+Spec-Kit slash-flow tools:
+
+- `ini_brain_spec_constitution` maps to `/constitution`.
+- `ini_brain_spec_create` maps to `/specify`.
+- `ini_brain_spec_clarify` maps to `/clarify`.
+- `ini_brain_spec_plan` maps to `/plan`.
+- `ini_brain_spec_tasks` maps to `/tasks`.
+- `ini_brain_spec_next_task` helps `/implement` pick the next unchecked task.
+
+## Automatic Spec-Kit Flow
+
+For a new project, unclear request, or large feature, INI Brain should guide agents through:
+
+```text
+/constitution -> /specify -> /clarify -> /plan -> /tasks -> /implement
+```
+
+This is important because it prevents the agent from jumping into code before the rules, scope, open questions, architecture, and tasks are clear. For small fixes, simple edits, or quick questions, INI Brain intentionally uses the lighter context workflow so the process does not become heavy.
+
 ## Code Intelligence
 
 INI Brain exposes one stable MCP surface and selects the strongest local engine automatically:

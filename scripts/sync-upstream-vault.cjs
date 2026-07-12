@@ -17,7 +17,12 @@ const rawSources = new Map([
     const rawBase = rawSources.get(source.id);
     if (!rawBase) continue;
     for (const file of source.files || []) {
-      const content = await fetchText(`${rawBase}/${file.path}`);
+      const url = `${rawBase}/${file.path}`;
+      const content = await fetchText(url).catch(error => {
+        console.warn(`Warning: keeping existing snapshot for ${source.id}/${file.path}: ${error.message}`);
+        return null;
+      });
+      if (content === null) continue;
       const target = path.join(root, source.snapshotRoot, file.path);
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.writeFileSync(target, content, 'utf8');
@@ -27,6 +32,7 @@ const rawSources = new Map([
   manifest.updatedAt = new Date().toISOString();
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   console.log('Upstream vault snapshots refreshed.');
+  process.exit(0);
 })().catch(error => {
   console.error(error);
   process.exit(1);

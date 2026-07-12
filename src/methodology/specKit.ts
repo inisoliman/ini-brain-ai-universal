@@ -82,6 +82,35 @@ ${opts.description}
   return { specPath, slug };
 }
 
+export async function readConstitution(root: string): Promise<string> {
+  const file = await ensureConstitution(root);
+  return fs.readFile(file, 'utf8');
+}
+
+export async function clarifySpec(opts: { root: string; specSlug: string }): Promise<string> {
+  const dir = path.join(opts.root, '.specify', 'specs', opts.specSlug);
+  await fs.mkdir(dir, { recursive: true });
+  const clarificationsPath = path.join(dir, 'clarifications.md');
+  const body = `# Clarifications: ${opts.specSlug}
+
+**Created:** ${new Date().toISOString()}
+
+## Questions
+
+- [ ] Who is the primary user?
+- [ ] What exact outcome proves this feature works?
+- [ ] What input/output examples should be supported?
+- [ ] What must stay out of scope?
+- [ ] What security, privacy, or performance constraints apply?
+
+## Decisions
+
+- ...
+`;
+  await fs.writeFile(clarificationsPath, body, 'utf8');
+  return clarificationsPath;
+}
+
 export async function createPlan(opts: {
   root: string; specSlug: string; techStack: string;
 }): Promise<string> {
@@ -152,6 +181,18 @@ export async function createTasks(opts: { root: string; specSlug: string }): Pro
   return tasksPath;
 }
 
+export async function readNextTask(root: string, specSlug: string): Promise<{ task?: string; tasksPath: string }> {
+  const tasksPath = path.join(root, '.specify', 'specs', specSlug, 'tasks.md');
+  let body = '';
+  try {
+    body = await fs.readFile(tasksPath, 'utf8');
+  } catch {
+    return { tasksPath };
+  }
+  const next = body.split(/\r?\n/).find(line => /^- \[ \]\s+/.test(line));
+  return { tasksPath, task: next?.replace(/^- \[ \]\s+/, '') };
+}
+
 export async function listSpecs(root: string): Promise<string[]> {
   try {
     const entries = await fs.readdir(path.join(root, '.specify', 'specs'), { withFileTypes: true });
@@ -160,12 +201,17 @@ export async function listSpecs(root: string): Promise<string[]> {
 }
 
 export async function readSpec(root: string, slug: string): Promise<{
-  spec?: string; plan?: string; tasks?: string;
+  spec?: string; clarifications?: string; plan?: string; tasks?: string;
 }> {
   const dir = path.join(root, '.specify', 'specs', slug);
   const read = async (name: string) => {
     try { return await fs.readFile(path.join(dir, name), 'utf8'); }
     catch { return undefined; }
   };
-  return { spec: await read('spec.md'), plan: await read('plan.md'), tasks: await read('tasks.md') };
+  return {
+    spec: await read('spec.md'),
+    clarifications: await read('clarifications.md'),
+    plan: await read('plan.md'),
+    tasks: await read('tasks.md')
+  };
 }
