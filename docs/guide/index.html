@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="الدليل العربي المصور لاستخدام INI Brain AI Universal">
+  <title>دليل INI Brain — ابدأ هنا</title>
+  <link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">تخطَّ إلى الشرح</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">IB</span><span>دليل INI Brain</span></a>
+    <button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="main-nav">القائمة</button>
+    <nav class="nav" id="main-nav" data-nav aria-label="التنقل الرئيسي">
+      <a aria-current="page" href="index.html">ابدأ هنا</a><a href="vscode.html">أزرار VS Code</a><a href="agents.html">Codex والوكلاء</a><a href="smart-setup.html">الإعداد الذكي</a><a href="features.html">المميزات</a><a href="troubleshooting.html">حل المشاكل</a>
+    </nav>
+  </div></header>
+  <main id="content">
+    <section class="hero"><div class="hero-inner">
+      <div>
+        <p class="eyebrow">دليل عربي مصور • خطوة بخطوة</p>
+        <h1>ذاكرة ذكية لمشروعك، يفهمها كل وكيل.</h1>
+        <p class="lead">INI Brain يفحص المشروع محليًا، يختصر سياقه، يحفظ قراراته، ثم يعطي Codex وClaude وCline ما يحتاجونه فقط.</p>
+        <div class="hero-actions"><a class="button primary" href="#quick-start">ابدأ في 5 دقائق</a><a class="button" href="vscode.html">اشرح لي كل زر</a></div>
+      </div>
+      <div class="hero-visual"><img src="assets/hero-brain.svg" alt="INI Brain يصل المشروع بكوديكس وكلود وكلين وفجوال ستوديو كود"></div>
+    </div></section>
+    <div class="page">
+      <section class="section" aria-labelledby="simple-idea">
+        <h2 id="simple-idea">الفكرة ببساطة شديدة</h2>
+        <p class="section-intro">تخيّل أن مشروعك حقيبة مدرسية كبيرة. بدل أن تجعل كل وكيل يفتح كل الكتب، INI Brain يصنع له ورقة صغيرة تقول: هذا المشروع، وهذه قواعده، وهذه الملفات المهمة.</p>
+        <div class="grid three">
+          <article class="card"><div class="icon">1</div><h3>يفحص محليًا</h3><p>يقرأ أسماء الملفات وبنيتها على جهازك. الفحص نفسه لا يستخدم نموذج AI ولا يستهلك توكينات.</p></article>
+          <article class="card"><div class="icon">2</div><h3>يصنع عقل المشروع</h3><p>ينشئ <code>.brain</code> وملف <code>AGENTS.md</code> وذاكرة وملخصًا مركزًا.</p></article>
+          <article class="card"><div class="icon">3</div><h3>يخدم كل الوكلاء</h3><p>Codex وClaude وCline وغيرهم يطلبون السياق نفسه عبر MCP أو ملفات المهارات.</p></article>
+        </div>
+      </section>
+      <section class="section" id="quick-start" aria-labelledby="quick-title">
+        <h2 id="quick-title">البدء السريع للمستخدم العادي</h2>
+        <div class="steps">
+          <article class="step"><div><h3>ثبّت ملف الإضافة</h3><p>افتح VS Code، ثم Extensions، ثم القائمة <strong>…</strong>، ثم <strong>Install from VSIX</strong>. اختر ملف <code>ini-brain-ai-universal-3.2.0.vsix</code>.</p></div></article>
+          <article class="step"><div><h3>افتح مجلد مشروعك</h3><p>من VS Code اختر <strong>File → Open Folder</strong>. يجب أن يكون كل مشروع في مجلده الخاص.</p></div></article>
+          <article class="step"><div><h3>افتح علامة المخ</h3><p>من الشريط الجانبي اضغط أيقونة <strong>INI Brain AI</strong>. ستظهر لك لوحة الأزرار.</p><img src="assets/vscode-sidebar.svg" alt="لوحة INI Brain داخل VS Code مع أهم الأزرار مرقمة"></div></article>
+          <article class="step"><div><h3>اضغط Smart Setup</h3><p>ستُعرض خطة الحزم المناسبة. اقرأ السبب، اختر ما تريد، ثم وافق. لا يتم تنزيل مستودعات كاملة.</p></div></article>
+          <article class="step"><div><h3>اربط وكيلك</h3><p>إذا كنت تستخدم Codex Windows أو Claude أو Cline، اتبع صفحة <a href="agents.html">الوكلاء</a>. بعد الربط سيظهر MCP باسم <code>ini-brain-ai</code>.</p></div></article>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="first-prompt">
+        <h2 id="first-prompt">أول طلب تقوله للوكيل</h2>
+        <p class="section-intro">انسخ هذا النص داخل Codex أو Claude أو Cline:</p>
+        <pre><code>ابدأ باستخدام ini_brain_auto_brief لهذه المهمة.
+ثم استخدم ini_brain_get_context قبل أي تعديل.
+إذا كان هذا مشروعًا جديدًا، اعرض ini_brain_smart_setup_plan ولا تطبق شيئًا قبل موافقتي.
+بعد الانتهاء احفظ القرارات المهمة باستخدام ini_brain_save_memory.</code></pre>
+        <div class="callout"><strong>كيف أعرف أنه يعمل؟</strong>اطلب من الوكيل: «استخدم ini_brain_status». إذا أعاد مسار مشروعك ووجود <code>.brain</code> فالربط صحيح.</div>
+      </section>
+      <section class="section" aria-labelledby="choose-guide"><h2 id="choose-guide">ماذا تريد أن تتعلم الآن؟</h2>
+        <div class="grid three">
+          <a class="card" href="vscode.html"><div class="icon">⌘</div><h3>كل زر في VS Code</h3><p>متى تضغطه، وماذا يكتب، وما الذي يحتاج موافقتك.</p></a>
+          <a class="card" href="agents.html"><div class="icon">AI</div><h3>Codex وClaude وCline</h3><p>إعداد Windows، MCP، وأوامر اختبار جاهزة للنسخ.</p></a>
+          <a class="card" href="smart-setup.html"><div class="icon">✦</div><h3>كيف يختار تلقائيًا؟</h3><p>كيف يفهم المشروع ويستخدم الملفات المفيدة من المصادر.</p></a>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><strong>INI Brain AI Universal</strong><span>الدليل يعمل محليًا ولا يحتاج إنترنت.</span></div></footer>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

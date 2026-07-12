@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Smart Project Setup — INI Brain</title><link rel="stylesheet" href="assets/guide.css"></head>
+<body>
+  <a class="skip-link" href="#content">تخطَّ إلى الشرح</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">IB</span><span>دليل INI Brain</span></a><button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="main-nav">القائمة</button><nav class="nav" id="main-nav" data-nav aria-label="التنقل الرئيسي"><a href="index.html">ابدأ هنا</a><a href="vscode.html">أزرار VS Code</a><a href="agents.html">Codex والوكلاء</a><a aria-current="page" href="smart-setup.html">الإعداد الذكي</a><a href="features.html">المميزات</a><a href="troubleshooting.html">حل المشاكل</a></nav></div></header>
+  <main class="page" id="content">
+    <div class="page-title"><p class="eyebrow">اختيار ذكي • موافقة صريحة • ملفات منتقاة</p><h1>كيف يستفيد تلقائيًا من كل الـrepos؟</h1><p class="lead">لا يحمل المستودعات كاملة داخل كل مشروع. يقرأ وصف مشروعك وملفاته، يختار الحزم، ثم ينسخ الملفات المفيدة الموجودة في Upstream Vault ويشغّل النسخة المكيّفة داخل INI Brain.</p></div>
+    <div class="diagram"><img src="assets/smart-flow.svg" alt="مراحل Smart Project Setup من وصف الفكرة حتى تقرير التطبيق"></div>
+
+    <section class="section" aria-labelledby="new-project"><h2 id="new-project">لمشروع جديد فارغ</h2>
+      <div class="steps">
+        <article class="step"><div><h3>اضغط Guided Setup</h3><p>سيظهر ملف <code>project_request.md</code>.</p></div></article>
+        <article class="step"><div><h3>اكتب طلبًا واضحًا</h3><pre><code># مشروعي
+أريد متجر React بواجهة عربية، API في Node.js، قاعدة بيانات، وأستخدم Codex وClaude.</code></pre><p>لا تحتاج لغة هندسية. اكتب ما تريد ومن سيستخدمه.</p></div></article>
+        <article class="step"><div><h3>اضغط Smart Setup</h3><p>يفحص الوصف محليًا ويكتشف: واجهة، API، ومجموعة وكلاء. لا استدعاء AI ولا تكلفة توكينات.</p></div></article>
+        <article class="step"><div><h3>راجع الحزم</h3><p>المقترح محدد مسبقًا، والاختياري غير محدد. عدّل الاختيار كما تريد.</p></div></article>
+        <article class="step"><div><h3>اضغط Apply</h3><p>بعد التأكيد يكتب تقريرًا في <code>.brain/smart-setup.json</code> بكل ما أُضيف.</p></div></article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="packs"><h2 id="packs">الحزم وما تستفيد منه</h2>
+      <div class="table-wrap"><table><thead><tr><th>الحزمة</th><th>متى تُقترح؟</th><th>المصادر</th><th>الميزة التي تعمل فعليًا</th></tr></thead><tbody>
+        <tr><td>أساس التخطيط والعمل</td><td>دائمًا، وبالأخص المشروع الجديد</td><td>Spec-Kit، Superpowers، gstack</td><td>Spec/Plan/Tasks + ست مهارات هندسية مضغوطة.</td></tr>
+        <tr><td>توفير التوكينات المتوازن</td><td>دائمًا</td><td>Ponytail، Caveman، Claude Token Efficient</td><td>Ponytail Lite + Caveman Lite ومرايا للوكلاء المكتشفين.</td></tr>
+        <tr><td>جودة الواجهة</td><td>React/HTML/CSS/Vue/Svelte أو وصف واجهة</td><td>Guard Skills، Impeccable</td><td>Clean Code + Test + Frontend Design Guards.</td></tr>
+        <tr><td>فهم الكود الكبير</td><td>150 ملفًا فأكثر أو ثلاث لغات فأكثر</td><td>Graphify، codebase-memory-mcp</td><td>Knowledge Graph داخلي، مع مرجع المحرك المتقدم دون تثبيته تلقائيًا.</td></tr>
+        <tr><td>الذاكرة والسياق</td><td>مشروع قائم أو 20 ملفًا فأكثر</td><td>AgentMemory inspiration</td><td>Remember/Recall/Handoff تستخدم أدوات ذاكرة INI Brain المحلية.</td></tr>
+        <tr><td>العمل مع عدة وكلاء</td><td>عند اكتشاف وكيلين أو ذكرهما في الوصف</td><td>Delegate Skills</td><td>مهارة تفويض محدودة النطاق مع مراجعة واختبارات.</td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section class="section" aria-labelledby="download"><h2 id="download">هل يوجد تنزيل من الإنترنت؟</h2>
+      <div class="grid two">
+        <article class="card"><div class="icon">✓</div><h3>Smart Setup العادي</h3><p>لا يحتاج إنترنت. ينسخ snapshots المنتقاة المعبأة داخل الإضافة، ثم يفعّل كود INI Brain المحلي.</p></article>
+        <article class="card"><div class="icon">↻</div><h3>Check Upstream</h3><p>عند ضغطك فقط، يطلب metadata صغيرة من GitHub. Apply Upstream ينزّل الملفات المسجلة للمصدر، لا المستودع كاملًا.</p></article>
+      </div>
+      <div class="callout warning"><strong>البرامج الخارجية مختلفة</strong><code>codebase-memory-mcp</code> برنامج اختياري؛ لا يثبته Smart Setup. ثبّته صراحة عبر <code>-InstallCodeIntel</code> إذا أردت المحرك المتقدم.</div>
+    </section>
+
+    <section class="section" aria-labelledby="agents-smart"><h2 id="agents-smart">تشغيله من Codex أو Claude أو Cline</h2>
+      <pre><code>استخدم ini_brain_smart_setup_plan واعرض لي الخطة بالعربية فقط.
+لا تطبق أي حزمة بعد.</code></pre>
+      <p>بعد أن توافق، قل مثلًا:</p>
+      <pre><code>طبق ini_brain_smart_setup_apply بالحزم التالية فقط:
+workflow-core, token-savings, frontend-quality</code></pre>
+      <div class="callout"><strong>لماذا خطوتان؟</strong>حتى لا يغير الوكيل إعداد مشروعك لمجرد أنه ظن أن شيئًا مفيد. التوصية للذكاء، والقرار لك.</div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><a href="agents.html">← Codex والوكلاء</a><a href="features.html">التالي: كل المميزات</a></div></footer>
+  <script src="assets/guide.js"></script>
+</body></html>

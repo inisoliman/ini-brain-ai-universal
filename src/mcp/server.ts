@@ -14,6 +14,7 @@ import { codeIntelligenceTools } from './tools/codeIntelligenceTools';
 import { graphTools } from './tools/graphTools';
 import { methodologyTools } from './tools/methodologyTools';
 import { savingsTools } from './tools/savingsTools';
+import { smartSetupTools } from './tools/smartSetupTools';
 import { resolveWorkspace } from './workspace';
 
 const GOLDEN_PROMPT = [
@@ -67,6 +68,7 @@ const EXTRA_TOOLS: Record<string, ToolDefinition> = {
   ...savingsTools,
   ...graphTools,
   ...methodologyTools,
+  ...smartSetupTools,
   ...codeIntelligenceTools
 };
 
@@ -80,6 +82,7 @@ const EXTRA_TOOL_LIST = Object.entries(EXTRA_TOOLS).map(([name, tool]) => ({
     name === 'ini_brain_spec_clarify' ||
     name === 'ini_brain_spec_plan' ||
     name === 'ini_brain_spec_tasks' ||
+    name === 'ini_brain_smart_setup_apply' ||
     name === 'ini_brain_code_index'
     ? localWriteAnnotations()
     : readOnlyAnnotations()

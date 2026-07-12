@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>حل المشاكل — INI Brain</title><link rel="stylesheet" href="assets/guide.css"></head>
+<body>
+  <a class="skip-link" href="#content">تخطَّ إلى الشرح</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">IB</span><span>دليل INI Brain</span></a><button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="main-nav">القائمة</button><nav class="nav" id="main-nav" data-nav aria-label="التنقل الرئيسي"><a href="index.html">ابدأ هنا</a><a href="vscode.html">أزرار VS Code</a><a href="agents.html">Codex والوكلاء</a><a href="smart-setup.html">الإعداد الذكي</a><a href="features.html">المميزات</a><a aria-current="page" href="troubleshooting.html">حل المشاكل</a></nav></div></header>
+  <main class="page" id="content">
+    <div class="page-title"><p class="eyebrow">ابدأ بالاختبار الأبسط</p><h1>حل المشاكل خطوة خطوة</h1><p class="lead">لا تعِد التثبيت عشوائيًا. حدّد أول نقطة لا تعمل، ثم أصلحها.</p></div>
+    <section class="section" aria-labelledby="diagnostic"><h2 id="diagnostic">اختبار الدقائق الثلاث</h2>
+      <div class="steps">
+        <article class="step"><div><h3>هل الإضافة ظاهرة؟</h3><p>ابحث في Extensions عن INI Brain، ثم تأكد أنها Enabled. أعد تحميل VS Code.</p></div></article>
+        <article class="step"><div><h3>هل عقل المشروع موجود؟</h3><p>اضغط Scan Project، ثم تحقق من وجود <code>.brain/metadata.json</code> و<code>AGENTS.md</code>.</p></div></article>
+        <article class="step"><div><h3>هل MCP يعمل؟</h3><p>في الوكيل اطلب <code>ini_brain_status</code>. إذا لم تظهر الأداة، المشكلة في إعداد العميل أو إعادة التشغيل.</p></div></article>
+        <article class="step"><div><h3>هل المسار صحيح؟</h3><p>اقرأ قيمة workspace في النتيجة. يجب أن تكون مجلد مشروعك، لا مجلد الإضافة.</p></div></article>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="problems"><h2 id="problems">المشاكل الشائعة</h2>
+      <div class="table-wrap"><table><thead><tr><th>المشكلة</th><th>السبب المعتاد</th><th>الحل</th></tr></thead><tbody>
+        <tr><td>Codex لا يرى أدوات INI Brain</td><td>لم يُحدّث config أو لم يُعد تشغيله</td><td>شغّل installer، افحص <code>~/.codex/config.toml</code>، أغلق Codex وافتح مهمة جديدة.</td></tr>
+        <tr><td>Cline يظهر الخادم Offline</td><td>مسار server.js خاطئ أو dist غير مبني</td><td>شغّل <code>npm run compile</code> في مجلد INI Brain، ثم اضغط Install MCP وأعد تحميل VS Code.</td></tr>
+        <tr><td>Claude Desktop لا يتصل</td><td>التطبيق بقي في system tray</td><td>Quit كاملًا، افحص JSON، ثم افتحه من جديد.</td></tr>
+        <tr><td>workspace مشروع خاطئ</td><td>العميل شغّل MCP من مجلد مركزي</td><td>افتح المهمة من مجلد المشروع، أو مرّر <code>workspace</code> في الأداة.</td></tr>
+        <tr><td>Smart Setup لا يكتشف واجهة في مجلد فارغ</td><td>لا توجد ملفات ولا وصف</td><td>اكتب React/واجهة/موقع داخل <code>project_request.md</code> ثم أعد Preview.</td></tr>
+        <tr><td>لا توجد حزمة Code Intelligence متقدمة</td><td>المحرك اختياري</td><td>Lite Graph يعمل تلقائيًا. للتثبيت الصريح استخدم <code>-InstallCodeIntel</code>.</td></tr>
+        <tr><td>التوكينات زادت في سؤال بسيط</td><td>استدعيت سياق المشروع بلا حاجة</td><td>لا تستخدم Auto Brief للأسئلة العامة. استخدم budgetChars أصغر للمهام الصغيرة.</td></tr>
+        <tr><td>الإجابة قصيرة لدرجة غير مفهومة</td><td>Caveman أو Ponytail مستوى شديد</td><td>Switch Level إلى Lite، أو Disable All، ثم أعد المهمة.</td></tr>
+        <tr><td>التحديث لم ينزّل repo كاملًا</td><td>هذا السلوك المقصود</td><td>INI Brain يجلب الملفات المسجلة فقط. الـarchive الكامل للنسخ الاحتياطي وليس لكل مشروع.</td></tr>
+      </tbody></table></div>
+    </section>
+    <section class="section" aria-labelledby="commands"><h2 id="commands">أوامر فحص للمطور</h2>
+      <pre><code>node --version
+npm --version
+npm run compile
+npm run smoke:all
+npm run audit:public
+npm run package</code></pre>
+      <p>اختبار الخادم يدويًا:</p>
+      <pre><code>node dist/mcp/server.js</code></pre>
+      <div class="callout warning"><strong>ملاحظة</strong>الخادم ينتظر JSON-RPC على stdin؛ ظهوره بلا واجهة رسومية طبيعي. الاختبار الأفضل هو <code>npm run smoke:mcp</code>.</div>
+    </section>
+    <section class="section" aria-labelledby="reset"><h2 id="reset">قبل أن تحذف شيئًا</h2>
+      <ul class="checklist"><li>لا تحذف <code>.brain/backups</code> إذا كنت تحتاج الاستعادة.</li><li>استخدم Disable/Remove All بدل حذف أجزاء عشوائية.</li><li>احفظ نسخة من قراراتك المهمة.</li><li>لا تستخدم <code>git reset --hard</code> لحل مشكلة إعداد.</li></ul>
+      <div class="callout danger"><strong>مفتاح API</strong>لا تكتبه في README أو AGENTS.md أو project_request.md أو memories.json. أدخله من Settings ليُحفظ في SecretStorage.</div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><a href="features.html">← المميزات</a><a href="index.html">العودة للبداية</a></div></footer>
+  <script src="assets/guide.js"></script>
+</body></html>
+

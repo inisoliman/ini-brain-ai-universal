@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="620" viewBox="0 0 1040 620" role="img" aria-labelledby="title desc">
+  <title id="title">استخدام INI Brain مع تطبيق Codex على Windows</title><desc id="desc">رسم لتطبيق Codex ومحادثة تبدأ بأداة auto brief</desc>
+  <rect width="1040" height="620" rx="28" fill="#eaf0f8"/>
+  <rect x="24" y="24" width="992" height="572" rx="20" fill="#fff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="24" y="24" width="992" height="50" rx="20" fill="#162033"/><rect x="24" y="54" width="992" height="20" fill="#162033"/>
+  <circle cx="56" cy="49" r="8" fill="#ef4444"/><circle cx="82" cy="49" r="8" fill="#f59e0b"/><circle cx="108" cy="49" r="8" fill="#22c55e"/><text x="520" y="56" text-anchor="middle" fill="#dbe5f3" font-family="Segoe UI,Arial" font-size="17">ChatGPT Codex — Windows</text>
+  <rect x="24" y="74" width="250" height="522" fill="#f1f4f9"/><text x="50" y="112" fill="#1e293b" font-family="Segoe UI,Arial" font-size="18" font-weight="800">Tasks</text>
+  <rect x="42" y="132" width="214" height="72" rx="12" fill="#fff" stroke="#d9e0ec"/><text x="60" y="160" fill="#334155" font-family="Segoe UI,Arial" font-size="14" font-weight="700">مشروعي الجديد</text><text x="60" y="184" fill="#64748b" font-family="Segoe UI,Arial" font-size="12">C:\projects\my-app</text>
+  <rect x="298" y="100" width="690" height="400" rx="17" fill="#fbfcfe" stroke="#e2e8f0"/>
+  <g font-family="Segoe UI,Arial"><rect x="578" y="132" width="378" height="86" rx="15" fill="#5b4cf0"/><text x="932" y="162" text-anchor="end" fill="#fff" font-size="15">ابدأ بـ ini_brain_auto_brief لهذه المهمة،</text><text x="932" y="189" text-anchor="end" fill="#fff" font-size="15">ثم اعرض خطة Smart Setup فقط.</text>
+  <rect x="328" y="244" width="560" height="190" rx="15" fill="#eef3fa"/><text x="350" y="278" fill="#1e293b" font-size="15" font-weight="800">INI Brain Auto Brief ✓</text><text x="350" y="310" fill="#475569" font-size="14">Workspace: C:\projects\my-app</text><text x="350" y="342" fill="#475569" font-size="14">Recommended: workflow-core, token-savings</text><text x="350" y="374" fill="#14845f" font-size="14">Network required: false</text><text x="350" y="406" fill="#475569" font-size="14">Waiting for your approval before writing files.</text>
+  <rect x="298" y="524" width="690" height="52" rx="13" fill="#fff" stroke="#cbd5e1"/><text x="324" y="556" fill="#94a3b8" font-size="14">اكتب مهمتك هنا...</text><circle cx="956" cy="550" r="18" fill="#5b4cf0"/><path d="M949 550h14m-7-7l7 7-7 7" stroke="#fff" stroke-width="2" fill="none"/></g>
+</svg>
+

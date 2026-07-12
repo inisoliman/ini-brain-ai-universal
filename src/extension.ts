@@ -26,6 +26,7 @@ import { buildCodeGraph, loadGraph, saveGraph, computeImpact } from './graph/kno
 import { renderMermaid, renderMermaidHtml } from './graph/mermaidRenderer';
 import { deployToAllAgents, removeFromAllAgents, detectInstalledAdapters } from './adapters/registry';
 import { checkAll, applyOne } from './updater/repoSync';
+import { applySmartSetup, createSmartSetupPlan, formatSmartSetupPlan, recommendedPackIds, SmartSetupPackId } from './smartSetup/smartProjectSetup';
 
 let output: vscode.OutputChannel;
 
@@ -97,6 +98,43 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       await onboarding.initializeOrRefresh();
       vscode.window.showInformationMessage('INI Brain guided setup completed.');
     })),
+    vscode.commands.registerCommand('iniBrain.smartSetupPreview', () => runWithStatus(sidebar, 'Smart setup', async () => {
+      const plan = await createSmartSetupPlan(root);
+      output.clear();
+      output.appendLine(formatSmartSetupPlan(plan));
+      output.show(true);
+      sidebar.log(`Smart setup: ${recommendedPackIds(plan).length} recommended pack(s).`);
+      const choice = await vscode.window.showInformationMessage('Smart setup plan is ready in Output.', 'Choose Packages');
+      if (choice === 'Choose Packages') await vscode.commands.executeCommand('iniBrain.smartSetupApply');
+    })),
+    vscode.commands.registerCommand('iniBrain.smartSetupApply', () => runWithStatus(sidebar, 'Smart setup', async () => {
+      const plan = await createSmartSetupPlan(root);
+      const picked = await vscode.window.showQuickPick(
+        plan.recommendations.map(item => ({
+          label: item.title,
+          description: item.recommended ? 'Recommended' : 'Optional',
+          detail: `${item.description} ${item.reasons.join(' ')}`,
+          packId: item.id,
+          picked: item.recommended,
+        })),
+        { canPickMany: true, placeHolder: 'Choose the packs to add. Only curated local files will be used.' }
+      );
+      if (!picked?.length) return;
+      const names = picked.map(item => item.label).join(', ');
+      const confirm = await vscode.window.showWarningMessage(
+        `Apply these packs? ${names}\nNo repositories will be cloned.`,
+        { modal: true },
+        'Apply'
+      );
+      if (confirm !== 'Apply') return;
+      const result = await applySmartSetup(root, picked.map(item => item.packId as SmartSetupPackId));
+      sidebar.log(`Smart setup applied ${result.appliedPacks.length} pack(s), wrote ${result.writtenFiles.length} file(s).`);
+      vscode.window.showInformationMessage('Smart project setup completed. See .brain/smart-setup.json for the report.');
+    })),
+    vscode.commands.registerCommand('iniBrain.openVisualGuide', async () => {
+      const guide = vscode.Uri.file(path.join(context.extensionPath, 'docs', 'guide', 'index.html'));
+      await vscode.env.openExternal(guide);
+    }),
     vscode.commands.registerCommand('iniBrain.generateAgentGuide', () => runWithStatus(sidebar, 'Generating', async () => {
       const scan = await scanner.scan();
       const brain = await brainStore.writeScan(scan);

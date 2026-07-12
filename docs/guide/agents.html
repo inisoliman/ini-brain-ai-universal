@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codex وClaude وCline — INI Brain</title><link rel="stylesheet" href="assets/guide.css"></head>
+<body>
+  <a class="skip-link" href="#content">تخطَّ إلى الشرح</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">IB</span><span>دليل INI Brain</span></a><button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="main-nav">القائمة</button><nav class="nav" id="main-nav" data-nav aria-label="التنقل الرئيسي"><a href="index.html">ابدأ هنا</a><a href="vscode.html">أزرار VS Code</a><a aria-current="page" href="agents.html">Codex والوكلاء</a><a href="smart-setup.html">الإعداد الذكي</a><a href="features.html">المميزات</a><a href="troubleshooting.html">حل المشاكل</a></nav></div></header>
+  <main class="page" id="content">
+    <div class="page-title"><p class="eyebrow">Windows • MCP • خطوات قابلة للنسخ</p><h1>كيف يعمل مع Codex وCline وClaude؟</h1><p class="lead">الوكلاء جميعًا يستخدمون نفس العقل. الاختلاف فقط في مكان إعداد MCP ومجلد المهارات.</p></div>
+    <div class="flow"><span>مشروعك</span><b>←</b><span>.brain + AGENTS.md</span><b>←</b><span>INI Brain MCP</span><b>←</b><span>Codex / Claude / Cline</span></div>
+
+    <section class="section" aria-labelledby="install-server"><h2 id="install-server">مرة واحدة فقط: جهّز الخادم على Windows</h2>
+      <p class="section-intro">إذا كان معك مجلد المصدر، افتح PowerShell داخله وشغّل المثبّت الشامل. هو يبني الخادم ويضيفه إلى Codex وClaude Desktop وCline الموجودين على جهازك.</p>
+      <pre><code>powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1</code></pre>
+      <div class="callout"><strong>لا تريد تعديل برنامج معيّن؟</strong>استخدم مثلًا <code>-SkipClaude</code> أو <code>-SkipCline</code> أو <code>-SkipCodex</code>. المحرك المتقدم اختياري: <code>-InstallCodeIntel</code>.</div>
+    </section>
+
+    <section class="section" aria-labelledby="codex"><h2 id="codex">ChatGPT Codex على Windows — الخطوات المهمة لك</h2>
+      <div class="steps">
+        <article class="step"><div><h3>ثبت إعداد MCP</h3><p>شغّل المثبّت أعلاه، أو أضف الخادم يدويًا في ملف <code>%USERPROFILE%\.codex\config.toml</code>.</p><pre><code>[mcp_servers.ini-brain-ai]
+command = "node"
+args = ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"]
+startup_timeout_sec = 120</code></pre></div></article>
+        <article class="step"><div><h3>أغلق Codex وافتحه</h3><p>إعادة التشغيل مهمة لأن قائمة أدوات MCP تُحمّل في بداية المهمة.</p></div></article>
+        <article class="step"><div><h3>افتح المشروع الصحيح</h3><p>في Codex اختر مجلد المشروع نفسه الذي فتحته في VS Code. لا تختَر مجلد INI Brain إلا إذا كنت تطور الإضافة نفسها.</p></div></article>
+        <article class="step"><div><h3>ابدأ بمهمة اختبار</h3><pre><code>استخدم ini_brain_status وأخبرني بمسار workspace وهل .brain موجود.</code></pre><p>إذا كان المسار مشروعك، فالربط صحيح.</p></div></article>
+        <article class="step"><div><h3>ابدأ العمل الطبيعي</h3><pre><code>ابدأ بـ ini_brain_auto_brief لهذه المهمة، ثم استخدم ini_brain_get_context قبل التعديل.
+اعرض خطة Smart Setup إذا احتاج المشروع، ولا تطبقها قبل موافقتي.</code></pre></div></article>
+      </div>
+      <div class="diagram"><img src="assets/codex-windows.svg" alt="تطبيق Codex على Windows يعرض نتيجة INI Brain Auto Brief وخطة الإعداد الذكي"></div>
+      <div class="callout warning"><strong>إذا فتح Codex مشروعًا خاطئًا</strong>أنشئ مهمة جديدة من مجلد المشروع الصحيح، أو مرّر <code>workspace</code> صراحة عند استدعاء الأداة. لا تثبّت متغير <code>INI_BRAIN_WORKSPACE</code> عالميًا لمشروع واحد.</div>
+    </section>
+
+    <section class="section" aria-labelledby="cline"><h2 id="cline">Cline داخل VS Code</h2>
+      <div class="grid two">
+        <article class="card"><div class="icon">1</div><h3>الطريقة الأسهل</h3><p>من لوحة INI Brain اضغط <strong>Install MCP</strong>. يحفظ Cline الموجود ويحُدّث خادم <code>ini-brain-ai</code> فقط.</p></article>
+        <article class="card"><div class="icon">2</div><h3>أعد تحميل VS Code</h3><p>افتح Cline → MCP Servers وتأكد أن INI Brain مفعّل وليس Disabled.</p></article>
+        <article class="card"><div class="icon">3</div><h3>اختبره</h3><p>قل: «استخدم <code>ini_brain_status</code> ثم <code>ini_brain_auto_brief</code> لهذه المهمة».</p></article>
+        <article class="card"><div class="icon">4</div><h3>بدون MCP</h3><p>اضغط <strong>Copy for Cline</strong> والصق النص في المحادثة. هذا يعمل، لكنه أقل راحة من الأدوات الحية.</p></article>
+      </div>
+      <p>الإضافة تولد أيضًا <code>.cline/skills</code> و<code>.clinerules/skills</code> وworkflow خاصًا بالمشروع.</p>
+    </section>
+
+    <section class="section" aria-labelledby="claude"><h2 id="claude">Claude Desktop وClaude Code</h2>
+      <div class="tabs" data-tabs>
+        <div class="tabs" role="tablist" aria-label="نوع Claude">
+          <button class="tab-button" role="tab" aria-selected="true" aria-controls="claude-desktop">Claude Desktop</button>
+          <button class="tab-button" role="tab" aria-selected="false" aria-controls="claude-code">Claude Code</button>
+        </div>
+        <div id="claude-desktop" class="tab-panel card" role="tabpanel"><h3>Claude Desktop</h3><p>المثبّت الشامل يضيف الخادم إلى <code>%APPDATA%\Claude\claude_desktop_config.json</code>. أغلق التطبيق من شريط النظام بالكامل، ثم افتحه. استخدم نفس Prompt الاختبار.</p></div>
+        <div id="claude-code" class="tab-panel card" role="tabpanel" hidden><h3>Claude Code</h3><p>شغّله من جذر المشروع. Smart Setup ينشر المهارات إلى <code>.claude/skills/&lt;name&gt;/SKILL.md</code> عند اكتشاف مجلد <code>.claude</code> أو ملف <code>CLAUDE.md</code>.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="others"><h2 id="others">Cursor وWindsurf وGemini وCopilot وغيرهم</h2>
+      <div class="table-wrap"><table><thead><tr><th>الوكيل</th><th>مكان المهارات</th><th>ملاحظة</th></tr></thead><tbody>
+        <tr><td>Cursor</td><td><code>.cursor/rules/*.mdc</code></td><td>المهارات عند الطلب <code>alwaysApply: false</code> لتقليل التوكينات.</td></tr>
+        <tr><td>Windsurf</td><td><code>.windsurf/rules/</code></td><td>شغّل Adapters → Install All بعد تفعيل الحزم.</td></tr>
+        <tr><td>Gemini CLI</td><td><code>.gemini/skills/</code></td><td>يُكتشف عند وجود <code>.gemini</code>.</td></tr>
+        <tr><td>GitHub Copilot</td><td><code>.github/copilot-instructions.md</code></td><td>تُضاف أقسام بعلامات INI Brain ويمكن إزالتها بأمان.</td></tr>
+        <tr><td>OpenCode</td><td><code>.opencode/skills/</code></td><td>يدعم مهارات وأوامر محلية للمشروع.</td></tr>
+        <tr><td>Kiro / Kimi / Antigravity</td><td>مجلدات القواعد الخاصة بها أو <code>.brain</code></td><td>استخدم Copy MCP Config إذا كان العميل يدعم stdio MCP.</td></tr>
+      </tbody></table></div>
+      <div class="callout"><strong>فكرة مهمة</strong>لا تحتاج إلى عقل منفصل لكل وكيل. المصدر الحقيقي هو <code>.brain</code> و<code>AGENTS.md</code>، ومجلدات الوكلاء مرايا مناسبة لصيغتهم.</div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><a href="vscode.html">← أزرار VS Code</a><a href="smart-setup.html">التالي: الإعداد الذكي</a></div></footer>
+  <script src="assets/guide.js"></script>
+</body></html>
+

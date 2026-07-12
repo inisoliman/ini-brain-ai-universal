@@ -10,7 +10,7 @@ export const cursorAdapter: AgentAdapter = {
            (await pathExists(path.join(root, '.cursorrules')));
   },
   async writeSkill({ root, name, body }) {
-    const mdcBody = `---\ndescription: ${name} skill\nalwaysApply: true\n---\n\n${body}`;
+    const mdcBody = `---\ndescription: ${name} skill\nalwaysApply: false\n---\n\n${body}`;
     return [await writeText(path.join(root, '.cursor', 'rules', `${name}.mdc`), mdcBody)];
   },
   async writeCommand({ root, name, body }) {

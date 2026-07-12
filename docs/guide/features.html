@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>المميزات والتوكينات — INI Brain</title><link rel="stylesheet" href="assets/guide.css"></head>
+<body>
+  <a class="skip-link" href="#content">تخطَّ إلى الشرح</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">IB</span><span>دليل INI Brain</span></a><button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="main-nav">القائمة</button><nav class="nav" id="main-nav" data-nav aria-label="التنقل الرئيسي"><a href="index.html">ابدأ هنا</a><a href="vscode.html">أزرار VS Code</a><a href="agents.html">Codex والوكلاء</a><a href="smart-setup.html">الإعداد الذكي</a><a aria-current="page" href="features.html">المميزات</a><a href="troubleshooting.html">حل المشاكل</a></nav></div></header>
+  <main class="page" id="content">
+    <div class="page-title"><p class="eyebrow">استخدم المناسب فقط</p><h1>أفضل طريقة لاستخدام كل المميزات</h1><p class="lead">INI Brain يوفر التوكينات عندما يمنع القراءة والتفسير المتكرر. لكنه قد يستهلك أكثر إذا طلبت سياقًا كبيرًا لسؤال صغير.</p></div>
+    <section class="section" aria-labelledby="daily-flow"><h2 id="daily-flow">المسار اليومي الموصى به</h2>
+      <div class="flow"><span>Auto Brief مرة</span><b>←</b><span>Context مركز</span><b>←</b><span>التعديل</span><b>←</b><span>Impact + Tests</span><b>←</b><span>Save Memory</span></div>
+      <div class="callout"><strong>Prompt عملي</strong>«ابدأ بـauto brief، اقرأ السياق للمهمة فقط، عدّل أصغر عدد ملفات، افحص التأثير، شغّل الاختبارات، ثم احفظ القرار الدائم فقط.»</div>
+    </section>
+    <section class="section" aria-labelledby="token-truth"><h2 id="token-truth">حقيقة توفير التوكينات</h2>
+      <div class="grid two">
+        <article class="card"><h3>يوفر غالبًا عندما</h3><ul class="checklist"><li>المشروع متوسط أو كبير.</li><li>لديك جلسات متعددة.</li><li>توجد قرارات سابقة مهمة.</li><li>تستخدم Explain/Impact بدل قراءة ملفات كثيرة.</li><li>تحمّل المهارة المناسبة فقط.</li></ul></article>
+        <article class="card"><h3>قد يستهلك أكثر عندما</h3><ul><li>السؤال عام ولا يتعلق بالمشروع.</li><li>المشروع ملفان فقط.</li><li>تطلب Auto Brief وContext عدة مرات بلا داعٍ.</li><li>تفعّل Ultra ثم تضطر لإعادة السؤال بسبب إجابة غامضة.</li><li>تضع كل مهارة Always Apply؛ لذلك جعلنا Cursor عند الطلب.</li></ul></article>
+      </div>
+      <p>للمقارنة المحلية استخدم:</p>
+      <pre><code>ini_brain_compare_tokens {
+  "baselineText": "النص الطويل قبل التحسين",
+  "optimizedText": "النص الأقصر بعد التحسين"
+}</code></pre>
+      <div class="callout warning"><strong>العداد تقديري</strong>النتيجة تقارن حجم النصين بنفس الخوارزمية. الاستهلاك الحقيقي يظهر في برنامج النموذج نفسه ويختلف حسب tokenizer.</div>
+    </section>
+    <section class="section" aria-labelledby="feature-map"><h2 id="feature-map">أي ميزة لأي سؤال؟</h2>
+      <div class="table-wrap"><table><thead><tr><th>أريد أن…</th><th>استخدم</th><th>مثال طلب</th></tr></thead><tbody>
+        <tr><td>أفهم المشروع لأول مرة</td><td>Onboarding + Auto Brief</td><td>«أنشئ onboarding ثم اشرح نقاط البداية.»</td></tr>
+        <tr><td>أخطط ميزة كبيرة</td><td>Product Discovery + Spec-Kit</td><td>«استخدم product-discovery ثم أنشئ spec فقط.»</td></tr>
+        <tr><td>أصلح bug</td><td>Systematic Investigation</td><td>«شخّص السبب أولًا ولا تعدّل قبل إعادة الإنتاج.»</td></tr>
+        <tr><td>أعرف أثر ملف</td><td>Explain + Impact / Knowledge Graph</td><td>«اشرح هذا الملف ثم احسب blast radius.»</td></tr>
+        <tr><td>أراجع الواجهة</td><td>Frontend Design Guard</td><td>«راجع layout وaccessibility وresponsive بصور حقيقية.»</td></tr>
+        <tr><td>أراجع الأمن</td><td>Security Review</td><td>«راجع trust boundaries وOWASP بأدلة من الكود.»</td></tr>
+        <tr><td>أستكمل غدًا</td><td>Save Memory + Project Handoff</td><td>«احفظ القرارات واكتب الخطوة التالية بوضوح.»</td></tr>
+        <tr><td>أجهز إصدارًا</td><td>Unified Review + Release Readiness</td><td>«شغّل البوابات وأعطني READY أو NOT_READY.»</td></tr>
+      </tbody></table></div>
+    </section>
+    <section class="section" aria-labelledby="files"><h2 id="files">ما هذه الملفات التي ظهرت في مشروعي؟</h2>
+      <div class="grid two">
+        <article class="card"><h3><code>AGENTS.md</code></h3><p>دستور قصير يقرأه Codex ووكلاء آخرون: أهم الملفات، القواعد، ومسار العمل.</p></article>
+        <article class="card"><h3><code>.brain/compact_context.md</code></h3><p>الملخص المركز الذي يوفر قراءة المشروع كاملًا كل مرة.</p></article>
+        <article class="card"><h3><code>.brain/memories.json</code></h3><p>ذاكرة محلية للقرارات والأخطاء والتفضيلات. لا تضع أسرارًا فيها.</p></article>
+        <article class="card"><h3><code>.brain/upstream/</code></h3><p>الملفات المنتقاة التي اختارها Smart Setup أو Upstream Apply، وليست clones.</p></article>
+        <article class="card"><h3><code>.codex/.cline/.claude</code></h3><p>مرايا مهارات بصيغة كل وكيل. المصدر الحقيقي يبقى `.brain`.</p></article>
+        <article class="card"><h3><code>.specify/</code></h3><p>مواصفات وخطط ومهام الميزات الكبيرة.</p></article>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="safety"><h2 id="safety">الأمان والخصوصية</h2>
+      <ul class="checklist"><li>الفحص وبناء الرسم والذاكرة محلي.</li><li>مفاتيح API داخل VS Code SecretStorage.</li><li>Auto Mode يعرض التغييرات ويطلب موافقة ويحفظ backup.</li><li>Smart Setup لا يثبت binaries ولا يستنسخ repos.</li><li>Memory Compact يبدأ Dry Run.</li><li>Apply Upstream يحتاج اختيارًا من المستخدم.</li></ul>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><a href="smart-setup.html">← الإعداد الذكي</a><a href="troubleshooting.html">التالي: حل المشاكل</a></div></footer>
+  <script src="assets/guide.js"></script>
+</body></html>
+

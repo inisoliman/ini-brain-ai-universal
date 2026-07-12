@@ -67,6 +67,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     const statusClass = this.status.toLowerCase().replace(/\s+/g, '-');
     const legacyButtons = [
       ['Scan Project', 'iniBrain.scanProject', 'primary'],
+      ['Smart Setup', 'iniBrain.smartSetupPreview', 'primary'],
       ['Rebuild Brain', 'iniBrain.rebuildBrain', 'secondary'],
       ['Ask AI', 'openAskChat', 'secondary'],
       ['Auto Mode', 'iniBrain.autoMode', 'secondary'],
@@ -84,7 +85,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       ['Memory Profile', 'iniBrain.showMemoryProfile', 'secondary'],
       ['Copy MCP Config', 'iniBrain.copyMcpConfigForCline', 'secondary'],
       ['Install MCP', 'iniBrain.installMcpForCline', 'primary'],
-      ['Settings', 'iniBrain.openSettings', 'secondary']
+      ['Settings', 'iniBrain.openSettings', 'secondary'],
+      ['Visual Guide', 'iniBrain.openVisualGuide', 'secondary']
     ];
     const cards = [
       ['Token Savings', [

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>شرح أزرار VS Code — INI Brain</title><link rel="stylesheet" href="assets/guide.css"></head>
+<body>
+  <a class="skip-link" href="#content">تخطَّ إلى الشرح</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">IB</span><span>دليل INI Brain</span></a><button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="main-nav">القائمة</button><nav class="nav" id="main-nav" data-nav aria-label="التنقل الرئيسي"><a href="index.html">ابدأ هنا</a><a aria-current="page" href="vscode.html">أزرار VS Code</a><a href="agents.html">Codex والوكلاء</a><a href="smart-setup.html">الإعداد الذكي</a><a href="features.html">المميزات</a><a href="troubleshooting.html">حل المشاكل</a></nav></div></header>
+  <main class="page" id="content">
+    <div class="page-title"><p class="eyebrow">مرجع كامل للوحة الإضافة</p><h1>ماذا يفعل كل زر؟</h1><p class="lead">ابدأ دائمًا بـSmart Setup للمشروع الجديد، أو Scan Project للمشروع الموجود. باقي الأزرار أدوات تستخدمها عند الحاجة.</p></div>
+    <div class="diagram"><img src="assets/vscode-sidebar.svg" alt="لوحة INI Brain داخل VS Code مع الأزرار مرقمة"></div>
+    <section class="section" aria-labelledby="main-buttons"><h2 id="main-buttons">الأزرار الأساسية</h2>
+      <div class="table-wrap"><table><thead><tr><th>الزر</th><th>متى أستخدمه؟</th><th>ماذا يفعل؟</th><th>هل يغيّر ملفات؟</th></tr></thead><tbody>
+        <tr><td>Scan Project</td><td>أول مرة في مشروع موجود</td><td>يفحص الملفات محليًا وينشئ عقل المشروع وملفات الوكلاء.</td><td>نعم: <code>.brain</code> و<code>AGENTS.md</code> ومرايا المهارات.</td></tr>
+        <tr><td>Smart Setup</td><td>مشروع جديد أو حين تريد أفضل إعداد</td><td>يفهم اللغات ووصف المشروع والوكلاء، ثم يعرض حزمًا مقترحة.</td><td>المعاينة لا. التطبيق بعد موافقتك نعم.</td></tr>
+        <tr><td>Rebuild Brain</td><td>بعد تغييرات كبيرة أو إذا أصبح الملخص قديمًا</td><td>يعيد الفحص وبناء خرائط السياق.</td><td>يحدّث ملفات INI Brain فقط.</td></tr>
+        <tr><td>Guided Setup</td><td>عندما يكون المجلد فارغًا</td><td>ينشئ <code>project_request.md</code> لتكتب فيه فكرتك.</td><td>ينشئ ملف وصف المشروع.</td></tr>
+        <tr><td>Ask AI</td><td>لسؤال المزود الاختياري من داخل VS Code</td><td>يرسل السؤال مع سياق المشروع المركز إلى المزود الذي أعددته.</td><td>لا، إلا إذا اخترت Auto Mode لاحقًا.</td></tr>
+        <tr><td>Auto Mode</td><td>عندما تريد من AI اقتراح تعديلات ملفات</td><td>يعرض الخطة والتغييرات، يطلب التأكيد، ثم يحفظ نسخة احتياطية قبل الكتابة.</td><td>نعم بعد موافقة صريحة.</td></tr>
+        <tr><td>Generate Project</td><td>لبناء مشروع جديد من الوصف</td><td>يستخدم المزود لإعداد خطة ملفات مشروع.</td><td>نعم بعد المعاينة والتأكيد.</td></tr>
+      </tbody></table></div>
+    </section>
+    <section class="section" aria-labelledby="understand-buttons"><h2 id="understand-buttons">الفهم والذاكرة والجودة</h2>
+      <div class="table-wrap"><table><thead><tr><th>الزر</th><th>وظيفته بلغة بسيطة</th></tr></thead><tbody>
+        <tr><td>Agent Guide</td><td>يعيد إنشاء <code>AGENTS.md</code> وتعليمات المشروع للوكلاء.</td></tr>
+        <tr><td>Skills &amp; Workflow</td><td>ينشئ المهارات المناسبة للغات وأطر المشروع ومسار العمل.</td></tr>
+        <tr><td>Onboarding</td><td>يكتب دليل «ابدأ من هنا» يشرح أهم الملفات ونقاط الدخول.</td></tr>
+        <tr><td>Explain File</td><td>افتح ملفًا في المحرر، ثم اضغطه لمعرفة exports والتبعيات ومن يعتمد عليه.</td></tr>
+        <tr><td>Analyze Impact</td><td>يفحص ملفات Git المتغيرة ويخبرك بما قد يتأثر.</td></tr>
+        <tr><td>Quality Guards</td><td>ينشئ حراس Clean Code والاختبارات والواجهة وإرشادات التغيير البسيط.</td></tr>
+        <tr><td>Save Memory</td><td>يحفظ قرارًا أو خطأً أو تفضيلًا ليسترجعه الوكلاء لاحقًا.</td></tr>
+        <tr><td>Search Memory</td><td>يبحث في الذاكرة المحلية بكلماتك.</td></tr>
+        <tr><td>Memory Profile</td><td>يعرض عدد الذكريات وأهم المفاهيم والملفات المتكررة.</td></tr>
+        <tr><td>Restore Backup</td><td>يعيد ملفًا من نسخة Auto Mode الاحتياطية. راجع التاريخ قبل الاختيار.</td></tr>
+      </tbody></table></div>
+    </section>
+    <section class="section" aria-labelledby="connection-buttons"><h2 id="connection-buttons">الاتصال بالوكلاء والإعدادات</h2>
+      <div class="grid two">
+        <article class="card"><h3>Copy for Cline</h3><p>ينسخ سياقًا مركزًا تلصقه يدويًا في Cline. مفيد حتى قبل إعداد MCP.</p></article>
+        <article class="card"><h3>Copy MCP Config</h3><p>ينسخ JSON العام لخادم INI Brain. استخدمه في أي عميل MCP يدعم stdio.</p></article>
+        <article class="card"><h3>Install MCP</h3><p>يثبت إعداد MCP تلقائيًا داخل Cline على Windows ويحافظ على الخوادم الموجودة.</p></article>
+        <article class="card"><h3>Settings</h3><p>يفتح إعدادات المزود والنموذج والمهلة والتأكيد والنسخ الاحتياطية. مفتاح API يُحفظ في SecretStorage.</p></article>
+        <article class="card"><h3>Visual Guide</h3><p>يفتح هذا الدليل المصور من داخل الإضافة.</p></article>
+        <article class="card"><h3>Refresh / Clear Console</h3><p>Refresh يعيد رسم اللوحة، وClear Console يمسح رسائل اللوحة فقط ولا يحذف ملفات أو ذاكرة.</p></article>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="cards"><h2 id="cards">بطاقات المميزات</h2>
+      <div class="table-wrap"><table><thead><tr><th>البطاقة والزر</th><th>النتيجة</th></tr></thead><tbody>
+        <tr><td>Token Savings → Enable All</td><td>يفعّل Caveman وPonytail وClaude Lean. للمبتدئ نوصي Smart Setup لأنه يختار Lite المتوازن.</td></tr>
+        <tr><td>Disable All / Dashboard / Switch Level</td><td>إلغاء التوفير، عرض السجل المقاس، أو اختيار Lite/Full/Ultra. ابدأ بـLite.</td></tr>
+        <tr><td>Knowledge Graph → Build / View</td><td>يبني رسمًا محليًا للملفات وعلاقات الاستيراد ثم يعرضه.</td></tr>
+        <tr><td>Knowledge Graph → Find Impact</td><td>افتح ملفًا ثم اعرف من يعتمد عليه مباشرة وبشكل متسلسل.</td></tr>
+        <tr><td>Spec-Driven Dev → New Spec</td><td>يكتب ماذا نبني ولماذا وقصص المستخدم ومعايير القبول.</td></tr>
+        <tr><td>Plan → Tasks → Implement</td><td>يحوّل المواصفة إلى معمارية، ثم مهام صغيرة، ثم يفتح المهمة التالية.</td></tr>
+        <tr><td>Engineering Workflow</td><td>يضيف اكتشاف المنتج ومراجعة الخطة والتحقيق والأمن ومراجعة الإصدار، أو يزيلها.</td></tr>
+        <tr><td>Adapters → Install All</td><td>ينشر المهارات المفعلة إلى الوكلاء المكتشفين فقط.</td></tr>
+        <tr><td>Adapters → Remove All</td><td>يزيل مرايا مهارات INI Brain من الوكلاء بعد تأكيدك.</td></tr>
+        <tr><td>Upstream Updates → Check Now</td><td>يفحص commit metadata صغيرة عند طلبك، ثم يعرض التحديثات قبل التطبيق.</td></tr>
+        <tr><td>Upstream Updates → Configure</td><td>يحفظ تفضيل الفحص الدوري. التطبيق يظل بحاجة موافقة.</td></tr>
+      </tbody></table></div>
+      <div class="callout warning"><strong>قاعدة سهلة</strong>لا تعرف أي زر تستخدم؟ مشروع جديد: Smart Setup. مشروع موجود: Scan Project. سؤال لوكيل: ابدأ بـ<code>ini_brain_auto_brief</code>.</div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><a href="index.html">← العودة للبداية</a><a href="agents.html">التالي: Codex والوكلاء</a></div></footer>
+  <script src="assets/guide.js"></script>
+</body></html>

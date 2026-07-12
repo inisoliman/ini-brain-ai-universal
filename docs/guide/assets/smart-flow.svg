@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="390" viewBox="0 0 1100 390" role="img" aria-labelledby="title desc">
+  <title id="title">مراحل الإعداد الذكي</title><desc id="desc">ست مراحل من وصف المشروع حتى تقرير الملفات المضافة</desc>
+  <rect width="1100" height="390" rx="28" fill="#f4f6ff"/>
+  <g fill="none" stroke="#8a82e8" stroke-width="4"><path d="M180 195H264"/><path d="M366 195H450"/><path d="M552 195H636"/><path d="M738 195H822"/><path d="M924 195H990"/></g>
+  <g fill="#5b4cf0"><path d="M258 187l14 8-14 8z"/><path d="M444 187l14 8-14 8z"/><path d="M630 187l14 8-14 8z"/><path d="M816 187l14 8-14 8z"/><path d="M984 187l14 8-14 8z"/></g>
+  <g font-family="Segoe UI,Arial" text-anchor="middle">
+    <g><circle cx="110" cy="195" r="68" fill="#fff" stroke="#d9dff0" stroke-width="3"/><text x="110" y="181" font-size="29">✍</text><text x="110" y="215" fill="#29324a" font-size="15" font-weight="800">اكتب فكرتك</text><text x="110" y="238" fill="#68748a" font-size="12">project_request.md</text></g>
+    <g><circle cx="314" cy="195" r="68" fill="#fff" stroke="#d9dff0" stroke-width="3"/><text x="314" y="181" font-size="29">⌕</text><text x="314" y="215" fill="#29324a" font-size="15" font-weight="800">فحص محلي</text><text x="314" y="238" fill="#68748a" font-size="12">صفر توكينات</text></g>
+    <g><circle cx="500" cy="195" r="68" fill="#fff" stroke="#d9dff0" stroke-width="3"/><text x="500" y="181" font-size="29">💡</text><text x="500" y="215" fill="#29324a" font-size="15" font-weight="800">اقتراح الحزم</text><text x="500" y="238" fill="#68748a" font-size="12">مع السبب</text></g>
+    <g><circle cx="686" cy="195" r="68" fill="#fff" stroke="#d9dff0" stroke-width="3"/><text x="686" y="181" font-size="29">☑</text><text x="686" y="215" fill="#29324a" font-size="15" font-weight="800">أنت تختار</text><text x="686" y="238" fill="#68748a" font-size="12">موافقة صريحة</text></g>
+    <g><circle cx="872" cy="195" r="68" fill="#fff" stroke="#d9dff0" stroke-width="3"/><text x="872" y="181" font-size="29">↓</text><text x="872" y="215" fill="#29324a" font-size="15" font-weight="800">نسخ المنتقى</text><text x="872" y="238" fill="#68748a" font-size="12">بدون clone</text></g>
+    <g><circle cx="1030" cy="195" r="55" fill="#dff8ef" stroke="#67c6a2" stroke-width="3"/><text x="1030" y="185" font-size="27">✓</text><text x="1030" y="218" fill="#176649" font-size="14" font-weight="800">تقرير واضح</text></g>
+    <text x="550" y="54" fill="#312e81" font-size="24" font-weight="900">Smart Project Setup</text><text x="550" y="342" fill="#68748a" font-size="15">المشروع لا يتغير من خلفك: الخطة أولًا، ثم اختيارك، ثم التطبيق</text>
+  </g>
+</svg>
+
