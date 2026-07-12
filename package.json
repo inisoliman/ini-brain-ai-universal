@@ -248,8 +248,10 @@
     "smoke:savings": "node scripts/savings-smoke.cjs",
     "smoke:adapters": "node scripts/adapters-smoke.cjs",
     "smoke:updater": "node scripts/updater-smoke.cjs",
+    "smoke:upstream-vault": "node scripts/upstream-vault-smoke.cjs",
+    "smoke:code-intelligence": "node scripts/code-intelligence-smoke.cjs",
     "audit:public": "node scripts/public-release-audit.cjs",
-    "smoke:all": "npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater",
+    "smoke:all": "npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater && npm run smoke:upstream-vault && npm run smoke:code-intelligence",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
   },

@@ -25,6 +25,7 @@ child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list
 child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'ini_brain_status', arguments: {} } })}\n`);
 child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 4, method: 'tools/call', params: { name: 'ini_brain_memory_stats', arguments: {} } })}\n`);
 child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 5, method: 'tools/call', params: { name: 'ini_brain_memory_compact', arguments: {} } })}\n`);
+child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 6, method: 'tools/call', params: { name: 'ini_brain_code_status', arguments: {} } })}\n`);
 
 setTimeout(() => {
   child.kill();
@@ -39,6 +40,8 @@ setTimeout(() => {
   const generateTool = tools.find(tool => tool.name === 'ini_brain_generate_agent_guide');
   const memoryStatsTool = tools.find(tool => tool.name === 'ini_brain_memory_stats');
   const memoryCompactTool = tools.find(tool => tool.name === 'ini_brain_memory_compact');
+  const codeStatusTool = tools.find(tool => tool.name === 'ini_brain_code_status');
+  const codeIndexTool = tools.find(tool => tool.name === 'ini_brain_code_index');
   if (statusTool?.annotations?.readOnlyHint !== true || statusTool?.annotations?.destructiveHint !== false) {
     console.error(stdout);
     console.error(stderr);
@@ -61,6 +64,18 @@ setTimeout(() => {
     console.error(stdout);
     console.error(stderr);
     console.error('MCP smoke test failed: memory compact tool annotations are missing.');
+    process.exit(1);
+  }
+  if (codeStatusTool?.annotations?.readOnlyHint !== true) {
+    console.error(stdout);
+    console.error(stderr);
+    console.error('MCP smoke test failed: code status tool is not read-only.');
+    process.exit(1);
+  }
+  if (codeIndexTool?.annotations?.readOnlyHint !== false || codeIndexTool?.annotations?.destructiveHint !== false) {
+    console.error(stdout);
+    console.error(stderr);
+    console.error('MCP smoke test failed: code index tool annotations are missing.');
     process.exit(1);
   }
   const status = parseResponse(stdout, 3);
@@ -86,6 +101,14 @@ setTimeout(() => {
     console.error(stdout);
     console.error(stderr);
     console.error('MCP smoke test failed: memory compact did not default to dry-run preview.');
+    process.exit(1);
+  }
+  const codeText = parseResponse(stdout, 6)?.result?.content?.[0]?.text;
+  const codePayload = codeText ? JSON.parse(codeText) : null;
+  if (!codePayload?.selected?.provider || !Array.isArray(codePayload?.providers)) {
+    console.error(stdout);
+    console.error(stderr);
+    console.error('MCP smoke test failed: code intelligence status did not return provider data.');
     process.exit(1);
   }
   console.log('MCP smoke test passed.');

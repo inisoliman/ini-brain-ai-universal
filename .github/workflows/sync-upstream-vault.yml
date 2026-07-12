@@ -1,0 +1,38 @@
+name: Sync Upstream Vault
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Refresh curated snapshots
+        run: node scripts/sync-upstream-vault.cjs
+
+      - name: Verify vault checksums
+        run: node scripts/upstream-vault-smoke.cjs
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: automation/sync-upstream-vault
+          commit-message: chore: sync upstream vault snapshots
+          title: chore: sync upstream vault snapshots
+          body: |
+            Automated weekly refresh for curated upstream snapshots.
+
+            Full upstream repositories are archived separately by the archive-upstreams workflow.
+          labels: upstream-vault

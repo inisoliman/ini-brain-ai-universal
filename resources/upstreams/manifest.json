@@ -1,0 +1,50 @@
+{
+  "schema": "ini-brain.upstream-vault.v1",
+  "updatedAt": "2026-07-12T00:00:00.000Z",
+  "mirrorRepository": "inisoliman/ini-brain-ai-universal",
+  "fallbackOrder": [
+    "original",
+    "mirror",
+    "snapshot"
+  ],
+  "sources": [
+    {
+      "id": "codebase-memory-mcp",
+      "repository": "DeusData/codebase-memory-mcp",
+      "branch": "main",
+      "pinnedCommit": "e19a6994932f7004588dd571facf5aeac05d100a",
+      "license": "MIT",
+      "integrationType": "engine",
+      "snapshotRoot": "resources/upstreams/codebase-memory-mcp",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f4f43c8fec48171fb2a671987744417d6dd6c198978289c6cfaf90f1387d14da"
+        },
+        {
+          "path": "server.json",
+          "sha256": "6b9276da65b93ec17938bcff551beec008ba717dac4dea040c390f54a41ac5c9"
+        }
+      ]
+    },
+    {
+      "id": "delegate-skills",
+      "repository": "amElnagdy/delegate-skills",
+      "branch": "main",
+      "pinnedCommit": "e36f68a22ba151936266a0073771251b15d698db",
+      "license": "MIT",
+      "integrationType": "workflow",
+      "snapshotRoot": "resources/upstreams/delegate-skills",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "dffe5f1e6f7e1c2ecc0eb684e452c941fe6b71f142196af0d7f1d57604048e64"
+        },
+        {
+          "path": "skills/codex-delegate/SKILL.md",
+          "sha256": "aa08dba05c3e2ecdd00c11e8cbf184870a8c911aef9901d2dc7c35a39b635f4e"
+        }
+      ]
+    }
+  ]
+}

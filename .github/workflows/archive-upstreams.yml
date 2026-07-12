@@ -1,0 +1,24 @@
+name: Archive Upstreams
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '47 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create git bundle archives
+        run: bash scripts/archive-upstreams.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-git-bundles
+          path: upstream-archives/*.bundle
+          if-no-files-found: error

@@ -10,6 +10,7 @@ import { compactMemories, getMemoryStats } from '../core/memoryCompactor';
 import { MemoryStore, parseCsvList } from '../core/memoryStore';
 import { ProjectScanner } from '../core/projectScanner';
 import { MemoryKind } from '../core/types';
+import { codeIntelligenceTools } from './tools/codeIntelligenceTools';
 import { graphTools } from './tools/graphTools';
 import { methodologyTools } from './tools/methodologyTools';
 import { savingsTools } from './tools/savingsTools';
@@ -64,14 +65,15 @@ class McpError extends Error {
 const EXTRA_TOOLS: Record<string, ToolDefinition> = {
   ...savingsTools,
   ...graphTools,
-  ...methodologyTools
+  ...methodologyTools,
+  ...codeIntelligenceTools
 };
 
 const EXTRA_TOOL_LIST = Object.entries(EXTRA_TOOLS).map(([name, tool]) => ({
   name,
   description: tool.description,
   inputSchema: withWorkspaceInput(tool.inputSchema),
-  annotations: name === 'ini_brain_graph_build' || name === 'ini_brain_spec_create'
+  annotations: name === 'ini_brain_graph_build' || name === 'ini_brain_spec_create' || name === 'ini_brain_code_index'
     ? localWriteAnnotations()
     : readOnlyAnnotations()
 }));
