@@ -14,6 +14,7 @@
 #
 # Skip flags:
 #   -SkipBuild    do not rebuild
+#   -SkipCodeIntel do not install optional codebase-memory-mcp
 #   -SkipCodex    do not modify Codex config
 #   -SkipClaude   do not modify Claude Desktop config
 #   -SkipCline    do not modify Cline config
@@ -22,6 +23,7 @@
 [CmdletBinding()]
 param(
   [switch]$SkipBuild,
+  [switch]$SkipCodeIntel,
   [switch]$SkipCodex,
   [switch]$SkipClaude,
   [switch]$SkipCline
@@ -93,9 +95,35 @@ if (-not (Test-Path $ServerJs)) {
 }
 Write-Ok "Server file ready: $ServerJs"
 
-# ----- 3) Codex CLI config ---------------------------------------------------
+# ----- 3) Optional advanced Code Intelligence --------------------------------
+if (-not $SkipCodeIntel) {
+  Write-Step "3) Advanced Code Intelligence (optional)"
+  try {
+    $cbmVersion = & codebase-memory-mcp --version 2>$null
+    if ($LASTEXITCODE -eq 0) {
+      Write-Ok "codebase-memory-mcp already installed: $cbmVersion"
+    } else {
+      throw "codebase-memory-mcp returned exit code $LASTEXITCODE"
+    }
+  } catch {
+    Write-Host "    Running: npm install -g codebase-memory-mcp"
+    try {
+      & npm install -g codebase-memory-mcp
+      if ($LASTEXITCODE -ne 0) { throw "npm install -g codebase-memory-mcp failed" }
+      $cbmVersion = & codebase-memory-mcp --version 2>$null
+      Write-Ok "codebase-memory-mcp installed: $cbmVersion"
+    } catch {
+      Write-Warn2 "Could not install codebase-memory-mcp automatically. INI Brain Lite Graph fallback will still work."
+      Write-Warn2 "$_"
+    }
+  }
+} else {
+  Write-Warn2 "Advanced Code Intelligence skipped (SkipCodeIntel). Lite Graph fallback will be used."
+}
+
+# ----- 4) Codex CLI config ---------------------------------------------------
 if (-not $SkipCodex) {
-  Write-Step "3) Codex CLI (~/.codex/config.toml)"
+  Write-Step "4) Codex CLI (~/.codex/config.toml)"
   $codexDir = Join-Path $env:USERPROFILE '.codex'
   $codexConfig = Join-Path $codexDir 'config.toml'
   if (-not (Test-Path $codexDir)) { New-Item -ItemType Directory -Path $codexDir | Out-Null }
@@ -124,9 +152,9 @@ startup_timeout_sec = 120
   Write-Warn2 "Codex config skipped (SkipCodex)"
 }
 
-# ----- 4) Claude Desktop config ----------------------------------------------
+# ----- 5) Claude Desktop config ----------------------------------------------
 if (-not $SkipClaude) {
-  Write-Step "4) Claude Desktop"
+  Write-Step "5) Claude Desktop"
   $claudeDir = Join-Path $env:APPDATA 'Claude'
   $claudeConfig = Join-Path $claudeDir 'claude_desktop_config.json'
 
@@ -157,9 +185,9 @@ if (-not $SkipClaude) {
   Write-Warn2 "Claude config skipped (SkipClaude)"
 }
 
-# ----- 5) Cline (VS Code) config ---------------------------------------------
+# ----- 6) Cline (VS Code) config ---------------------------------------------
 if (-not $SkipCline) {
-  Write-Step "5) Cline (VS Code)"
+  Write-Step "6) Cline (VS Code)"
   $clineDir = Join-Path $env:APPDATA 'Code\User\globalStorage\saoudrizwan.claude-dev\settings'
   $clineConfig = Join-Path $clineDir 'cline_mcp_settings.json'
 
