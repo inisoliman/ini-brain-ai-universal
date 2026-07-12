@@ -1,4 +1,6 @@
 import { execFile, spawn } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   CodeArchitectureResult,
   CodeChangesResult,
@@ -10,7 +12,11 @@ import {
   CodeTraceResult
 } from './types';
 
-const EXECUTABLE = process.env.INI_BRAIN_CODEBASE_MEMORY_BIN || 'codebase-memory-mcp';
+interface CommandInvocation {
+  command: string;
+  argsPrefix: string[];
+}
+
 const TIMEOUT_MS = 120_000;
 const OUTPUT_LIMIT = 1024 * 1024 * 4;
 
@@ -74,8 +80,9 @@ export class CodebaseMemoryProvider implements CodeIntelligenceProvider {
 }
 
 async function runVersion(root: string): Promise<{ ok: boolean; version?: string; error?: string }> {
+  const invocation = resolveCommandInvocation();
   return new Promise(resolve => {
-    execFile(EXECUTABLE, ['--version'], { cwd: root, windowsHide: true, timeout: 10_000 }, (error, stdout, stderr) => {
+    execFile(invocation.command, [...invocation.argsPrefix, '--version'], { cwd: root, windowsHide: true, timeout: 10_000 }, (error, stdout, stderr) => {
       if (error) {
         resolve({ ok: false, error: stderr.trim() || error.message });
         return;
@@ -86,8 +93,9 @@ async function runVersion(root: string): Promise<{ ok: boolean; version?: string
 }
 
 async function runCli(root: string, tool: string, args: Record<string, unknown>): Promise<unknown> {
+  const invocation = resolveCommandInvocation();
   return new Promise((resolve, reject) => {
-    const child = spawn(EXECUTABLE, ['cli', tool, JSON.stringify(args)], {
+    const child = spawn(invocation.command, [...invocation.argsPrefix, 'cli', tool, JSON.stringify(args)], {
       cwd: root,
       shell: false,
       windowsHide: true,
@@ -118,6 +126,39 @@ async function runCli(root: string, tool: string, args: Record<string, unknown>)
       resolve(parseJsonOrText(stdout));
     });
   });
+}
+
+function resolveCommandInvocation(): CommandInvocation {
+  const configured = process.env.INI_BRAIN_CODEBASE_MEMORY_BIN;
+  if (configured) return scriptOrBinaryInvocation(configured);
+
+  if (process.platform === 'win32') {
+    const npmBin = findWindowsNpmBinJs();
+    if (npmBin) return { command: process.execPath, argsPrefix: [npmBin] };
+  }
+
+  return { command: 'codebase-memory-mcp', argsPrefix: [] };
+}
+
+function scriptOrBinaryInvocation(command: string): CommandInvocation {
+  if (command.endsWith('.js')) {
+    return { command: process.execPath, argsPrefix: [command] };
+  }
+  return { command, argsPrefix: [] };
+}
+
+function findWindowsNpmBinJs(): string | undefined {
+  const searchDirs = (process.env.PATH || '')
+    .split(path.delimiter)
+    .filter(Boolean);
+  const appData = process.env.APPDATA;
+  if (appData) searchDirs.unshift(path.join(appData, 'npm'));
+
+  for (const dir of searchDirs) {
+    const candidate = path.join(dir, 'node_modules', 'codebase-memory-mcp', 'bin.js');
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return undefined;
 }
 
 function appendLimited(current: string, next: string): string {
