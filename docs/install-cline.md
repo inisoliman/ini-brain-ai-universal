@@ -38,17 +38,17 @@ If Cline starts MCP servers outside the project folder, add `INI_BRAIN_WORKSPACE
 
 Reload Cline MCP servers or reload VS Code.
 
-## Recommended Cline Instruction
+## Automatic Startup Protocol
 
-```md
-Before editing, call ini_brain_auto_brief and ini_brain_get_context for my task. Use ini_brain_search_memory when prior decisions may matter. Save durable findings with ini_brain_save_memory after finishing.
-```
+No manual startup instruction is required for MCP clients that honor server
+instructions. INI Brain supplies the status, auto-brief, focused-context, memory,
+and Smart Setup preview rules automatically.
 
 The VS Code extension also generates `.cline/skills` and `.clinerules` files when you run Scan Project or Generate Agent Guide.
 
 ## Arabic Summary
 
 - ابن السيرفر بـ `npm install` و`npm run compile`.
-- أضف إعداد MCP أعلاه داخل ملف إعدادات Cline.
-- أعد تحميل Cline أو VS Code.
-- بعد Scan Project ستجد skills وclinerules مولدة تلقائياً.
+- أضف إعداد MCP داخل ملف إعدادات Cline أو اترك إضافة VS Code تدمجه تلقائياً عند التفعيل.
+- أعد تحميل Cline أو VS Code بعد أول تركيب.
+- لا تحتاج إلى تعليمات بدء يدوية إذا كان العميل يقرأ تعليمات MCP.

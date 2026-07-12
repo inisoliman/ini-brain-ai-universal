@@ -15,6 +15,11 @@ code --install-extension .\ini-brain-ai-universal-3.2.0.vsix --force
 
 Reload VS Code after installation.
 
+On first activation, the extension automatically merges its packaged MCP server
+into detected Codex, Claude Desktop, and Cline settings. It preserves existing
+servers and never pins the global configuration to the currently open workspace.
+Restart an already-running client once to load the new MCP configuration.
+
 ## First Use
 
 1. Open any project folder.
@@ -44,5 +49,5 @@ Run **INI Brain: Settings** or **INI Brain: Configure AI Provider** to set:
 1. انسخ المستودع من GitHub.
 2. شغل `npm install` ثم `npm run compile` ثم `npm run package`.
 3. ثبت ملف `ini-brain-ai-universal-3.2.0.vsix` داخل VS Code.
-4. افتح أي مشروع ثم استخدم **INI Brain: Scan Project**.
+4. عند أول تفعيل، الإضافة تدمج MCP تلقائياً في Codex وClaude Desktop وCline إذا وجدت إعداداتهم.
 5. مفتاح API اختياري ويتم حفظه في VS Code SecretStorage وليس داخل ملفات المشروع.

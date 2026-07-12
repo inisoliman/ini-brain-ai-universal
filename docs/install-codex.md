@@ -41,15 +41,16 @@ startup_timeout_sec = 120
 
 Do not set `INI_BRAIN_WORKSPACE` for a global Codex install unless you intentionally want to pin INI Brain to one project. Without that variable, INI Brain resolves the active project from the MCP process working directory and known workspace environment variables.
 
-## Recommended Codex Prompt
+## Automatic Startup Protocol
 
-```md
-Start with ini_brain_auto_brief for this task, then call ini_brain_get_context before editing. Search memory when prior decisions may matter. After finishing, save durable decisions or bugs with ini_brain_save_memory.
-```
+No manual startup prompt is required. The MCP server supplies instructions to
+Codex at the start of each new task: verify `ini_brain_status`, call
+`ini_brain_auto_brief`, load focused context before editing, and preview Smart
+Setup without applying it until the user explicitly approves.
 
 ## Arabic Summary
 
 - ابن السيرفر: `npm install` ثم `npm run compile`.
-- أضف `dist/mcp/server.js` إلى Codex كخادم MCP.
+- أضف `dist/mcp/server.js` إلى Codex كسيرفر MCP.
 - افتح Codex من جذر المشروع الذي تريد العمل عليه.
-- ابدأ أي مهمة بـ `ini_brain_auto_brief` ثم `ini_brain_get_context`.
+- لا تحتاج إلى كتابة prompt بدء يدوي؛ تعليمات MCP تطلب `ini_brain_status` و`ini_brain_auto_brief` و`ini_brain_get_context` تلقائياً.

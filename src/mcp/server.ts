@@ -18,13 +18,16 @@ import { smartSetupTools } from './tools/smartSetupTools';
 import { resolveWorkspace } from './workspace';
 
 const GOLDEN_PROMPT = [
-  'INI Brain protocol for every coding task:',
-  '1. At the START of any task, call ini_brain_auto_brief once to load AGENTS.md, the compact project context, runtime memory, and prior decisions.',
-  '2. Before editing files, call ini_brain_get_context with the user task to get a focused brief.',
-  '3. Use ini_brain_search_memory whenever past decisions or bugs may matter.',
-  '4. Use ini_brain_explain on a file before changing it, and ini_brain_impact on the changed file list before finalizing.',
-  '5. After finishing, call ini_brain_save_memory to persist durable decisions, fixes, or workflow insights.',
+  'INI Brain automatic protocol for every new conversation and coding task:',
+  '1. Call ini_brain_status first. Verify that its workspace is the user\'s current project and report whether .brain exists. If the workspace is wrong, stop and resolve it before editing.',
+  '2. Call ini_brain_auto_brief once with the current task to load AGENTS.md, compact context, runtime memory, and prior decisions.',
+  '3. Before editing files, call ini_brain_get_context with the user task to get a focused brief.',
+  '4. If the project needs setup guidance, call ini_brain_smart_setup_plan and show the proposed plan. Never call ini_brain_smart_setup_apply until the user explicitly approves the selected packs.',
+  '5. Use ini_brain_search_memory whenever past decisions or bugs may matter.',
+  '6. Use ini_brain_explain on a file before changing it, and ini_brain_impact on the changed file list before finalizing.',
+  '7. After finishing, call ini_brain_save_memory to persist durable decisions, fixes, or workflow insights.',
   'For new projects or large features, run the Spec-Kit flow automatically: /constitution -> /specify -> /clarify -> /plan -> /tasks -> /implement. For small fixes, use the lighter INI Brain context workflow.',
+  'These instructions are supplied automatically by MCP. Do not ask the user to paste a startup prompt manually.',
   'A background scan keeps .brain/ and AGENTS.md fresh automatically. You never need to ask the user to run a scan.'
 ].join('\n');
 

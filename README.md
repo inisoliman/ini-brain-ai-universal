@@ -1,4 +1,4 @@
-# INI Brain AI Universal
+﻿# INI Brain AI Universal
 
 Local-first AI productivity platform for VS Code and MCP clients. INI Brain scans a workspace, builds a durable `.brain/` knowledge base, generates `AGENTS.md`, exposes focused project context through MCP, and helps multiple coding agents share the same workflow, memories, quality guards, project map, and code-intelligence tools.
 
@@ -77,6 +77,12 @@ The installer does not clone upstream repositories. Advanced
 `codebase-memory-mcp` installation is opt-in through `-InstallCodeIntel`; without
 it, the built-in Lite Graph remains active.
 
+The official install and update source is
+[github.com/inisoliman/ini-brain-ai-universal](https://github.com/inisoliman/ini-brain-ai-universal/).
+The VS Code extension automatically merges its packaged MCP server into detected
+Codex, Claude Desktop, and Cline settings. Existing MCP servers are preserved.
+Restart an already-running client once after first installation.
+
 ## Codex Windows App
 
 The Codex Windows app uses the same Codex MCP configuration as Codex CLI. If the installer updated `~/.codex/config.toml`, restart Codex and open a project.
@@ -89,11 +95,10 @@ For best automatic behavior:
 4. Start a new Codex task for the target project.
 5. Confirm the MCP tool list contains `ini_brain_auto_brief`.
 
-If a specific Codex task does not call tools automatically, start with:
-
-```text
-ابدأ باستخدام ini_brain_auto_brief لهذه المهمة، ثم استخدم ini_brain_get_context قبل أي تعديل. بعد الانتهاء احفظ القرارات المهمة باستخدام ini_brain_save_memory.
-```
+No startup text needs to be copied manually. The MCP initialization instructions
+tell Codex to verify the workspace with `ini_brain_status`, run
+`ini_brain_auto_brief`, load focused context, and preview Smart Setup before any
+approved apply action.
 
 ## MCP Tools
 
@@ -193,18 +198,19 @@ Agent
 
 The advanced engine is optional. INI Brain does not silently download or execute binaries. If `codebase-memory-mcp` is installed on PATH, INI Brain uses it for indexing, search, architecture, traces, changes, and graph queries. If it is not installed, INI Brain returns to the built-in Lite Graph and keeps working.
 
-Useful prompts:
+Useful optional commands:
 
 ```text
-استخدم ini_brain_code_status وأخبرني أي محرك Code Intelligence يعمل الآن.
+ini_brain_code_status
 ```
 
 ```text
-استخدم ini_brain_code_index ثم ini_brain_code_architecture لشرح بنية المشروع.
+ini_brain_code_index
+ini_brain_code_architecture
 ```
 
 ```text
-استخدم ini_brain_code_search للبحث عن: authentication middleware
+ini_brain_code_search: authentication middleware
 ```
 
 ## Upstream Vault
@@ -227,42 +233,18 @@ Automation included:
 
 See [Upstream Vault and Permanent Backups](docs/upstream-vault.md) for the complete source list, licensing boundary, restore instructions, and automatic-update flow.
 
-## Ready-To-Use Agent Prompts
+## Automatic Agent Protocol
 
-Health check:
+Compatible MCP clients receive INI Brain startup instructions automatically from the server during initialization. Users should not paste a startup prompt into every new conversation.
 
-```text
-استخدم ini_brain_status وأخبرني هل INI Brain يعمل على هذا المشروع.
-```
+The automatic protocol asks the agent to:
 
-Start a coding task:
-
-```text
-ابدأ بـ ini_brain_auto_brief لهذه المهمة، ثم استخدم ini_brain_get_context قبل قراءة أو تعديل الملفات. افحص التأثير باستخدام ini_brain_impact عند الحاجة، وبعد الانتهاء احفظ القرارات المهمة باستخدام ini_brain_save_memory.
-```
-
-Search memory:
-
-```text
-استخدم ini_brain_search_memory للبحث عن قرارات أو أخطاء سابقة مرتبطة بهذه المهمة: <اكتب المهمة هنا>.
-```
-
-Spec-Kit example:
-
-```text
-ابدأ بـ ini_brain_auto_brief ثم أنشئ spec باسم:
-RankMath Settings Cleanup
-
-الوصف:
-أريد تنظيم إعدادات RankMath، مراجعة الملفات المؤثرة، عمل خطة تنفيذ، ثم تقسيمها إلى مهام صغيرة قابلة للتنفيذ بدون كسر الموقع.
-استخدم أدوات Spec-Kit المتاحة.
-```
-
-Memory maintenance:
-
-```text
-استخدم ini_brain_memory_stats لعرض حالة الذاكرة، ثم استخدم ini_brain_memory_compact كمعاينة dry-run فقط ولا تطبق التنظيف إلا إذا طلبت منك ذلك صراحة.
-```
+1. Call `ini_brain_status` and verify the workspace and `.brain`.
+2. Call `ini_brain_auto_brief` once for the current task.
+3. Call `ini_brain_get_context` before editing.
+4. Preview Smart Setup with `ini_brain_smart_setup_plan` when useful.
+5. Never call `ini_brain_smart_setup_apply` until the user explicitly approves.
+6. Save durable decisions or fixes with `ini_brain_save_memory` after finishing.
 
 ## VS Code Features
 
@@ -308,7 +290,7 @@ code --install-extension .\ini-brain-ai-universal-3.2.0.vsix --force
 
 INI Brain AI Universal إضافة محلية لـ VS Code وMCP تساعد وكلاء الذكاء الاصطناعي على فهم المشروع والعمل من نفس الذاكرة والسياق. المصدر الأساسي هو `.brain/` و`AGENTS.md`، أما مجلدات `.codex/` و`.cline/` فهي مرايا خفيفة وليست عقولاً منفصلة.
 
-في هذا الفرع تمت إضافة طبقة Code Intelligence تلقائية: إذا كان `codebase-memory-mcp` مثبتاً يتم استخدامه كمحرك أقوى، وإذا لم يكن موجوداً يعمل Lite Graph الداخلي مباشرة. كذلك تمت إضافة Upstream Vault حتى لا تضيع الخصائص المهمة إذا تغيرت أو اختفت الريبوهات الأصلية.
+إذا كان `codebase-memory-mcp` مثبتاً يتم استخدامه كمحرك Code Intelligence أقوى، وإذا لم يكن موجوداً يعمل Lite Graph الداخلي مباشرة. كذلك يحفظ Upstream Vault ملفات منتقاة وخفيفة من المشاريع المرجعية حتى لا تضيع الخصائص المهمة إذا تغيرت الريبوهات الأصلية.
 
 ## Acknowledgements
 

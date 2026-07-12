@@ -149,6 +149,11 @@
           "default": true,
           "description": "Automatically initialize or refresh INI Brain context when a workspace opens."
         },
+        "iniBrain.mcp.autoInstall": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically merge INI Brain MCP into detected Codex, Claude Desktop, and Cline client settings when the extension starts."
+        },
         "iniBrain.maxContextFiles": {
           "type": "number",
           "default": 16,
@@ -265,8 +270,10 @@
     "smoke:install-behavior": "node scripts/install-behavior-smoke.cjs",
     "smoke:smart-setup": "node scripts/smart-setup-smoke.cjs",
     "smoke:guide": "node scripts/guide-smoke.cjs",
+    "smoke:auto-mcp": "node scripts/auto-mcp-installer-smoke.cjs",
+    "smoke:mcp-instructions": "node scripts/mcp-instructions-smoke.cjs",
     "audit:public": "node scripts/public-release-audit.cjs",
-    "smoke:all": "npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater && npm run smoke:upstream-vault && npm run smoke:code-intelligence && npm run smoke:workflows && npm run smoke:engineering-workflow && npm run smoke:install-behavior && npm run smoke:smart-setup && npm run smoke:guide",
+    "smoke:all": "npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater && npm run smoke:upstream-vault && npm run smoke:code-intelligence && npm run smoke:workflows && npm run smoke:engineering-workflow && npm run smoke:install-behavior && npm run smoke:smart-setup && npm run smoke:guide && npm run smoke:auto-mcp && npm run smoke:mcp-instructions",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
   },

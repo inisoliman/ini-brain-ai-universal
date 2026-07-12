@@ -11,6 +11,7 @@ import { safeResolve } from './core/pathUtils';
 import { ProjectScanner } from './core/projectScanner';
 import { MemoryKind } from './core/types';
 import { buildMcpConfigJson } from './integrations/mcpConfig';
+import { autoInstallMcpClients } from './integrations/autoMcpInstaller';
 import { getIntegrationAdapters } from './integrations/registry';
 import { ProjectOnboardingService } from './onboarding/projectOnboarding';
 import { SidebarProvider } from './ui/sidebarProvider';
@@ -193,7 +194,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })),
     vscode.commands.registerCommand('iniBrain.showMemoryProfile', () => runWithStatus(sidebar, 'Ready', async () => showMemoryProfile(memory, sidebar))),
     vscode.commands.registerCommand('iniBrain.copyMcpConfigForCline', () => vscode.commands.executeCommand('iniBrain.copyMcpConfig')),
-    vscode.commands.registerCommand('iniBrain.installMcpForCline', () => runWithStatus(sidebar, 'Ready', async () => installMcpForCline(root, sidebar))),
+    vscode.commands.registerCommand('iniBrain.installMcpForCline', () => runWithStatus(sidebar, 'Ready', async () => installMcpForCline(sidebar))),
     vscode.commands.registerCommand('iniBrain.generateOnboarding', () => runWithStatus(sidebar, 'Ready', async () => {
       const brain = await brainStore.readBrain() || await brainStore.writeScan(await scanner.scan());
       const markdown = insights.buildOnboarding(brain);
@@ -489,12 +490,23 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
 
   sidebar.log('INI Brain AI Universal activated.');
+  if (vscode.workspace.getConfiguration('iniBrain').get('mcp.autoInstall', true)) {
+    void runAutomaticMcpInstall(sidebar);
+  }
   if (vscode.workspace.getConfiguration('iniBrain').get('autoScan', true)) {
     void runAutoOnboarding(onboarding, sidebar);
   }
 }
 
 export function deactivate(): void {}
+
+async function runAutomaticMcpInstall(sidebar: SidebarProvider): Promise<void> {
+  const results = await autoInstallMcpClients({ serverScript: getMcpServerScript() });
+  for (const result of results) {
+    if (result.status === 'installed') sidebar.log(`MCP auto-configured for ${result.client}. Restart that client to activate it.`);
+    if (result.status === 'error') sidebar.log(`MCP auto-configuration failed for ${result.client}: ${result.message}`);
+  }
+}
 
 function getWorkspaceRoot(): string | undefined {
   return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -831,7 +843,7 @@ async function showMemoryProfile(memory: MemoryStore, sidebar: SidebarProvider):
   sidebar.log(`Memory profile shown. Total memories: ${profile.totalMemories}.`);
 }
 
-async function installMcpForCline(root: string, sidebar: SidebarProvider): Promise<void> {
+async function installMcpForCline(sidebar: SidebarProvider): Promise<void> {
   const settingsPath = getClineMcpSettingsPath();
   const ok = await vscode.window.showWarningMessage(`Install/update INI Brain MCP in Cline settings?\n\n${settingsPath}`, { modal: true }, 'Install');
   if (ok !== 'Install') return;
@@ -846,7 +858,6 @@ async function installMcpForCline(root: string, sidebar: SidebarProvider): Promi
       'ini-brain-ai': {
         command: 'node',
         args: [getMcpServerScript()],
-        env: { INI_BRAIN_WORKSPACE: root },
         disabled: false,
         autoApprove: []
       }

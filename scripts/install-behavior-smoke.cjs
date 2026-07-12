@@ -14,5 +14,7 @@ if (!installer.includes('if ($InstallCodeIntel -and -not $SkipCodeIntel)')) {
 if (/git\s+clone/i.test(activation) || /npm\s+install/i.test(activation)) {
   throw new Error('extension activation must not clone repositories or install packages');
 }
+if (/INI_BRAIN_WORKSPACE/.test(activation)) {
+  throw new Error('extension activation and global MCP install must not pin a workspace');
+}
 console.log('OK install behavior smoke');
-
