@@ -14,3 +14,4 @@ node_modules/**
 package-lock.json
 AGENTS.local.md
 project_request.md
+upstream-archives/**

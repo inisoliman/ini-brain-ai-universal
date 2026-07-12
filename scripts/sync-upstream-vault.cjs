@@ -16,19 +16,24 @@ let changed = false;
         console.warn(`Warning: keeping existing snapshot for ${source.id}: ${error.message}`);
         return null;
       });
-    if (commit?.sha && source.pinnedCommit !== commit.sha) {
-      source.pinnedCommit = commit.sha;
-      changed = true;
-    }
-
+    const revision = commit?.sha || source.pinnedCommit || source.branch;
+    const snapshots = [];
+    let complete = true;
     for (const file of source.files || []) {
-      const url = `https://raw.githubusercontent.com/${source.repository}/${source.branch}/${file.path}`;
+      const url = `https://raw.githubusercontent.com/${source.repository}/${revision}/${file.path}`;
       const content = await fetchText(url).catch(error => {
         console.warn(`Warning: keeping existing snapshot for ${source.id}/${file.path}: ${error.message}`);
         return null;
       });
-      if (content === null) continue;
+      if (content === null) {
+        complete = false;
+        continue;
+      }
+      snapshots.push({ file, content });
+    }
+    if (!complete) continue;
 
+    for (const { file, content } of snapshots) {
       const target = path.join(root, source.snapshotRoot, file.path);
       const hash = crypto.createHash('sha256').update(content).digest('hex');
       const existing = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : undefined;
@@ -41,6 +46,10 @@ let changed = false;
         file.sha256 = hash;
         changed = true;
       }
+    }
+    if (commit?.sha && source.pinnedCommit !== commit.sha) {
+      source.pinnedCommit = commit.sha;
+      changed = true;
     }
   }
 
@@ -62,10 +71,12 @@ function fetchJson(url) {
 
 function fetchText(url) {
   return new Promise((resolve, reject) => {
+    const token = process.env.GITHUB_TOKEN;
     https.get(url, {
       headers: {
         Accept: 'application/vnd.github+json',
-        'User-Agent': 'ini-brain-ai-upstream-vault'
+        'User-Agent': 'ini-brain-ai-upstream-vault',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
       }
     }, response => {
       if (response.statusCode >= 400) {

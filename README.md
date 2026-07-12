@@ -186,15 +186,17 @@ The updater now uses a resilient source order:
 2. Mirror path in this repository under `resources/upstreams/`.
 3. Bundled local snapshot from `resources/upstreams/`.
 
-This protects important references if an upstream repository is renamed, deleted, unavailable, or rate-limited. The main branch stores only curated lightweight snapshots and license metadata. Full upstream repositories should be archived as `git bundle` artifacts by the GitHub workflow instead of being committed into normal project history.
+This protects important references if an upstream repository is renamed, deleted, unavailable, or rate-limited. The main branch stores curated lightweight snapshots and license metadata. Full upstream repositories that permit public redistribution are stored as `git bundle` assets in the permanent `upstream-archives` GitHub Release, rather than being committed into normal project history. The vault is shared by all supported clients; it is not Codex-only.
 
 Automation included:
 
-- `.github/workflows/sync-upstream-vault.yml`: weekly/manual snapshot refresh and PR creation.
-- `.github/workflows/archive-upstreams.yml`: weekly/manual full `git bundle` archives as GitHub artifacts.
+- `.github/workflows/sync-upstream-vault.yml`: daily/manual snapshot refresh and reviewed PR creation.
+- `.github/workflows/archive-upstreams.yml`: daily/manual full `git bundle` archives as both run artifacts and permanent GitHub Release assets.
 - `scripts/upstream-vault-smoke.cjs`: verifies snapshot checksums.
 - `scripts/sync-upstream-vault.cjs`: refreshes curated snapshots.
-- `scripts/archive-upstreams.sh`: creates full bundle archives.
+- `scripts/archive-upstreams.cjs`: creates full bundle archives from the manifest.
+
+See [Upstream Vault and Permanent Backups](docs/upstream-vault.md) for the complete source list, licensing boundary, restore instructions, and automatic-update flow.
 
 ## Ready-To-Use Agent Prompts
 
@@ -292,5 +294,6 @@ INI Brain integrates ideas and MIT-licensed material from:
 - [alexgreensh/token-optimizer](https://github.com/alexgreensh/token-optimizer)
 - [DeusData/codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) for optional advanced code-intelligence integration.
 - [amElnagdy/delegate-skills](https://github.com/amElnagdy/delegate-skills) for safe delegation workflow inspiration and curated reference snapshots.
+- [amElnagdy/guard-skills](https://github.com/amElnagdy/guard-skills) for quality-guard research and curated reference snapshots.
 - [rohitg00/agentmemory](https://github.com/rohitg00/agentmemory) for memory-lifecycle inspiration only.
 - [pbakaus/impeccable](https://github.com/pbakaus/impeccable) and [impeccable.style](https://impeccable.style/) for frontend review workflow inspiration only.

@@ -10,6 +10,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root, 'resources', 'upstre
 const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ini-brain-upstream-'));
 const report = { generatedAt: new Date().toISOString(), sources: [] };
 let archivedCount = 0;
+let failedCount = 0;
 
 try {
   fs.mkdirSync(outputDir, { recursive: true });
@@ -19,6 +20,7 @@ try {
   }
   fs.writeFileSync(path.join(outputDir, 'archive-manifest.json'), `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   if (!archivedCount) throw new Error('No upstream repositories were archived.');
+  if (failedCount) throw new Error(`${failedCount} upstream repository archive(s) failed.`);
   console.log(`Archived ${archivedCount} upstream repository(s).`);
 } finally {
   fs.rmSync(temporaryRoot, { recursive: true, force: true });
@@ -30,6 +32,7 @@ function archiveSource(source) {
   const clone = run('git', ['clone', '--mirror', `https://github.com/${source.repository}.git`, mirrorPath]);
   if (!clone.ok) {
     report.sources.push({ id: source.id, repository: source.repository, archived: false, error: clone.error });
+    failedCount += 1;
     console.warn(`Warning: keeping the previous release asset for ${source.id}: ${clone.error}`);
     return;
   }
@@ -37,6 +40,7 @@ function archiveSource(source) {
   const bundle = run('git', ['-C', mirrorPath, 'bundle', 'create', bundlePath, '--all']);
   if (!bundle.ok) {
     report.sources.push({ id: source.id, repository: source.repository, archived: false, error: bundle.error });
+    failedCount += 1;
     console.warn(`Warning: could not archive ${source.id}: ${bundle.error}`);
     return;
   }

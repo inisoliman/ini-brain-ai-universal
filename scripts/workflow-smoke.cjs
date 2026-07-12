@@ -32,6 +32,11 @@ if (!archiveWorkflow.includes('gh release upload upstream-archives')) {
   failures.push('.github/workflows/archive-upstreams.yml: permanent release backup is required');
 }
 
+const syncWorkflow = fs.readFileSync(path.join(workflowsDir, 'sync-upstream-vault.yml'), 'utf8');
+if (!syncWorkflow.includes('GITHUB_TOKEN: ${{ github.token }}')) {
+  failures.push('.github/workflows/sync-upstream-vault.yml: authenticated GitHub API access is required');
+}
+
 if (failures.length) {
   console.error('Workflow smoke failed:');
   for (const failure of failures) console.error(`- ${failure}`);

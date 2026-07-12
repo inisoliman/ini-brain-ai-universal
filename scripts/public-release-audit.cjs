@@ -64,7 +64,7 @@ function auditPublicDocs() {
 
 function auditPackageIgnores() {
   const vscodeignore = read('.vscodeignore');
-  for (const required of ['src/**', '.brain/**', '.codex/**', 'docs/plans/**', 'scripts/**']) {
+  for (const required of ['src/**', '.brain/**', '.codex/**', 'docs/plans/**', 'scripts/**', 'upstream-archives/**']) {
     if (!vscodeignore.includes(required)) fail(`.vscodeignore missing ${required}`);
   }
 }

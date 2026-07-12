@@ -297,7 +297,40 @@
           "sha256": "e26ac0962e4a016a561e4317232bd23d5266b74f38e8bfc785d81f41f93e25b9"
         }
       ]
+    },
+    {
+      "id": "guard-skills",
+      "repository": "amElnagdy/guard-skills",
+      "branch": "master",
+      "pinnedCommit": "ffa26036b7b5e77b20b5d679304a703b6fd1a43d",
+      "license": "MIT",
+      "classification": "quality-guard",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/guard-skills",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "b336404532649bdfd6b5c7558146c2e193c1287b633655ca103483c6ffe79857"
+        },
+        {
+          "path": "README.md",
+          "sha256": "943bc303610e946a79ced7f59abe320583996a93c9dfca03c2f6b2e995118531"
+        },
+        {
+          "path": "skills/clean-code-guard/SKILL.md",
+          "sha256": "4694ad1d36cdcff2e1bfe3b1f903bc21820b682a35385e0f8b382e2cce897be2"
+        },
+        {
+          "path": "skills/test-guard/SKILL.md",
+          "sha256": "77aeeb60d5cd12f075b358c3a99b49aba5eaf012fa8f3e217d1ed6983922e9b0"
+        },
+        {
+          "path": "skills/docs-guard/SKILL.md",
+          "sha256": "8648f87ad021a87225d46a5c83c977e8e56594068a9f3fe4e4ad47da93f418ef"
+        }
+      ]
     }
   ],
-  "updatedAt": "2026-07-12T01:48:28.565Z"
+  "updatedAt": "2026-07-12T01:55:00.340Z"
 }

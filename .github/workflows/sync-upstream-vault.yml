@@ -20,6 +20,8 @@ jobs:
           node-version: 24
 
       - name: Refresh curated snapshots
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/sync-upstream-vault.cjs
 
       - name: Verify vault checksums
