@@ -29,8 +29,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           branch: automation/sync-upstream-vault
-          commit-message: chore: sync upstream vault snapshots
-          title: chore: sync upstream vault snapshots
+          commit-message: 'chore: sync upstream vault snapshots'
+          title: 'chore: sync upstream vault snapshots'
           body: |
             Automated weekly refresh for curated upstream snapshots.
 
