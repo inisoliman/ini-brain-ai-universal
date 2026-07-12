@@ -2,7 +2,7 @@
   "name": "ini-brain-ai-universal",
   "displayName": "INI Brain AI Universal",
   "description": "Local-first AI productivity platform: project memory, token savings (Caveman+Ponytail), Spec-Driven Development, knowledge graph, and universal adapter for Claude/Codex/Cline/Cursor/Windsurf/Antigravity/Gemini/Copilot/OpenCode/Kimi/Kiro and any MCP client.",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "publisher": "ini-brain",
   "license": "MIT",
   "engines": {

@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For Generic MCP Clients
 
-Version: 3.1.0
+Version: 3.2.0
 
 Any stdio MCP-compatible client can use INI Brain AI Universal.
 

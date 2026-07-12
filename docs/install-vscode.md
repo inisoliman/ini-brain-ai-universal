@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For VS Code
 
-Version: 3.1.0
+Version: 3.2.0
 
 ## From Source
 
@@ -10,7 +10,7 @@ cd ini-brain-ai-universal
 npm install
 npm run compile
 npm run package
-code --install-extension .\ini-brain-ai-universal-3.1.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.2.0.vsix --force
 ```
 
 Reload VS Code after installation.
@@ -43,6 +43,6 @@ Run **INI Brain: Settings** or **INI Brain: Configure AI Provider** to set:
 
 1. انسخ المستودع من GitHub.
 2. شغل `npm install` ثم `npm run compile` ثم `npm run package`.
-3. ثبت ملف `ini-brain-ai-universal-3.1.0.vsix` داخل VS Code.
+3. ثبت ملف `ini-brain-ai-universal-3.2.0.vsix` داخل VS Code.
 4. افتح أي مشروع ثم استخدم **INI Brain: Scan Project**.
 5. مفتاح API اختياري ويتم حفظه في VS Code SecretStorage وليس داخل ملفات المشروع.

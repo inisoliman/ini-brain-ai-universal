@@ -1,6 +1,6 @@
 # AI Agent Operating Guide
 
-This repository contains INI Brain AI Universal version 3.1.0.
+This repository contains INI Brain AI Universal version 3.2.0.
 
 ## Required Reading
 

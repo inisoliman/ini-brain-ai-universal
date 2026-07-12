@@ -75,6 +75,7 @@ const EXTRA_TOOL_LIST = Object.entries(EXTRA_TOOLS).map(([name, tool]) => ({
   description: tool.description,
   inputSchema: withWorkspaceInput(tool.inputSchema),
   annotations: name === 'ini_brain_graph_build' ||
+    name === 'ini_brain_spec_constitution' ||
     name === 'ini_brain_spec_create' ||
     name === 'ini_brain_spec_clarify' ||
     name === 'ini_brain_spec_plan' ||
@@ -178,7 +179,7 @@ class IniBrainMcpServer {
       return {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'ini-brain-ai-universal', version: '3.1.0' },
+        serverInfo: { name: 'ini-brain-ai-universal', version: '3.2.0' },
         instructions: GOLDEN_PROMPT
       };
     }

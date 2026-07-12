@@ -2,7 +2,7 @@
 
 Local-first AI productivity platform for VS Code and MCP clients. INI Brain scans a workspace, builds a durable `.brain/` knowledge base, generates `AGENTS.md`, exposes focused project context through MCP, and helps multiple coding agents share the same workflow, memories, quality guards, project map, and code-intelligence tools.
 
-Current version: **3.1.0** with v3.2 development features in this branch.
+Current version: **3.2.0**.
 
 Repository: [github.com/inisoliman/ini-brain-ai-universal](https://github.com/inisoliman/ini-brain-ai-universal)
 
@@ -252,13 +252,13 @@ npm run package
 The VSIX output is:
 
 ```text
-ini-brain-ai-universal-3.1.0.vsix
+ini-brain-ai-universal-3.2.0.vsix
 ```
 
 Install in VS Code:
 
 ```powershell
-code --install-extension .\ini-brain-ai-universal-3.1.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.2.0.vsix --force
 ```
 
 ## Safety Model
