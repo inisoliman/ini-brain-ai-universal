@@ -14,7 +14,7 @@
 #
 # Skip flags:
 #   -SkipBuild    do not rebuild
-#   -SkipCodeIntel do not install optional codebase-memory-mcp
+#   -InstallCodeIntel install optional codebase-memory-mcp (off by default)
 #   -SkipCodex    do not modify Codex config
 #   -SkipClaude   do not modify Claude Desktop config
 #   -SkipCline    do not modify Cline config
@@ -23,6 +23,7 @@
 [CmdletBinding()]
 param(
   [switch]$SkipBuild,
+  [switch]$InstallCodeIntel,
   [switch]$SkipCodeIntel,
   [switch]$SkipCodex,
   [switch]$SkipClaude,
@@ -96,7 +97,7 @@ if (-not (Test-Path $ServerJs)) {
 Write-Ok "Server file ready: $ServerJs"
 
 # ----- 3) Optional advanced Code Intelligence --------------------------------
-if (-not $SkipCodeIntel) {
+if ($InstallCodeIntel -and -not $SkipCodeIntel) {
   Write-Step "3) Advanced Code Intelligence (optional)"
   try {
     $cbmVersion = & codebase-memory-mcp --version 2>$null
@@ -118,7 +119,7 @@ if (-not $SkipCodeIntel) {
     }
   }
 } else {
-  Write-Warn2 "Advanced Code Intelligence skipped (SkipCodeIntel). Lite Graph fallback will be used."
+  Write-Warn2 "Advanced Code Intelligence not installed. Use -InstallCodeIntel to opt in; Lite Graph remains available."
 }
 
 # ----- 4) Codex CLI config ---------------------------------------------------

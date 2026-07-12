@@ -20,6 +20,13 @@ export interface SavingsRecord {
   mode: string;
 }
 
+export interface TokenComparison {
+  baseline: TokenStats;
+  optimized: TokenStats;
+  estimatedTokensSaved: number;
+  estimatedReductionPercent: number;
+}
+
 const DEFAULT_INPUT_COST_PER_1K = 0.003;  // gpt-4.1 input
 const DEFAULT_OUTPUT_COST_PER_1K = 0.012; // gpt-4.1 output
 
@@ -40,6 +47,16 @@ export function measureText(text: string, costPer1K = DEFAULT_INPUT_COST_PER_1K)
     totalWords: text.trim().split(/\s+/).filter(Boolean).length,
     estimatedCostUsd: (tokens / 1000) * costPer1K,
   };
+}
+
+export function compareTokenEstimates(baselineText: string, optimizedText: string): TokenComparison {
+  const baseline = measureText(baselineText);
+  const optimized = measureText(optimizedText);
+  const estimatedTokensSaved = Math.max(0, baseline.totalTokens - optimized.totalTokens);
+  const estimatedReductionPercent = baseline.totalTokens === 0
+    ? 0
+    : Math.round((estimatedTokensSaved / baseline.totalTokens) * 1000) / 10;
+  return { baseline, optimized, estimatedTokensSaved, estimatedReductionPercent };
 }
 
 export async function measureFile(filePath: string): Promise<TokenStats> {

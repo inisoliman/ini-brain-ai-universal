@@ -1,4 +1,4 @@
-import { measureText, readSavingsHistory, summarizeSavings } from '../../savings/tokenMeter';
+import { compareTokenEstimates, measureText, readSavingsHistory, summarizeSavings } from '../../savings/tokenMeter';
 
 export const savingsTools = {
   ini_brain_savings_status: {
@@ -22,5 +22,18 @@ export const savingsTools = {
       required: ['text'],
     },
     handler: async (args: { text: string }) => measureText(args.text),
+  },
+  ini_brain_compare_tokens: {
+    description: 'Compare two supplied texts with the same local estimate. This measures text-size reduction, not a universal model claim.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        baselineText: { type: 'string' },
+        optimizedText: { type: 'string' },
+      },
+      required: ['baselineText', 'optimizedText'],
+    },
+    handler: async (args: { baselineText: string; optimizedText: string }) =>
+      compareTokenEstimates(args.baselineText, args.optimizedText),
   },
 };

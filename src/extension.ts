@@ -21,6 +21,7 @@ import { deployClaudeLeanLocal, removeClaudeLeanLocal } from './savings/claudeLe
 import { measureText, readSavingsHistory, summarizeSavings } from './savings/tokenMeter';
 import { removeAllSavings } from './savings';
 import { createSpec, createPlan, createTasks, listSpecs } from './methodology/specKit';
+import { deployEngineeringWorkflowLocal, ENGINEERING_WORKFLOW_SKILLS, removeEngineeringWorkflowLocal } from './methodology/engineeringWorkflow';
 import { buildCodeGraph, loadGraph, saveGraph, computeImpact } from './graph/knowledgeGraph';
 import { renderMermaid, renderMermaidHtml } from './graph/mermaidRenderer';
 import { deployToAllAgents, removeFromAllAgents, detectInstalledAdapters } from './adapters/registry';
@@ -208,7 +209,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           await deployToAllAgents({ root, skillName: 'caveman', skillBody: body, onlyInstalled: true });
         } catch {}
       }
-      vscode.window.showInformationMessage(`Caveman enabled (${mode}). Output tokens -~70%.`);
+      vscode.window.showInformationMessage(`Caveman enabled (${mode}). Measure results for your prompts; savings vary by task and model.`);
     }),
     vscode.commands.registerCommand('iniBrain.disableCaveman', async () => {
       await removeCavemanLocal(root);
@@ -228,7 +229,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           await deployToAllAgents({ root, skillName: 'ponytail', skillBody: body, onlyInstalled: true });
         } catch {}
       }
-      vscode.window.showInformationMessage(`Ponytail enabled (${mode}). Code -~54%.`);
+      vscode.window.showInformationMessage(`Ponytail enabled (${mode}). It favors smaller implementations; savings vary by task and model.`);
     }),
     vscode.commands.registerCommand('iniBrain.disablePonytail', async () => {
       await removePonytailLocal(root);
@@ -250,7 +251,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       await vscode.commands.executeCommand('iniBrain.enableCaveman');
       await vscode.commands.executeCommand('iniBrain.enablePonytail');
       await vscode.commands.executeCommand('iniBrain.enableClaudeLean');
-      vscode.window.showInformationMessage('All savings enabled. Expected ~60-80% token reduction.');
+      vscode.window.showInformationMessage('All savings enabled. Verify savings with token comparison or client usage data.');
     }),
     vscode.commands.registerCommand('iniBrain.disableAllSavings', async () => {
       await removeAllSavings(root);
@@ -329,6 +330,23 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(tasksFile));
       vscode.window.showInformationMessage('Hand tasks.md to your AI: "Implement next unchecked task and mark [x]."');
     }),
+
+    // === Engineering Workflow Pack ===
+    vscode.commands.registerCommand('iniBrain.enableEngineeringWorkflow', () => runWithStatus(sidebar, 'Generating', async () => {
+      await deployEngineeringWorkflowLocal(root);
+      for (const workflowSkill of ENGINEERING_WORKFLOW_SKILLS) {
+        const body = await fs.readFile(path.join(root, '.brain', 'skills', `${workflowSkill.id}.md`), 'utf8');
+        await deployToAllAgents({ root, skillName: workflowSkill.id, skillBody: body, onlyInstalled: true });
+      }
+      await vscode.workspace.getConfiguration('iniBrain').update('engineeringWorkflow.enabled', true, vscode.ConfigurationTarget.Workspace);
+      vscode.window.showInformationMessage(`Engineering Workflow enabled with ${ENGINEERING_WORKFLOW_SKILLS.length} focused skills.`);
+    })),
+    vscode.commands.registerCommand('iniBrain.disableEngineeringWorkflow', () => runWithStatus(sidebar, 'Ready', async () => {
+      await removeEngineeringWorkflowLocal(root);
+      await Promise.all(ENGINEERING_WORKFLOW_SKILLS.map(workflowSkill => removeFromAllAgents(root, workflowSkill.id)));
+      await vscode.workspace.getConfiguration('iniBrain').update('engineeringWorkflow.enabled', false, vscode.ConfigurationTarget.Workspace);
+      vscode.window.showInformationMessage('Engineering Workflow disabled.');
+    })),
     
     // === Graph ===
     vscode.commands.registerCommand('iniBrain.buildKnowledgeGraph', () => runWithStatus(sidebar, 'Building graph', async () => {
@@ -367,6 +385,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       const cfg = vscode.workspace.getConfiguration('iniBrain');
       if (cfg.get<boolean>('caveman.enabled')) await vscode.commands.executeCommand('iniBrain.enableCaveman');
       if (cfg.get<boolean>('ponytail.enabled')) await vscode.commands.executeCommand('iniBrain.enablePonytail');
+      if (cfg.get<boolean>('engineeringWorkflow.enabled')) await vscode.commands.executeCommand('iniBrain.enableEngineeringWorkflow');
       vscode.window.showInformationMessage(`Deployed to ${detected.length} agents.`);
     }),
     vscode.commands.registerCommand('iniBrain.removeAllAgents', async () => {
@@ -375,6 +394,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       await removeFromAllAgents(root, 'caveman');
       await removeFromAllAgents(root, 'ponytail');
       await removeFromAllAgents(root, 'claude-lean');
+      await Promise.all(ENGINEERING_WORKFLOW_SKILLS.map(workflowSkill => removeFromAllAgents(root, workflowSkill.id)));
       vscode.window.showInformationMessage('Removed.');
     }),
     

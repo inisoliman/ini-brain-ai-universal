@@ -66,11 +66,16 @@ powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1
 
 The installer verifies Node.js, runs `npm install` and `npm run compile`, then writes MCP configuration for Codex, Claude Desktop, and Cline.
 
-Skip flags:
+Optional and skip flags:
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1 -InstallCodeIntel
 powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1 -SkipBuild -SkipCodex -SkipClaude -SkipCline
 ```
+
+The installer does not clone upstream repositories. Advanced
+`codebase-memory-mcp` installation is opt-in through `-InstallCodeIntel`; without
+it, the built-in Lite Graph remains active.
 
 ## Codex Windows App
 
@@ -114,6 +119,7 @@ Feature tools:
 
 - `ini_brain_savings_status`
 - `ini_brain_measure_tokens`
+- `ini_brain_compare_tokens`
 - `ini_brain_graph_build`
 - `ini_brain_graph_impact`
 - `ini_brain_spec_list`
@@ -150,6 +156,29 @@ For a new project, unclear request, or large feature, INI Brain should guide age
 ```
 
 This is important because it prevents the agent from jumping into code before the rules, scope, open questions, architecture, and tasks are clear. For small fixes, simple edits, or quick questions, INI Brain intentionally uses the lighter context workflow so the process does not become heavy.
+
+## Optional Engineering Workflow Pack
+
+Run **INI Brain: Enable Engineering Workflow Pack** to add six compact, on-demand
+skills: product discovery, engineering plan review, systematic investigation,
+unified review, security review, and release readiness. The pack adapts selected
+workflow ideas from gstack but does not bundle its browser daemon, telemetry,
+cookie tools, deployment runtime, or Bun dependencies.
+
+The complete pack is not injected into every prompt. Skills are stored locally and
+loaded only when an agent selects the matching workflow.
+
+## Network and Download Behavior
+
+- Activating or scanning with the extension performs local filesystem work only.
+- Installing INI Brain installs this project's npm development dependencies; it
+  does not clone acknowledged upstream repositories.
+- `codebase-memory-mcp` is installed only when `install-all.ps1` receives the
+  explicit `-InstallCodeIntel` switch.
+- **Check Upstream** requests small GitHub commit metadata only after the user runs
+  the command.
+- **Apply Upstream** downloads only the curated files listed for that source, never
+  a full repository clone.
 
 ## Code Intelligence
 
@@ -290,6 +319,7 @@ INI Brain integrates ideas and MIT-licensed material from:
 - [drona23/claude-token-efficient](https://github.com/drona23/claude-token-efficient)
 - [github/spec-kit](https://github.com/github/spec-kit)
 - [obra/superpowers](https://github.com/obra/superpowers)
+- [garrytan/gstack](https://github.com/garrytan/gstack) for the optional compact Engineering Workflow Pack; no gstack runtime is bundled.
 - [safishamsi/graphify](https://github.com/safishamsi/graphify)
 - [alexgreensh/token-optimizer](https://github.com/alexgreensh/token-optimizer)
 - [DeusData/codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) for optional advanced code-intelligence integration.

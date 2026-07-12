@@ -104,6 +104,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         ['Tasks', 'iniBrain.specTasks'],
         ['Implement', 'iniBrain.specImplement']
       ]],
+      ['Engineering Workflow', [
+        ['Enable Pack', 'iniBrain.enableEngineeringWorkflow'],
+        ['Disable Pack', 'iniBrain.disableEngineeringWorkflow']
+      ]],
       ['Adapters', [
         ['Install All', 'iniBrain.installAllAgents'],
         ['Remove All', 'iniBrain.removeAllAgents']

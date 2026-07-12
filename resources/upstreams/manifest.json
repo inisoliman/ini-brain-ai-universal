@@ -157,6 +157,23 @@
       ]
     },
     {
+      "id": "gstack",
+      "repository": "garrytan/gstack",
+      "branch": "main",
+      "pinnedCommit": "7c9df1c568a9ea745508f679a329332b2c338063",
+      "license": "MIT",
+      "classification": "reference-workflow",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/gstack",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "5766540ee040f68a5aa43c60bcd1c5dc05076fc18568456d29b4a6d1dd3c04fb"
+        }
+      ]
+    },
+    {
       "id": "graphify",
       "repository": "safishamsi/graphify",
       "branch": "v8",

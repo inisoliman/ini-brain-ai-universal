@@ -23,6 +23,7 @@ Full Git history for every archive-eligible source is stored as a `.bundle` in t
 | `drona23/claude-token-efficient` | runtime skill | yes | yes |
 | `github/spec-kit` | runtime workflow | yes | yes |
 | `obra/superpowers` | runtime workflow | yes | yes |
+| `garrytan/gstack` | workflow methodology reference | license only | yes |
 | `safishamsi/graphify` | runtime reference | yes | yes |
 | `DeusData/codebase-memory-mcp` | optional code-intelligence engine | yes | yes |
 | `amElnagdy/delegate-skills` | delegation workflow | yes | yes |

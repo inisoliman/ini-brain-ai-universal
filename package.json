@@ -80,9 +80,9 @@
       { "command": "iniBrain.generateGuards", "title": "INI Brain: Generate Quality Guards" },
       { "command": "iniBrain.restoreBackup", "title": "INI Brain: Restore Auto Mode Backup" },
 
-      { "command": "iniBrain.enableCaveman", "title": "INI Brain: Enable Caveman Mode (output -70%)" },
+      { "command": "iniBrain.enableCaveman", "title": "INI Brain: Enable Caveman Compression" },
       { "command": "iniBrain.disableCaveman", "title": "INI Brain: Disable Caveman Mode" },
-      { "command": "iniBrain.enablePonytail", "title": "INI Brain: Enable Ponytail Mode (code -54%)" },
+      { "command": "iniBrain.enablePonytail", "title": "INI Brain: Enable Ponytail Minimal-Code Mode" },
       { "command": "iniBrain.disablePonytail", "title": "INI Brain: Disable Ponytail Mode" },
       { "command": "iniBrain.enableClaudeLean", "title": "INI Brain: Enable Claude Lean Rules" },
       { "command": "iniBrain.disableClaudeLean", "title": "INI Brain: Disable Claude Lean Rules" },
@@ -96,6 +96,8 @@
       { "command": "iniBrain.specPlan", "title": "INI Brain: Generate Plan from Spec" },
       { "command": "iniBrain.specTasks", "title": "INI Brain: Break Spec into Tasks" },
       { "command": "iniBrain.specImplement", "title": "INI Brain: Open Next Task to Implement" },
+      { "command": "iniBrain.enableEngineeringWorkflow", "title": "INI Brain: Enable Engineering Workflow Pack" },
+      { "command": "iniBrain.disableEngineeringWorkflow", "title": "INI Brain: Disable Engineering Workflow Pack" },
 
       { "command": "iniBrain.buildKnowledgeGraph", "title": "INI Brain: Build Knowledge Graph" },
       { "command": "iniBrain.showKnowledgeGraph", "title": "INI Brain: Show Knowledge Graph" },
@@ -178,7 +180,7 @@
         "iniBrain.caveman.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable Caveman compression skill (reduces AI output verbosity ~70%)."
+          "description": "Enable Caveman compression. Actual token reduction varies by task and model."
         },
         "iniBrain.caveman.mode": {
           "type": "string",
@@ -189,7 +191,7 @@
         "iniBrain.ponytail.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable Ponytail lazy-senior-dev skill (reduces generated code ~54%)."
+          "description": "Enable Ponytail minimal-code guidance. Actual reduction varies by task and model."
         },
         "iniBrain.ponytail.mode": {
           "type": "string",
@@ -206,6 +208,11 @@
           "type": "boolean",
           "default": false,
           "description": "Enable local Spec-Driven Development workflow."
+        },
+        "iniBrain.engineeringWorkflow.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable the compact product, engineering, investigation, review, security, and release workflow pack."
         },
         "iniBrain.graph.autoBuild": {
           "type": "boolean",
@@ -251,8 +258,10 @@
     "smoke:upstream-vault": "node scripts/upstream-vault-smoke.cjs",
     "smoke:code-intelligence": "node scripts/code-intelligence-smoke.cjs",
     "smoke:workflows": "node scripts/workflow-smoke.cjs",
+    "smoke:engineering-workflow": "node scripts/engineering-workflow-smoke.cjs",
+    "smoke:install-behavior": "node scripts/install-behavior-smoke.cjs",
     "audit:public": "node scripts/public-release-audit.cjs",
-    "smoke:all": "npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater && npm run smoke:upstream-vault && npm run smoke:code-intelligence && npm run smoke:workflows",
+    "smoke:all": "npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater && npm run smoke:upstream-vault && npm run smoke:code-intelligence && npm run smoke:workflows && npm run smoke:engineering-workflow && npm run smoke:install-behavior",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
   },

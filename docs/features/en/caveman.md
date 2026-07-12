@@ -1,7 +1,7 @@
 # Caveman - AI Response Compressor
 
 ## Benefit
-About 70% savings in output tokens.
+Designed to reduce output verbosity. Actual token reduction varies by model, task, and prompt; measure it in your client.
 
 ## Enable
 `INI Brain: Enable Caveman Mode` or set `iniBrain.caveman.enabled = true`.

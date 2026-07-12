@@ -1,7 +1,7 @@
 # Ponytail - Lazy Code Writer
 
 ## Benefit
-About 54% savings in generated code.
+Designed to reduce unnecessary generated code. Actual reduction varies by model, task, and prompt; measure it in your client.
 
 ## Philosophy
 1. Does it need to exist? (YAGNI)

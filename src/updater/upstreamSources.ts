@@ -20,6 +20,11 @@ export const UPSTREAM_SOURCES: UpstreamSource[] = [
   source('claude-token-efficient', 'drona23', 'claude-token-efficient', 'main', 'Claude lean rules', ['CLAUDE.md'], 'skill'),
   source('spec-kit', 'github', 'spec-kit', 'main', 'SDD templates', ['README.md'], 'workflow'),
   source('superpowers', 'obra', 'superpowers', 'main', 'Composable skills methodology', ['README.md'], 'workflow'),
+  {
+    ...source('gstack', 'garrytan', 'gstack', 'main', 'Engineering workflow methodology reference', ['LICENSE'], 'reference'),
+    pinnedCommit: '7c9df1c568a9ea745508f679a329332b2c338063',
+    license: 'MIT'
+  },
   source('graphify', 'safishamsi', 'graphify', 'v8', 'Knowledge graph builder', ['README.md'], 'reference'),
   source('token-optimizer', 'alexgreensh', 'token-optimizer', 'main', 'Token measurement', ['README.md'], 'reference'),
   {

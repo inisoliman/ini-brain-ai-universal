@@ -4,7 +4,7 @@ const path = require('path');
 const { deployPonytailLocal, removePonytailLocal } = require('../dist/savings/ponytail');
 const { deployCavemanLocal, removeCavemanLocal } = require('../dist/savings/caveman');
 const { deployClaudeLeanLocal } = require('../dist/savings/claudeLean');
-const { measureText } = require('../dist/savings/tokenMeter');
+const { compareTokenEstimates, measureText } = require('../dist/savings/tokenMeter');
 
 (async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ini-savings-'));
@@ -25,6 +25,13 @@ const { measureText } = require('../dist/savings/tokenMeter');
   const stats = measureText('Hello world this is a test');
   if (stats.totalTokens <= 0) throw new Error('token count failed');
   console.log('tokens:', stats.totalTokens);
+
+  const comparison = compareTokenEstimates('This is a deliberately verbose baseline response with repeated detail.', 'Short response.');
+  if (comparison.estimatedTokensSaved <= 0 || comparison.estimatedReductionPercent <= 0) {
+    throw new Error('token comparison failed');
+  }
+  const emptyComparison = compareTokenEstimates('', 'Short response.');
+  if (emptyComparison.estimatedReductionPercent !== 0) throw new Error('empty baseline must not divide by zero');
 
   await removePonytailLocal(tmp);
   await removeCavemanLocal(tmp);
