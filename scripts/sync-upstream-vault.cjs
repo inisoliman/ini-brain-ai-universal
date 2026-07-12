@@ -6,42 +6,70 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 const manifestPath = path.join(root, 'resources', 'upstreams', 'manifest.json');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-
-const rawSources = new Map([
-  ['codebase-memory-mcp', 'https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main'],
-  ['delegate-skills', 'https://raw.githubusercontent.com/amElnagdy/delegate-skills/main']
-]);
+let changed = false;
 
 (async () => {
   for (const source of manifest.sources || []) {
-    const rawBase = rawSources.get(source.id);
-    if (!rawBase) continue;
+    if (source.snapshotPolicy !== 'curated') continue;
+    const commit = await fetchJson(`https://api.github.com/repos/${source.repository}/commits/${source.branch}`)
+      .catch(error => {
+        console.warn(`Warning: keeping existing snapshot for ${source.id}: ${error.message}`);
+        return null;
+      });
+    if (commit?.sha && source.pinnedCommit !== commit.sha) {
+      source.pinnedCommit = commit.sha;
+      changed = true;
+    }
+
     for (const file of source.files || []) {
-      const url = `${rawBase}/${file.path}`;
+      const url = `https://raw.githubusercontent.com/${source.repository}/${source.branch}/${file.path}`;
       const content = await fetchText(url).catch(error => {
         console.warn(`Warning: keeping existing snapshot for ${source.id}/${file.path}: ${error.message}`);
         return null;
       });
       if (content === null) continue;
+
       const target = path.join(root, source.snapshotRoot, file.path);
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.writeFileSync(target, content, 'utf8');
-      file.sha256 = crypto.createHash('sha256').update(content).digest('hex');
+      const hash = crypto.createHash('sha256').update(content).digest('hex');
+      const existing = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : undefined;
+      if (existing !== content) {
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        fs.writeFileSync(target, content, 'utf8');
+        changed = true;
+      }
+      if (file.sha256 !== hash) {
+        file.sha256 = hash;
+        changed = true;
+      }
     }
   }
-  manifest.updatedAt = new Date().toISOString();
-  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
-  console.log('Upstream vault snapshots refreshed.');
-  process.exit(0);
+
+  if (changed) {
+    manifest.updatedAt = new Date().toISOString();
+    fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+    console.log('Upstream vault snapshots refreshed.');
+  } else {
+    console.log('Upstream vault is already current.');
+  }
 })().catch(error => {
   console.error(error);
-  process.exit(1);
+  process.exitCode = 1;
 });
+
+function fetchJson(url) {
+  return fetchText(url).then(JSON.parse);
+}
 
 function fetchText(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers: { 'User-Agent': 'ini-brain-ai-upstream-vault' } }, response => {
+    https.get(url, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'ini-brain-ai-upstream-vault'
+      }
+    }, response => {
       if (response.statusCode >= 400) {
+        response.resume();
         reject(new Error(`HTTP ${response.statusCode} ${url}`));
         return;
       }

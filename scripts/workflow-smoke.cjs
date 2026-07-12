@@ -27,6 +27,11 @@ for (const fileName of fs.readdirSync(workflowsDir).filter(name => name.endsWith
   });
 }
 
+const archiveWorkflow = fs.readFileSync(path.join(workflowsDir, 'archive-upstreams.yml'), 'utf8');
+if (!archiveWorkflow.includes('gh release upload upstream-archives')) {
+  failures.push('.github/workflows/archive-upstreams.yml: permanent release backup is required');
+}
+
 if (failures.length) {
   console.error('Workflow smoke failed:');
   for (const failure of failures) console.error(`- ${failure}`);

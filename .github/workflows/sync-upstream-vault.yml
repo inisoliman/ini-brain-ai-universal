@@ -3,7 +3,7 @@ name: Sync Upstream Vault
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 3 * * 1'
+    - cron: '17 3 * * *'
 
 permissions:
   contents: write
@@ -32,7 +32,7 @@ jobs:
           commit-message: 'chore: sync upstream vault snapshots'
           title: 'chore: sync upstream vault snapshots'
           body: |
-            Automated weekly refresh for curated upstream snapshots.
+            Automated daily refresh for curated upstream snapshots.
 
-            Full upstream repositories are archived separately by the archive-upstreams workflow.
+            Full upstream repositories are archived separately in the persistent upstream-archives release.
           labels: upstream-vault

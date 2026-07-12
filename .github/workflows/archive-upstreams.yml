@@ -3,10 +3,10 @@ name: Archive Upstreams
 on:
   workflow_dispatch:
   schedule:
-    - cron: '47 3 * * 1'
+    - cron: '47 3 * * *'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   archive:
@@ -19,10 +19,17 @@ jobs:
           node-version: 24
 
       - name: Create git bundle archives
-        run: bash scripts/archive-upstreams.sh
+        run: node scripts/archive-upstreams.cjs
 
       - uses: actions/upload-artifact@v6
         with:
           name: upstream-git-bundles
-          path: upstream-archives/*.bundle
+          path: upstream-archives/
           if-no-files-found: error
+
+      - name: Publish permanent release backup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view upstream-archives > $null 2>&1 || gh release create upstream-archives --target "$GITHUB_SHA" --title "Upstream repository archives" --notes "Automated retained backup of approved upstream repositories."
+          gh release upload upstream-archives upstream-archives/* --clobber

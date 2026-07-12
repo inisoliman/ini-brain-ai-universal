@@ -20,7 +20,7 @@ export const UPSTREAM_SOURCES: UpstreamSource[] = [
   source('claude-token-efficient', 'drona23', 'claude-token-efficient', 'main', 'Claude lean rules', ['CLAUDE.md'], 'skill'),
   source('spec-kit', 'github', 'spec-kit', 'main', 'SDD templates', ['README.md'], 'workflow'),
   source('superpowers', 'obra', 'superpowers', 'main', 'Composable skills methodology', ['README.md'], 'workflow'),
-  source('graphify', 'safishamsi', 'graphify', 'main', 'Knowledge graph builder', ['README.md'], 'reference'),
+  source('graphify', 'safishamsi', 'graphify', 'v8', 'Knowledge graph builder', ['README.md'], 'reference'),
   source('token-optimizer', 'alexgreensh', 'token-optimizer', 'main', 'Token measurement', ['README.md'], 'reference'),
   {
     ...source('codebase-memory-mcp', 'DeusData', 'codebase-memory-mcp', 'main', 'Advanced local code-intelligence engine', ['LICENSE', 'server.json'], 'engine'),
@@ -28,7 +28,7 @@ export const UPSTREAM_SOURCES: UpstreamSource[] = [
     license: 'MIT'
   },
   {
-    ...source('delegate-skills', 'amElnagdy', 'delegate-skills', 'main', 'Safe delegation workflow references', ['LICENSE', 'skills/codex-delegate/SKILL.md'], 'workflow'),
+    ...source('delegate-skills', 'amElnagdy', 'delegate-skills', 'master', 'Safe delegation workflow references', ['LICENSE', 'skills/codex-delegate/SKILL.md'], 'workflow'),
     pinnedCommit: 'e36f68a22ba151936266a0073771251b15d698db',
     license: 'MIT'
   },

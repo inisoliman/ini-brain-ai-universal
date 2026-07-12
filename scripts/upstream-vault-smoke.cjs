@@ -7,11 +7,17 @@ const manifestPath = path.join(root, 'resources', 'upstreams', 'manifest.json');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 const failures = [];
 
-if (manifest.schema !== 'ini-brain.upstream-vault.v1') {
+if (manifest.schema !== 'ini-brain.upstream-vault.v2') {
   failures.push('Unexpected upstream vault schema.');
 }
 
 for (const source of manifest.sources || []) {
+  if (!source.repository || !source.branch || !source.pinnedCommit || !source.license) {
+    failures.push(`Incomplete source metadata: ${source.id || 'unknown'}`);
+  }
+  if (source.snapshotPolicy === 'curated' && !(source.files || []).length) {
+    failures.push(`Curated source has no snapshot files: ${source.id}`);
+  }
   for (const file of source.files || []) {
     const absolute = path.join(root, source.snapshotRoot, file.path);
     if (!fs.existsSync(absolute)) {
@@ -23,6 +29,13 @@ for (const source of manifest.sources || []) {
       failures.push(`Checksum mismatch: ${source.id}/${file.path}`);
     }
   }
+}
+
+const registry = fs.readFileSync(path.join(root, 'src', 'updater', 'upstreamSources.ts'), 'utf8');
+const runtimeIds = [...registry.matchAll(/source\('([^']+)'/g)].map(match => match[1]);
+const manifestIds = new Set((manifest.sources || []).map(source => source.id));
+for (const id of runtimeIds) {
+  if (!manifestIds.has(id)) failures.push(`Runtime source is missing from vault manifest: ${id}`);
 }
 
 if (failures.length) {

@@ -1,6 +1,5 @@
 {
-  "schema": "ini-brain.upstream-vault.v1",
-  "updatedAt": "2026-07-12T01:08:40.662Z",
+  "schema": "ini-brain.upstream-vault.v2",
   "mirrorRepository": "inisoliman/ini-brain-ai-universal",
   "fallbackOrder": [
     "original",
@@ -9,12 +8,197 @@
   ],
   "sources": [
     {
+      "id": "ponytail",
+      "repository": "DietrichGebert/ponytail",
+      "branch": "main",
+      "pinnedCommit": "14a0d79548d4de8fc2de95c1b94bb0de63a739d3",
+      "license": "MIT",
+      "classification": "runtime-skill",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/ponytail",
+      "files": [
+        {
+          "path": "AGENTS.md",
+          "sha256": "b57f736a83ddab7111d752008c3e131a157e646a6b47c9eb223f076c494685a8"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "fb1bc6909ac3ef82d5c22106e32ef682b0cff66788fa915fb9b53b15c9d2f3ab"
+        },
+        {
+          "path": "skills/ponytail/SKILL.md",
+          "sha256": "1316a2f3f95741d2300b116fe0c2d81ce4a9568656ed0a62643f54aaf09957f2"
+        }
+      ]
+    },
+    {
+      "id": "caveman",
+      "repository": "JuliusBrussee/caveman",
+      "branch": "main",
+      "pinnedCommit": "0d95a81d35a9f2d123a5e9430d1cfc43d55f1bb0",
+      "license": "MIT",
+      "classification": "runtime-skill",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/caveman",
+      "files": [
+        {
+          "path": "AGENTS.md",
+          "sha256": "d3af7aef206bec4a7bcc26fbd2da9af1027a09c1d91a7e625633f81dc69b3312"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "5eb826cd03151bcc7cce3f80d40e87733237fedfc6c36d6908aca5fd650a0bdb"
+        },
+        {
+          "path": "skills/caveman/SKILL.md",
+          "sha256": "5e30bb56afbd0b01bd736f2da84180e76f18db4a64de8e124525d5c8dc2e8605"
+        }
+      ]
+    },
+    {
+      "id": "claude-token-efficient",
+      "repository": "drona23/claude-token-efficient",
+      "branch": "main",
+      "pinnedCommit": "0d30a6db75af983b8ababf585f28faefdfc87895",
+      "license": "MIT",
+      "classification": "runtime-skill",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/claude-token-efficient",
+      "files": [
+        {
+          "path": "CLAUDE.md",
+          "sha256": "6656125f2b4f777d9cb4149b2acc3b0281aab4e8d8ebdd4ddcdb1ae9274e8253"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "22355d9aaea0fc42136ca73831fd2a2127f891ba64f9b6c942ac004a7dea3bfb"
+        }
+      ]
+    },
+    {
+      "id": "spec-kit",
+      "repository": "github/spec-kit",
+      "branch": "main",
+      "pinnedCommit": "1be42992e64b08ff0dce3d7a914eaabf04284ffb",
+      "license": "MIT",
+      "classification": "runtime-workflow",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/spec-kit",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "2510b446bc1f0cf9702453075d20cd88631e20e5642658edb7325d9c1eb534f7"
+        },
+        {
+          "path": "README.md",
+          "sha256": "e77157661fca38da3e40e69ca6fb50e9edc54e539f7f69907e36bdc740705e51"
+        },
+        {
+          "path": "templates/constitution-template.md",
+          "sha256": "ce7549540fa45543cca797a150201d868e64495fdff39dc38246fb17bd4024b3"
+        },
+        {
+          "path": "templates/spec-template.md",
+          "sha256": "3945437fc35cd30a5b2bf7beea680337c3516826d3efa5a6b92c4a7eca1ba28e"
+        },
+        {
+          "path": "templates/plan-template.md",
+          "sha256": "dfba43da2b2a207ff8c177a0fba03af074fd45e261696b4b64172041fad2e992"
+        },
+        {
+          "path": "templates/tasks-template.md",
+          "sha256": "1e448e9153462e8c5b5a55231a54c756d870a82950d4dd9425a2bf5b7008a0d9"
+        },
+        {
+          "path": "templates/commands/clarify.md",
+          "sha256": "ecbfca3c314bb0afd52cb13f88b36720718c2a79700dac497909fd749971b912"
+        },
+        {
+          "path": "templates/commands/implement.md",
+          "sha256": "d3ea38697d7d1e95ae3168e288d328e4f67d33b02eaebd0b2e21041c90861820"
+        }
+      ]
+    },
+    {
+      "id": "superpowers",
+      "repository": "obra/superpowers",
+      "branch": "main",
+      "pinnedCommit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "license": "MIT",
+      "classification": "runtime-workflow",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/superpowers",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+        },
+        {
+          "path": "README.md",
+          "sha256": "993584ac25724e9dcb1639b12850d922ca8c21a4456bc7edbb1c5cc24456540e"
+        },
+        {
+          "path": "skills/using-superpowers/SKILL.md",
+          "sha256": "55379fe7c1c473a02c61961c822996bff30e1320d6921d9062509bc508482c05"
+        },
+        {
+          "path": "skills/writing-plans/SKILL.md",
+          "sha256": "272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845"
+        },
+        {
+          "path": "skills/executing-plans/SKILL.md",
+          "sha256": "bbd8d28bb655a52817cc129ce49f9e46fa7c6303f72ed5de95bfe914ef8e0ce8"
+        }
+      ]
+    },
+    {
+      "id": "graphify",
+      "repository": "safishamsi/graphify",
+      "branch": "v8",
+      "pinnedCommit": "591da764a18db9c558de627accd61a61b32bc23e",
+      "license": "MIT",
+      "classification": "runtime-reference",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/graphify",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "36ecff6bbb97aca1be64e95f42538cf796adde5864edac583e620643c096931a"
+        },
+        {
+          "path": "README.md",
+          "sha256": "57f6340e75978d3d54602b7ef969cdb53473741424975aa27eb9a20b3c3feceb"
+        }
+      ]
+    },
+    {
+      "id": "token-optimizer",
+      "repository": "alexgreensh/token-optimizer",
+      "branch": "main",
+      "pinnedCommit": "c8f860993fd813575fc7ba6a8e73fcee16ca0493",
+      "license": "PolyForm-Noncommercial-1.0.0",
+      "classification": "runtime-reference",
+      "snapshotPolicy": "metadata-only",
+      "archive": false,
+      "reason": "Public redistribution is disabled until a compatible commercial license is confirmed.",
+      "snapshotRoot": "resources/upstreams/token-optimizer",
+      "files": []
+    },
+    {
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "e19a6994932f7004588dd571facf5aeac05d100a",
+      "pinnedCommit": "8c9ac98e30b48e63d0a4df39f86ae1cd029f5349",
       "license": "MIT",
-      "integrationType": "engine",
+      "classification": "runtime-engine",
+      "snapshotPolicy": "curated",
+      "archive": true,
       "snapshotRoot": "resources/upstreams/codebase-memory-mcp",
       "files": [
         {
@@ -30,10 +214,12 @@
     {
       "id": "delegate-skills",
       "repository": "amElnagdy/delegate-skills",
-      "branch": "main",
+      "branch": "master",
       "pinnedCommit": "e36f68a22ba151936266a0073771251b15d698db",
       "license": "MIT",
-      "integrationType": "workflow",
+      "classification": "runtime-workflow",
+      "snapshotPolicy": "curated",
+      "archive": true,
       "snapshotRoot": "resources/upstreams/delegate-skills",
       "files": [
         {
@@ -41,10 +227,77 @@
           "sha256": "dffe5f1e6f7e1c2ecc0eb684e452c941fe6b71f142196af0d7f1d57604048e64"
         },
         {
+          "path": "README.md",
+          "sha256": "b3a7a909b207da74a05e6685e24b6366dd17853632f5ae8d8bb6a2cf576f58ff"
+        },
+        {
           "path": "skills/codex-delegate/SKILL.md",
-          "sha256": "aa08dba05c3e2ecdd00c11e8cbf184870a8c911aef9901d2dc7c35a39b635f4e"
+          "sha256": "b55ed150271c1c995db9a0fe57d01e6a0c4bf242ec623b711d995c5da2b255bd"
+        },
+        {
+          "path": "skills/opencode-delegate/SKILL.md",
+          "sha256": "ba99621d9520697b4238c223a5fea522fda3720500323efca6f3834b64690388"
+        }
+      ]
+    },
+    {
+      "id": "agentmemory",
+      "repository": "rohitg00/agentmemory",
+      "branch": "main",
+      "pinnedCommit": "93ae9bc04f3ab5042f982aaadf11f1e3f5137531",
+      "license": "Apache-2.0",
+      "classification": "reference",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/agentmemory",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "76c8d49ab42216a2533f603fbafa20a1bf71b56de136a401be52da034dcc012c"
+        },
+        {
+          "path": "README.md",
+          "sha256": "83ce14f8311247a9a1e496011a9ba71a9d94bc318ed91158c660d2710f8477ca"
+        },
+        {
+          "path": "plugin/skills/remember/SKILL.md",
+          "sha256": "f68701ff5cdf65b8a4b53941d9c34b207f357536ea84cd416ff69771769bafe1"
+        },
+        {
+          "path": "plugin/skills/recall/SKILL.md",
+          "sha256": "718ab72876b57c13d93e1103942556f2cb6cd929bcd43a5217bf6b42f96dc03e"
+        },
+        {
+          "path": "plugin/skills/handoff/SKILL.md",
+          "sha256": "1a56957440917ffb5706db1f27d81c7d1a679d35eb8541516091c2c51411f9d5"
+        }
+      ]
+    },
+    {
+      "id": "impeccable",
+      "repository": "pbakaus/impeccable",
+      "branch": "main",
+      "pinnedCommit": "630fc2682a5bd39b25a8e61f74b6b3f14f2b1e21",
+      "license": "Apache-2.0",
+      "classification": "reference",
+      "snapshotPolicy": "curated",
+      "archive": true,
+      "snapshotRoot": "resources/upstreams/impeccable",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "02bb8c3b4e70190e3986c0404ad2fd8d639b4f534252d82379cc1b502b6d1812"
+        },
+        {
+          "path": "README.md",
+          "sha256": "6f4b725239c1c9ead30e4631f25ab03a29cbb4dee81e6d8b16bc7927797044c4"
+        },
+        {
+          "path": "plugin/skills/impeccable/SKILL.md",
+          "sha256": "e26ac0962e4a016a561e4317232bd23d5266b74f38e8bfc785d81f41f93e25b9"
         }
       ]
     }
-  ]
+  ],
+  "updatedAt": "2026-07-12T01:48:28.565Z"
 }
