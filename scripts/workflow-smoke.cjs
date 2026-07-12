@@ -11,6 +11,9 @@ for (const fileName of fs.readdirSync(workflowsDir).filter(name => name.endsWith
   lines.forEach((line, index) => {
     const match = line.match(/^(\s+[A-Za-z0-9_-]+:\s+)([^'"[{|>][^#]*:\s+[^#]*)$/);
     if (match) failures.push(`${relative}:${index + 1}: quote scalar values that contain ':'`);
+    if (/node-version:\s*20\b/.test(line)) {
+      failures.push(`${relative}:${index + 1}: use node-version 24 to avoid GitHub Actions Node 20 deprecation warnings`);
+    }
   });
 }
 
