@@ -169,7 +169,7 @@
       "files": [
         {
           "path": "LICENSE",
-          "sha256": "5766540ee040f68a5aa43c60bcd1c5dc05076fc18568456d29b4a6d1dd3c04fb"
+          "sha256": "e56fbb5b3d95756f3fa1cfefa24732ec79f18ece1ad08a4e79e00df57e8b198c"
         }
       ]
     },
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "8c9ac98e30b48e63d0a4df39f86ae1cd029f5349",
+      "pinnedCommit": "2469ecc3a7a2f80debe296e1f17a1efcfdb9450c",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-07-12T01:55:00.340Z"
+  "updatedAt": "2026-07-13T06:32:45.092Z"
 }
