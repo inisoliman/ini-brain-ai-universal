@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "1be42992e64b08ff0dce3d7a914eaabf04284ffb",
+      "pinnedCommit": "ad601e5d52251f9131220c621d1cbbb7d61bebee",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -95,7 +95,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "e77157661fca38da3e40e69ca6fb50e9edc54e539f7f69907e36bdc740705e51"
+          "sha256": "c425a8c766ebafd3971ac1dc0741f49b01d60cc3d3cdb10b7e2b1d69bd0d4ee8"
         },
         {
           "path": "templates/constitution-template.md",
@@ -160,7 +160,7 @@
       "id": "gstack",
       "repository": "garrytan/gstack",
       "branch": "main",
-      "pinnedCommit": "7c9df1c568a9ea745508f679a329332b2c338063",
+      "pinnedCommit": "a3259400a366593e0c909dd9ac3e59752efd2488",
       "license": "MIT",
       "classification": "reference-workflow",
       "snapshotPolicy": "curated",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "2469ecc3a7a2f80debe296e1f17a1efcfdb9450c",
+      "pinnedCommit": "feadbe1955dd3e6db5d5622b24af8d132bc50ad2",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -232,7 +232,7 @@
       "id": "delegate-skills",
       "repository": "amElnagdy/delegate-skills",
       "branch": "master",
-      "pinnedCommit": "e36f68a22ba151936266a0073771251b15d698db",
+      "pinnedCommit": "a3b460502ab99fc29339cd238b03991dda6fb16b",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -294,7 +294,7 @@
       "id": "impeccable",
       "repository": "pbakaus/impeccable",
       "branch": "main",
-      "pinnedCommit": "630fc2682a5bd39b25a8e61f74b6b3f14f2b1e21",
+      "pinnedCommit": "8259c28209b92792005cec14dad573df39f68eaf",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-07-13T06:32:45.092Z"
+  "updatedAt": "2026-07-15T05:43:20.099Z"
 }
