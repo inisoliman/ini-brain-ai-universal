@@ -11,7 +11,7 @@
       "id": "ponytail",
       "repository": "DietrichGebert/ponytail",
       "branch": "main",
-      "pinnedCommit": "14a0d79548d4de8fc2de95c1b94bb0de63a739d3",
+      "pinnedCommit": "16f29800fd2681bdf24f3eb4ccffe38be3baec6b",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "ad601e5d52251f9131220c621d1cbbb7d61bebee",
+      "pinnedCommit": "fd101d531eaec8a1e709db2f37632bc93b6ce4d6",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "feadbe1955dd3e6db5d5622b24af8d132bc50ad2",
+      "pinnedCommit": "5d150ea0515d0598472d317360305a98dccb583a",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-07-15T05:43:20.099Z"
+  "updatedAt": "2026-07-16T05:57:05.611Z"
 }
