@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "fd101d531eaec8a1e709db2f37632bc93b6ce4d6",
+      "pinnedCommit": "57cc518d63d6f10da3dd93df1ebcadda87c59374",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -95,7 +95,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "c425a8c766ebafd3971ac1dc0741f49b01d60cc3d3cdb10b7e2b1d69bd0d4ee8"
+          "sha256": "0f8b1e840349038e7d26ca5b5e5065035b6382563475460eb0962e55f0eb3cdd"
         },
         {
           "path": "templates/constitution-template.md",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "5d150ea0515d0598472d317360305a98dccb583a",
+      "pinnedCommit": "e678b2b6acb02bc1ab84a854f2df0e1d092f2cc0",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -232,7 +232,7 @@
       "id": "delegate-skills",
       "repository": "amElnagdy/delegate-skills",
       "branch": "master",
-      "pinnedCommit": "a3b460502ab99fc29339cd238b03991dda6fb16b",
+      "pinnedCommit": "1137f156040709a2ed1bd382c913ccea89a65992",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -245,7 +245,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "b3a7a909b207da74a05e6685e24b6366dd17853632f5ae8d8bb6a2cf576f58ff"
+          "sha256": "2ed9f842792a27babacc5312a813041c640564c169786f298e0a3a08aaab8be9"
         },
         {
           "path": "skills/codex-delegate/SKILL.md",
@@ -294,7 +294,7 @@
       "id": "impeccable",
       "repository": "pbakaus/impeccable",
       "branch": "main",
-      "pinnedCommit": "8259c28209b92792005cec14dad573df39f68eaf",
+      "pinnedCommit": "8967edc988ee146823bca3c51fcf51296e9dec18",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-07-16T05:57:05.611Z"
+  "updatedAt": "2026-07-18T05:39:08.890Z"
 }
