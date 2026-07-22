@@ -10,10 +10,11 @@ import { copilotAdapter } from './copilotAdapter';
 import { openCodeAdapter } from './openCodeAdapter';
 import { kimiAdapter } from './kimiAdapter';
 import { kiroAdapter } from './kiroAdapter';
+import { kiloCodeAdapter } from './kiloCodeAdapter';
 import { universalFallback } from './universalFallback';
 
 export const ALL_ADAPTERS: AgentAdapter[] = [
-  claudeAdapter, codexAdapter, clineAdapter, cursorAdapter,
+  claudeAdapter, codexAdapter, clineAdapter, kiloCodeAdapter, cursorAdapter,
   windsurfAdapter, antigravityAdapter, geminiAdapter, copilotAdapter,
   openCodeAdapter, kimiAdapter, kiroAdapter, universalFallback,
 ];

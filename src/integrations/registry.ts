@@ -6,6 +6,7 @@ export function getIntegrationAdapters(): IntegrationAdapter[] {
     adapter('vscode', 'VS Code', 'Use the VS Code extension sidebar, commands, and SecretStorage.', 'docs/install-vscode.md', true),
     adapter('codex', 'Codex', 'Use AGENTS.md, Codex-friendly skill guidance, and MCP context tools.', 'docs/install-codex.md', false),
     adapter('cline', 'Cline', 'Use Cline MCP settings plus .cline and .clinerules generated skills.', 'docs/install-cline.md', true),
+    adapter('kilo-code', 'Kilo Code', 'Use Kilo Code MCP settings plus .kilo generated skills and commands.', 'docs/install-kilo-code.md', true),
     adapter('antigravity', 'Antigravity', 'Use generic MCP configuration and project instruction files where supported.', 'docs/install-antigravity.md', false),
     adapter('generic-mcp', 'Generic MCP Client', 'Use copyable JSON config for any stdio MCP-compatible client.', 'docs/install-generic-mcp.md', false)
   ];

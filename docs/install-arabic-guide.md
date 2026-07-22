@@ -1,6 +1,6 @@
 # دليل تثبيت INI Brain AI Universal
 
-الإصدار: 3.2.0
+الإصدار: 3.3.0
 
 ## الفكرة
 
@@ -26,7 +26,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1 -SkipClaude -
 npm install
 npm run compile
 npm run package
-code --install-extension .\ini-brain-ai-universal-3.2.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.3.0.vsix --force
 ```
 
 بعد التثبيت:

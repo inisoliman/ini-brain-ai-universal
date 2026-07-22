@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For Antigravity
 
-Version: 3.2.0
+Version: 3.3.0
 
 Antigravity-style agent environments can use INI Brain through generic MCP configuration and repository instruction files.
 

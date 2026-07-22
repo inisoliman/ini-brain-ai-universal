@@ -2,14 +2,16 @@
 
 Local-first AI productivity platform for VS Code and MCP clients. INI Brain scans a workspace, builds a durable `.brain/` knowledge base, generates `AGENTS.md`, exposes focused project context through MCP, and helps multiple coding agents share the same workflow, memories, quality guards, project map, and code-intelligence tools.
 
-Current version: **3.2.0**.
+Current version: **3.3.0**.
 
 Repository: [github.com/inisoliman/ini-brain-ai-universal](https://github.com/inisoliman/ini-brain-ai-universal)
 
 ## Highlights
 
 - Local workspace brain: `.brain/`, `AGENTS.md`, compact context, memories, workflow, quality gates, and generated skills.
-- MCP server for Codex, Claude Desktop, Cline, VS Code MCP clients, and any stdio MCP-compatible client.
+- MCP server for Codex, Claude Desktop, Claude Code, Cline, Kilo Code, Roo Code, Gemini CLI, Cursor, VS Code MCP clients, and any stdio MCP-compatible client.
+- Automatic client detection: the server reads MCP `clientInfo` and reports the connected client in `ini_brain_status`.
+- Workspace trust guard: if a client launches the server outside the project, background scanning stays off and status explains how to fix it instead of scanning the wrong directory.
 - Automatic golden prompt through MCP `instructions`, so compatible agents learn to call `ini_brain_auto_brief` and `ini_brain_get_context`.
 - Memory lifecycle metadata: `confidence`, `expiresAt`, `pinned`, and `origin`.
 - Safe local memory compaction with dry-run preview and pinned-memory protection.
@@ -64,7 +66,7 @@ cd ini-brain-ai-universal
 powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1
 ```
 
-The installer verifies Node.js, runs `npm install` and `npm run compile`, then writes MCP configuration for Codex, Claude Desktop, and Cline.
+The installer verifies Node.js, runs `npm install` and `npm run compile`, then writes MCP configuration for Codex, Claude Desktop, and Cline. The VS Code extension additionally auto-detects and configures Claude Code, Gemini CLI, Cursor, Kilo Code, and Roo Code when those clients are present.
 
 Optional and skip flags:
 
@@ -80,7 +82,8 @@ it, the built-in Lite Graph remains active.
 The official install and update source is
 [github.com/inisoliman/ini-brain-ai-universal](https://github.com/inisoliman/ini-brain-ai-universal/).
 The VS Code extension automatically merges its packaged MCP server into detected
-Codex, Claude Desktop, and Cline settings. Existing MCP servers are preserved.
+Codex, Claude Desktop, Claude Code, Gemini CLI, Cursor, Cline, Kilo Code, and Roo
+Code settings. Existing MCP servers are preserved.
 Restart an already-running client once after first installation.
 
 ## Codex Windows App
@@ -265,13 +268,13 @@ npm run package
 The VSIX output is:
 
 ```text
-ini-brain-ai-universal-3.2.0.vsix
+ini-brain-ai-universal-3.3.0.vsix
 ```
 
 Install in VS Code:
 
 ```powershell
-code --install-extension .\ini-brain-ai-universal-3.2.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.3.0.vsix --force
 ```
 
 ## Safety Model

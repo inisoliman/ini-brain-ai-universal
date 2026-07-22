@@ -15,7 +15,45 @@ import { graphTools } from './tools/graphTools';
 import { methodologyTools } from './tools/methodologyTools';
 import { savingsTools } from './tools/savingsTools';
 import { smartSetupTools } from './tools/smartSetupTools';
-import { resolveWorkspace } from './workspace';
+import { isTrustedWorkspace, resolveWorkspace } from './workspace';
+
+const SERVER_VERSION = '3.3.0';
+
+interface DetectedClient {
+  name: string;
+  version?: string;
+  source: 'initialize' | 'environment' | 'unknown';
+}
+
+let detectedClient: DetectedClient = detectClientFromEnvironment();
+
+function detectClientFromEnvironment(): DetectedClient {
+  const env = process.env;
+  if (env.CODEX_SANDBOX || env.CODEX_WORKSPACE || env.CODEX_CWD) return { name: 'codex', source: 'environment' };
+  if (env.CLAUDECODE || env.CLAUDE_CODE_ENTRYPOINT) return { name: 'claude-code', source: 'environment' };
+  if (env.GEMINI_CLI) return { name: 'gemini-cli', source: 'environment' };
+  return { name: 'unknown', source: 'unknown' };
+}
+
+function noteInitializeClient(params: Record<string, unknown>): void {
+  const info = params.clientInfo;
+  if (info && typeof info === 'object') {
+    const record = info as Record<string, unknown>;
+    const name = typeof record.name === 'string' && record.name.trim() ? record.name.trim() : '';
+    if (name) {
+      detectedClient = {
+        name,
+        version: typeof record.version === 'string' ? record.version : undefined,
+        source: 'initialize'
+      };
+      console.error(`[INI Brain MCP] client detected: ${detectedClient.name}${detectedClient.version ? ' ' + detectedClient.version : ''}`);
+      return;
+    }
+  }
+  if (detectedClient.source === 'unknown') {
+    console.error('[INI Brain MCP] client did not send clientInfo; keep generic instructions.');
+  }
+}
 
 const GOLDEN_PROMPT = [
   'INI Brain automatic protocol for every new conversation and coding task:',
@@ -120,12 +158,17 @@ class IniBrainMcpServer {
     const workspace = getWorkspace({});
     console.error(`[INI Brain MCP] running locally for ${workspace}`);
     // Background bootstrap: keep .brain/ and AGENTS.md fresh without user action.
+    // Never scan a foreign directory: when the resolved workspace has no project
+    // markers (client launched the server outside the project) background work
+    // stays off until a tool call passes an explicit, trusted workspace.
     const auto = AutoBackground.for(workspace);
-    if (!autoBackgroundDisabled()) {
+    if (!autoBackgroundDisabled() && isTrustedWorkspace(workspace)) {
       auto.ensureFresh().then(result => {
         if (result.scanned) console.error(`[INI Brain MCP] background scan triggered (${result.reason})`);
         auto.start();
       }).catch(error => console.error('[INI Brain MCP] bootstrap error', error));
+    } else if (!isTrustedWorkspace(workspace)) {
+      console.error('[INI Brain MCP] workspace has no project markers; background scan disabled until a tool call provides the real project root.');
     }
     process.on('SIGINT', () => { auto.stop(); process.exit(0); });
     process.on('SIGTERM', () => { auto.stop(); process.exit(0); });
@@ -182,10 +225,11 @@ class IniBrainMcpServer {
 
   private async dispatch(method: string, params: Record<string, unknown>): Promise<unknown> {
     if (method === 'initialize') {
+      noteInitializeClient(params);
       return {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'ini-brain-ai-universal', version: '3.2.0' },
+        serverInfo: { name: 'ini-brain-ai-universal', version: SERVER_VERSION },
         instructions: GOLDEN_PROMPT
       };
     }
@@ -193,9 +237,9 @@ class IniBrainMcpServer {
     if (method !== 'tools/call') throw new McpError(ErrorCode.MethodNotFound, `Unknown method: ${method}`);
     const name = typeof params.name === 'string' ? params.name : '';
     const args = (params.arguments || {}) as Record<string, unknown>;
-    // Make sure context is fresh before any tool runs.
+    // Make sure context is fresh before any tool runs — but only for trusted workspaces.
     const ws = getWorkspace(args);
-    if (!autoBackgroundDisabled()) void AutoBackground.for(ws).ensureFresh().catch(() => undefined);
+    if (!autoBackgroundDisabled() && isTrustedWorkspace(ws)) void AutoBackground.for(ws).ensureFresh().catch(() => undefined);
 
     switch (name) {
       case 'ini_brain_auto_brief': return text(await autoBrief(args), false);
@@ -234,12 +278,19 @@ class IniBrainMcpServer {
 
 async function status(args: Record<string, unknown>): Promise<Record<string, unknown>> {
   const workspace = getWorkspace(args);
-  const profile = await new MemoryStore(workspace).buildProfile();
+  const trusted = isTrustedWorkspace(workspace);
+  const profile = trusted ? await new MemoryStore(workspace).buildProfile() : { totalMemories: 0 };
   return {
     workspace,
+    workspaceTrusted: trusted,
+    ...(trusted ? {} : {
+      hint: 'The resolved path has no project markers (.brain, AGENTS.md, .git, package.json, ...). The MCP client launched the server outside the project. Call tools with the "workspace" argument set to the real project root, or set INI_BRAIN_WORKSPACE in the client MCP config.'
+    }),
+    client: detectedClient,
+    serverVersion: SERVER_VERSION,
     brainDir: path.join(workspace, '.brain'),
-    hasBrain: await exists(path.join(workspace, '.brain', 'metadata.json')),
-    hasAgentGuide: await exists(path.join(workspace, 'AGENTS.md')),
+    hasBrain: trusted && await exists(path.join(workspace, '.brain', 'metadata.json')),
+    hasAgentGuide: trusted && await exists(path.join(workspace, 'AGENTS.md')),
     memories: profile.totalMemories,
     generatedAt: new Date().toISOString()
   };
@@ -306,21 +357,30 @@ async function suggestSkills(args: Record<string, unknown>): Promise<Record<stri
 async function autoBrief(args: Record<string, unknown>): Promise<string> {
   const workspace = getWorkspace(args);
   const task = typeof args.task === 'string' && args.task.trim() ? args.task : 'general project understanding';
+  const trusted = isTrustedWorkspace(workspace);
   const auto = AutoBackground.for(workspace);
-  const fresh = await auto.ensureFresh().catch(() => ({ scanned: false, reason: 'error' }));
-  const agentsMd = await readText(path.join(workspace, 'AGENTS.md'), '');
-  const compact = await readText(path.join(workspace, '.brain', 'compact_context.md'), '');
-  const decisions = await readText(path.join(workspace, '.brain', 'decisions.md'), '');
-  const tasks = await readText(path.join(workspace, '.brain', 'tasks.md'), '');
+  const fresh = trusted && !autoBackgroundDisabled()
+    ? await auto.ensureFresh().catch(() => ({ scanned: false, reason: 'error' }))
+    : { scanned: false, reason: trusted ? 'disabled' : 'untrusted-workspace' };
+  const agentsMd = trusted ? await readText(path.join(workspace, 'AGENTS.md'), '') : '';
+  const compact = trusted ? await readText(path.join(workspace, '.brain', 'compact_context.md'), '') : '';
+  const decisions = trusted ? await readText(path.join(workspace, '.brain', 'decisions.md'), '') : '';
+  const tasks = trusted ? await readText(path.join(workspace, '.brain', 'tasks.md'), '') : '';
   const memoryStore = new MemoryStore(workspace);
-  const recentMems = await memoryStore.list(8);
-  const memCtx = await memoryStore.buildContext(task, 2500);
+  const recentMems = trusted ? await memoryStore.list(8) : [];
+  const memCtx = trusted ? await memoryStore.buildContext(task, 2500) : '';
 
   const lines: string[] = [];
   lines.push('# INI Brain Auto Brief');
   lines.push('');
   lines.push(`Workspace: ${workspace}`);
+  lines.push(`Connected MCP client: ${detectedClient.name}${detectedClient.version ? ' ' + detectedClient.version : ''}`);
   lines.push(`Task: ${task}`);
+  if (!trusted) {
+    lines.push('');
+    lines.push('WARNING: this path has no project markers, so it is not a real project root. Background scanning is disabled here. Re-call this tool with the "workspace" argument set to the user\'s actual project folder before relying on any context below.');
+    lines.push('');
+  }
   lines.push(`Background scan: ${fresh.scanned ? 'started (' + fresh.reason + ')' : 'fresh'}`);
   lines.push('');
   lines.push('## Protocol (follow automatically)');

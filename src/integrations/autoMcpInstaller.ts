@@ -10,123 +10,204 @@ export interface AutoMcpInstallOptions {
 }
 
 export interface AutoMcpInstallResult {
-  client: 'codex' | 'claude' | 'cline';
+  client: string;
   status: 'installed' | 'unchanged' | 'skipped' | 'error';
   configPath: string;
   message: string;
 }
 
-export async function autoInstallMcpClients(options: AutoMcpInstallOptions): Promise<AutoMcpInstallResult[]> {
-  const platform = options.platform ?? process.platform;
-  const homeDir = options.homeDir ?? process.env.USERPROFILE ?? process.env.HOME ?? '';
-  const appDataDir = options.appDataDir ?? process.env.APPDATA ?? path.join(homeDir, 'AppData', 'Roaming');
-  const paths = getClientConfigPaths(homeDir, appDataDir, platform);
-  return Promise.all([
-    installCodex(paths.codex, options.serverScript),
-    installJsonClient('claude', paths.claude, options.serverScript),
-    installJsonClient('cline', paths.cline, options.serverScript),
-  ]);
+type ClientKind = 'json' | 'toml';
+
+interface ClientDescriptor {
+  id: string;
+  kind: ClientKind;
+  /** VS Code-family settings shape keeps disabled/autoApprove keys. */
+  vscodeFamily: boolean;
+  /** Resolve candidate config file paths. Each entry is gated by an anchor
+   *  directory that must already exist (proof the client is installed). */
+  candidates(ctx: InstallContext): Array<{ anchor: string; configPath: string; createDir?: string }>;
 }
 
-export function getClientConfigPaths(homeDir: string, appDataDir: string, platform: NodeJS.Platform): {
-  codex: string;
-  claude: string;
-  cline: string;
-} {
-  const codex = path.join(homeDir, '.codex', 'config.toml');
-  if (platform === 'win32') {
-    return {
-      codex,
-      claude: path.join(appDataDir, 'Claude', 'claude_desktop_config.json'),
-      cline: path.join(appDataDir, 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json'),
-    };
-  }
-  if (platform === 'darwin') {
-    const support = path.join(homeDir, 'Library', 'Application Support');
-    return {
-      codex,
-      claude: path.join(support, 'Claude', 'claude_desktop_config.json'),
-      cline: path.join(support, 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json'),
-    };
-  }
-  const config = process.env.XDG_CONFIG_HOME ?? path.join(homeDir, '.config');
+interface InstallContext {
+  homeDir: string;
+  appDataDir: string;
+  platform: NodeJS.Platform;
+}
+
+const SERVER_KEY = 'ini-brain-ai';
+const EDITOR_DIRS = ['Code', 'Code - Insiders', 'VSCodium'] as const;
+
+/** Platform-specific per-application configuration root. */
+function configHome(ctx: InstallContext): string {
+  if (ctx.platform === 'win32') return ctx.appDataDir;
+  if (ctx.platform === 'darwin') return path.join(ctx.homeDir, 'Library', 'Application Support');
+  return process.env.XDG_CONFIG_HOME ?? path.join(ctx.homeDir, '.config');
+}
+
+function editorUserDirs(ctx: InstallContext): string[] {
+  return EDITOR_DIRS.map(dir => path.join(configHome(ctx), dir, 'User'));
+}
+
+function globalStorageCandidate(userDir: string, extensionId: string, settingsFile: string): { anchor: string; configPath: string; createDir: string } {
+  const anchor = path.join(userDir, 'globalStorage', extensionId);
   return {
-    codex,
-    claude: path.join(config, 'Claude', 'claude_desktop_config.json'),
-    cline: path.join(config, 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json'),
+    anchor,
+    configPath: path.join(anchor, 'settings', settingsFile),
+    createDir: path.join(anchor, 'settings'),
   };
 }
 
-async function installCodex(configPath: string, serverScript: string): Promise<AutoMcpInstallResult> {
-  if (!await directoryExists(path.dirname(configPath))) return skipped('codex', configPath);
-  try {
-    const current = await fs.readFile(configPath, 'utf8').catch(error => {
-      if (hasCode(error, 'ENOENT')) return '';
-      throw error;
-    });
-    const block = [
-      '[mcp_servers.ini-brain-ai]',
-      'command = "node"',
-      `args = [${JSON.stringify(serverScript)}]`,
-      'startup_timeout_sec = 120',
-    ].join('\n');
-    const withoutExisting = current
-      .replace(/(?:^|\r?\n)\[mcp_servers\.ini-brain-ai\][\s\S]*?(?=\r?\n\[|$)/g, '')
-      .trimEnd();
-    const next = `${withoutExisting}${withoutExisting ? '\n\n' : ''}${block}\n`;
-    if (next === current) return unchanged('codex', configPath);
-    await fs.writeFile(configPath, next, 'utf8');
-    return installed('codex', configPath);
-  } catch (error) {
-    return failed('codex', configPath, error);
-  }
+function perEditor(ctx: InstallContext, extensionId: string, settingsFile: string): Array<{ anchor: string; configPath: string; createDir: string }> {
+  return editorUserDirs(ctx).map(userDir => globalStorageCandidate(userDir, extensionId, settingsFile));
 }
 
-async function installJsonClient(
-  client: 'claude' | 'cline',
-  configPath: string,
+const CLIENTS: ClientDescriptor[] = [
+  {
+    id: 'codex',
+    kind: 'toml',
+    vscodeFamily: false,
+    candidates: ctx => [{ anchor: path.join(ctx.homeDir, '.codex'), configPath: path.join(ctx.homeDir, '.codex', 'config.toml') }],
+  },
+  {
+    id: 'claude',
+    kind: 'json',
+    vscodeFamily: false,
+    candidates: ctx => [{ anchor: path.join(configHome(ctx), 'Claude'), configPath: path.join(configHome(ctx), 'Claude', 'claude_desktop_config.json') }],
+  },
+  {
+    id: 'claude-code',
+    kind: 'json',
+    vscodeFamily: false,
+    candidates: ctx => [
+      { anchor: path.join(ctx.homeDir, '.claude'), configPath: path.join(ctx.homeDir, '.claude.json') },
+      { anchor: path.join(ctx.homeDir, '.claude.json'), configPath: path.join(ctx.homeDir, '.claude.json') },
+    ],
+  },
+  {
+    id: 'gemini-cli',
+    kind: 'json',
+    vscodeFamily: false,
+    candidates: ctx => [{ anchor: path.join(ctx.homeDir, '.gemini'), configPath: path.join(ctx.homeDir, '.gemini', 'settings.json') }],
+  },
+  {
+    id: 'cursor',
+    kind: 'json',
+    vscodeFamily: false,
+    candidates: ctx => [{ anchor: path.join(ctx.homeDir, '.cursor'), configPath: path.join(ctx.homeDir, '.cursor', 'mcp.json') }],
+  },
+  {
+    id: 'cline',
+    kind: 'json',
+    vscodeFamily: true,
+    candidates: ctx => perEditor(ctx, 'saoudrizwan.claude-dev', 'cline_mcp_settings.json'),
+  },
+  {
+    id: 'kilo-code',
+    kind: 'json',
+    vscodeFamily: true,
+    candidates: ctx => perEditor(ctx, 'kilocode.kilo-code', 'mcp_settings.json'),
+  },
+  {
+    id: 'roo-code',
+    kind: 'json',
+    vscodeFamily: true,
+    candidates: ctx => perEditor(ctx, 'rooveterinaryinc.roo-cline', 'mcp_settings.json'),
+  },
+];
+
+export async function autoInstallMcpClients(options: AutoMcpInstallOptions): Promise<AutoMcpInstallResult[]> {
+  const homeDir = options.homeDir ?? process.env.USERPROFILE ?? process.env.HOME ?? '';
+  const ctx: InstallContext = {
+    platform: options.platform ?? process.platform,
+    homeDir,
+    appDataDir: options.appDataDir ?? process.env.APPDATA ?? path.join(homeDir, 'AppData', 'Roaming'),
+  };
+  const results: AutoMcpInstallResult[] = [];
+  for (const client of CLIENTS) {
+    const candidates = client.candidates(ctx);
+    const handledPaths = new Set<string>();
+    for (const candidate of candidates) {
+      if (handledPaths.has(candidate.configPath)) continue;
+      const result = await installCandidate(client, candidate, options.serverScript);
+      // Only dedupe non-skipped outcomes: a skipped candidate (missing anchor)
+      // must not block a fallback candidate for the same config file whose
+      // anchor does exist (e.g. ~/.claude.json present without ~/.claude/).
+      if (result.status !== 'skipped') handledPaths.add(candidate.configPath);
+      results.push(result);
+    }
+  }
+  return results;
+}
+
+async function installCandidate(
+  client: ClientDescriptor,
+  candidate: { anchor: string; configPath: string; createDir?: string },
   serverScript: string
 ): Promise<AutoMcpInstallResult> {
-  if (!await directoryExists(path.dirname(configPath))) return skipped(client, configPath);
+  if (!await pathExists(candidate.anchor)) return skipped(client.id, candidate.configPath);
   try {
-    const current = await readJsonFile<Record<string, unknown>>(configPath, {});
-    const currentServers = isRecord(current.mcpServers) ? current.mcpServers : {};
-    const entry: Record<string, unknown> = {
-      command: 'node',
-      args: [serverScript],
-      disabled: false,
-      autoApprove: [],
-    };
-    const next = { ...current, mcpServers: { ...currentServers, 'ini-brain-ai': entry } };
-    if (JSON.stringify(next) === JSON.stringify(current)) return unchanged(client, configPath);
-    await writeJsonFile(configPath, next);
-    return installed(client, configPath);
+    if (candidate.createDir) await fs.mkdir(candidate.createDir, { recursive: true });
+    if (client.kind === 'toml') return await installToml(client.id, candidate.configPath, serverScript);
+    return await installJson(client, candidate.configPath, serverScript);
   } catch (error) {
-    return failed(client, configPath, error);
+    return failed(client.id, candidate.configPath, error);
   }
 }
 
-async function directoryExists(directory: string): Promise<boolean> {
+async function installToml(client: string, configPath: string, serverScript: string): Promise<AutoMcpInstallResult> {
+  const current = await fs.readFile(configPath, 'utf8').catch(error => {
+    if (hasCode(error, 'ENOENT')) return '';
+    throw error;
+  });
+  const block = [
+    `[mcp_servers.${SERVER_KEY}]`,
+    'command = "node"',
+    `args = [${JSON.stringify(serverScript)}]`,
+    'startup_timeout_sec = 120',
+  ].join('\n');
+  const withoutExisting = current
+    .replace(/(?:^|\r?\n)\[mcp_servers\.ini-brain-ai\][\s\S]*?(?=\r?\n\[|$)/g, '')
+    .trimEnd();
+  const next = `${withoutExisting}${withoutExisting ? '\n\n' : ''}${block}\n`;
+  if (next === current) return unchanged(client, configPath);
+  await fs.writeFile(configPath, next, 'utf8');
+  return installed(client, configPath);
+}
+
+async function installJson(client: ClientDescriptor, configPath: string, serverScript: string): Promise<AutoMcpInstallResult> {
+  const current = await readJsonFile<Record<string, unknown>>(configPath, {});
+  const currentServers = isRecord(current.mcpServers) ? current.mcpServers : {};
+  const entry: Record<string, unknown> = client.vscodeFamily
+    ? { command: 'node', args: [serverScript], disabled: false, autoApprove: [] }
+    : { command: 'node', args: [serverScript] };
+  const next = { ...current, mcpServers: { ...currentServers, [SERVER_KEY]: entry } };
+  if (JSON.stringify(next) === JSON.stringify(current)) return unchanged(client.id, configPath);
+  await writeJsonFile(configPath, next);
+  return installed(client.id, configPath);
+}
+
+async function pathExists(target: string): Promise<boolean> {
   try {
-    return (await fs.stat(directory)).isDirectory();
+    await fs.stat(target);
+    return true;
   } catch {
     return false;
   }
 }
 
-function installed(client: AutoMcpInstallResult['client'], configPath: string): AutoMcpInstallResult {
+function installed(client: string, configPath: string): AutoMcpInstallResult {
   return { client, status: 'installed', configPath, message: 'MCP configuration installed or refreshed.' };
 }
 
-function unchanged(client: AutoMcpInstallResult['client'], configPath: string): AutoMcpInstallResult {
+function unchanged(client: string, configPath: string): AutoMcpInstallResult {
   return { client, status: 'unchanged', configPath, message: 'MCP configuration is already current.' };
 }
 
-function skipped(client: AutoMcpInstallResult['client'], configPath: string): AutoMcpInstallResult {
-  return { client, status: 'skipped', configPath, message: 'Client configuration directory was not detected.' };
+function skipped(client: string, configPath: string): AutoMcpInstallResult {
+  return { client, status: 'skipped', configPath, message: 'Client was not detected on this machine.' };
 }
 
-function failed(client: AutoMcpInstallResult['client'], configPath: string, error: unknown): AutoMcpInstallResult {
+function failed(client: string, configPath: string, error: unknown): AutoMcpInstallResult {
   return { client, status: 'error', configPath, message: error instanceof Error ? error.message : String(error) };
 }
 

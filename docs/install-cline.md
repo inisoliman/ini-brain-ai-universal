@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For Cline
 
-Version: 3.2.0
+Version: 3.3.0
 
 ## Build
 

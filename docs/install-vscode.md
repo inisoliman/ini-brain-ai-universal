@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For VS Code
 
-Version: 3.2.0
+Version: 3.3.0
 
 ## From Source
 
@@ -10,13 +10,14 @@ cd ini-brain-ai-universal
 npm install
 npm run compile
 npm run package
-code --install-extension .\ini-brain-ai-universal-3.2.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.3.0.vsix --force
 ```
 
 Reload VS Code after installation.
 
 On first activation, the extension automatically merges its packaged MCP server
-into detected Codex, Claude Desktop, and Cline settings. It preserves existing
+into detected Codex, Claude Desktop, Claude Code, Gemini CLI, Cursor, Cline,
+Kilo Code, and Roo Code settings. It preserves existing
 servers and never pins the global configuration to the currently open workspace.
 Restart an already-running client once to load the new MCP configuration.
 
@@ -48,6 +49,6 @@ Run **INI Brain: Settings** or **INI Brain: Configure AI Provider** to set:
 
 1. انسخ المستودع من GitHub.
 2. شغل `npm install` ثم `npm run compile` ثم `npm run package`.
-3. ثبت ملف `ini-brain-ai-universal-3.2.0.vsix` داخل VS Code.
-4. عند أول تفعيل، الإضافة تدمج MCP تلقائياً في Codex وClaude Desktop وCline إذا وجدت إعداداتهم.
+3. ثبت ملف `ini-brain-ai-universal-3.3.0.vsix` داخل VS Code.
+4. عند أول تفعيل، الإضافة تدمج MCP تلقائياً في Codex وClaude Desktop وClaude Code وGemini CLI وCursor وCline وKilo Code وRoo Code إذا وجدت إعداداتهم.
 5. مفتاح API اختياري ويتم حفظه في VS Code SecretStorage وليس داخل ملفات المشروع.

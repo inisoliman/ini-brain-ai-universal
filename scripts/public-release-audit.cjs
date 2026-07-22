@@ -60,6 +60,16 @@ function auditPublicDocs() {
       if (pattern.test(body)) fail(`${doc}: ${label}`);
     }
   }
+
+  // VSIX filenames referenced in docs must match the current package version,
+  // regardless of which file type (md/html) mentions them.
+  const currentVersion = JSON.parse(read('package.json')).version;
+  for (const doc of docs) {
+    const body = read(doc);
+    for (const match of body.matchAll(/ini-brain-ai-universal-(\d+\.\d+\.\d+)\.vsix/g)) {
+      if (match[1] !== currentVersion) fail(`${doc}: stale VSIX version ${match[1]} (current ${currentVersion})`);
+    }
+  }
 }
 
 function auditPackageIgnores() {

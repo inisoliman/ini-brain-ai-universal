@@ -1,8 +1,8 @@
 {
   "name": "ini-brain-ai-universal",
   "displayName": "INI Brain AI Universal",
-  "description": "Local-first AI productivity platform: project memory, token savings (Caveman+Ponytail), Spec-Driven Development, knowledge graph, and universal adapter for Claude/Codex/Cline/Cursor/Windsurf/Antigravity/Gemini/Copilot/OpenCode/Kimi/Kiro and any MCP client.",
-  "version": "3.2.0",
+  "description": "Local-first AI productivity platform: project memory, token savings (Caveman+Ponytail), Spec-Driven Development, knowledge graph, and universal adapter for Claude/Codex/Cline/Kilo Code/Roo Code/Cursor/Windsurf/Antigravity/Gemini/Copilot/OpenCode/Kimi/Kiro and any MCP client.",
+  "version": "3.3.0",
   "publisher": "ini-brain",
   "license": "MIT",
   "engines": {
@@ -152,7 +152,7 @@
         "iniBrain.mcp.autoInstall": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically merge INI Brain MCP into detected Codex, Claude Desktop, and Cline client settings when the extension starts."
+          "description": "Automatically merge INI Brain MCP into detected Codex, Claude Desktop, Claude Code, Gemini CLI, Cursor, Cline, Kilo Code, and Roo Code client settings when the extension starts."
         },
         "iniBrain.maxContextFiles": {
           "type": "number",

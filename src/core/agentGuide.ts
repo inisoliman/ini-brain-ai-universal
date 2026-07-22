@@ -116,7 +116,9 @@ function buildAgentsGeneratedSection(data: BrainData, skills: SkillDefinition[])
     '# INI Brain AI Universal Agent Guide',
     '',
     `Generated: ${new Date().toISOString()}`,
-    `Workspace: ${data.projectMap.root}`,
+    // Only the folder name is recorded: absolute paths are machine-specific and
+    // must not leak into committed or shared AGENTS.md files.
+    `Workspace: ${workspaceDisplayName(data.projectMap.root)}`,
     `Indexed files: ${data.projectMap.totalFiles}`,
     '',
     '## Required Reading',
@@ -156,6 +158,12 @@ function buildAgentsGeneratedSection(data: BrainData, skills: SkillDefinition[])
     '- Prefer small, compatible changes.',
     '- Verify before claiming completion.'
   ].join('\n');
+}
+
+function workspaceDisplayName(root: string): string {
+  const normalized = root.replace(/[\\/]+$/, '');
+  const base = normalized.split(/[\\/]/).filter(Boolean).pop();
+  return base || '.';
 }
 
 function buildWorkflow(skills: SkillDefinition[]): string {
