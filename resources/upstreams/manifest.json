@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "57cc518d63d6f10da3dd93df1ebcadda87c59374",
+      "pinnedCommit": "d7699c39f2c3ab7d9c4f3eceff8f29ae1601cc3b",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "e678b2b6acb02bc1ab84a854f2df0e1d092f2cc0",
+      "pinnedCommit": "7d6cdb23ef5ca2fd51f5d5b7509b33e112ef15f3",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -261,7 +261,7 @@
       "id": "agentmemory",
       "repository": "rohitg00/agentmemory",
       "branch": "main",
-      "pinnedCommit": "93ae9bc04f3ab5042f982aaadf11f1e3f5137531",
+      "pinnedCommit": "a8e7d19a814a24a21818afc715f3301b3eaeee80",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -274,7 +274,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "83ce14f8311247a9a1e496011a9ba71a9d94bc318ed91158c660d2710f8477ca"
+          "sha256": "ded430ba0efb8df83116f1c375664109238308cf08880976b3073c1bfd31b897"
         },
         {
           "path": "plugin/skills/remember/SKILL.md",
@@ -294,7 +294,7 @@
       "id": "impeccable",
       "repository": "pbakaus/impeccable",
       "branch": "main",
-      "pinnedCommit": "8967edc988ee146823bca3c51fcf51296e9dec18",
+      "pinnedCommit": "4d849eb75f216109ea7053ed21530a11fafcc786",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -307,7 +307,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "6f4b725239c1c9ead30e4631f25ab03a29cbb4dee81e6d8b16bc7927797044c4"
+          "sha256": "1a4ad88f8b940583b0b758b0f659d3d9d56ddb283162be1d28fcc4d48d5c34d4"
         },
         {
           "path": "plugin/skills/impeccable/SKILL.md",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-07-18T05:39:08.890Z"
+  "updatedAt": "2026-07-22T06:06:56.435Z"
 }
