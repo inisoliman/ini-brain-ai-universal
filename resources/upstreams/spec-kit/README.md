@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="./media/logo_large.webp" alt="Spec Kit Logo" width="200" height="200"/>
+    <img src="https://raw.githubusercontent.com/github/spec-kit/main/media/logo_large.webp" alt="Spec Kit Logo" width="200" height="200"/>
     <h1>🌱 Spec Kit</h1>
     <h3><em>Define what to build before building it — with any AI coding agent.</em></h3>
 </div>
@@ -90,7 +90,7 @@ Bare `specify self upgrade` executes immediately, matching the no-prompt behavio
 
 ### 3. Establish project principles
 
-Launch your coding agent in the project directory. Most agents expose spec-kit as `/speckit.*` slash commands; Codex CLI in skills mode uses `$speckit-*` instead; GitHub Copilot CLI uses `/agents` to select the agent or address it directly in a prompt.
+Launch your coding agent in the project directory. Most agents expose spec-kit as `/speckit.*` slash commands; Codex CLI and Command Code in skills mode use `$speckit-*` instead; GitHub Copilot CLI uses `/agents` to select the agent or address it directly in a prompt.
 
 Use the **`/speckit.constitution`** command to create your project's governing principles and development guidelines that will guide all subsequent development.
 
@@ -136,7 +136,7 @@ For detailed step-by-step instructions, see our [comprehensive guide](./spec-dri
 
 Want to see Spec Kit in action? Watch our [video overview](https://www.youtube.com/watch?v=a9eR1xsfvHg&pp=0gcJCckJAYcqIYzv)!
 
-[![Spec Kit video header](/media/spec-kit-video-header.jpg)](https://www.youtube.com/watch?v=a9eR1xsfvHg&pp=0gcJCckJAYcqIYzv)
+[![Spec Kit video header](https://raw.githubusercontent.com/github/spec-kit/main/media/spec-kit-video-header.jpg)](https://www.youtube.com/watch?v=a9eR1xsfvHg&pp=0gcJCckJAYcqIYzv)
 
 ## 🌍 Community
 
@@ -283,9 +283,11 @@ specify bundle validate --path ./my-bundle      # structural + reference checks
 specify bundle build --path ./my-bundle         # produce a versioned .zip artifact
 ```
 
-Four ready-to-read example manifests live under
+Four ready-to-read example bundle manifests live under
 [`examples/bundles/`](examples/bundles/) (product manager, business analyst,
-security researcher, developer).
+security researcher, developer). These are bundle packaging examples, not
+filled generated feature specs; for end-to-end community examples, see the
+[community walkthroughs](https://github.github.io/spec-kit/community/walkthroughs.html).
 
 Key guarantees: `info` shows exactly what `install` adds (transparency);
 installs are idempotent and confined to the project root; `remove` never touches
