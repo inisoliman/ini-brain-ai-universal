@@ -69,15 +69,31 @@ Skip setup when you want one implementer or one-off dials. Pick the skill for a 
 | [`claude-delegate`](skills/claude-delegate/SKILL.md) | [Claude Code](https://code.claude.com/docs/en/overview) (`claude`) | `acceptEdits` + explicit tool surface | `--read-only` (`plan` mode) | `--resume-last`, `--session <id>` |
 | [`cline-delegate`](skills/cline-delegate/SKILL.md) | [Cline](https://github.com/cline/cline) (`cline`) | `--auto-approve true` in act mode; upstream sandbox not configured by the relay | `--plan` + `--auto-approve false` (relay-enforced pair) | — (headless JSON resume unsupported) |
 | [`codex-delegate`](skills/codex-delegate/SKILL.md) | [OpenAI Codex](https://github.com/openai/codex) (`codex`) | `--sandbox workspace-write` | `--read-only` | `--resume-last`, `--session <id>` |
+| [`commandcode-delegate`](skills/commandcode-delegate/SKILL.md) | [Command Code](https://commandcode.ai/docs/headless) (`cmd`; `cmdc` on Windows) | `--yolo` — the only headless write state; no sandbox [^commandcode] | `--read-only` (withheld tools + `plan`) | `--continue-last`, `--session <id>` |
 | [`cursor-delegate`](skills/cursor-delegate/SKILL.md) | [Cursor Agent](https://cursor.com/cli) (`cursor-agent`) | `--force`; `--no-force` withholds command approval | `--read-only` (plan mode) | `--resume-last`, `--session <id>` |
 | [`grok-delegate`](skills/grok-delegate/SKILL.md) | Grok Build (`grok`) | workspace-scoped; `--full-access` opt-in | `--read-only` — best-effort [^grok] | `--resume-last`, `--session <id>` |
 | [`kimi-delegate`](skills/kimi-delegate/SKILL.md) | [Kimi Code](https://moonshotai.github.io/kimi-code/en/) (`kimi`) | `auto permission mode`, always | — [^none] | `--resume-last`, `--session <id>` |
 | [`opencode-delegate`](skills/opencode-delegate/SKILL.md) | [OpenCode](https://opencode.ai) (`opencode`) | agent `build` (`--model` required) | `--read-only` (agent `plan`) | `--resume-last`, `--session <id>` |
 | [`pi-delegate`](skills/pi-delegate/SKILL.md) | [Pi](https://github.com/earendil-works/pi-mono) (`pi`) | full local tools — no sandbox, no permission modes [^none]; project trust opt-in | `--read-only` (`read,grep,find,ls`) | `--resume-last`, `--session <id>` |
+| [`omp-delegate`](skills/omp-delegate/SKILL.md) | [Oh My Pi](https://github.com/can1357/oh-my-pi) (`omp`) | `--yolo` (`tools.approvalMode: yolo`); project `.omp` extras off unless `--approve` | `--read-only` (`read,grep,glob`) | `--resume-last`, `--session <id>` |
 | [`qoder-delegate`](skills/qoder-delegate/SKILL.md) | [Qoder](https://docs.qoder.com/en/cli/quick-start) (`qodercli`) | `auto` permission mode; bypass opt-in | `--permission-mode plan` | `--resume-last`, `--resume <id>` |
 | [`vibe-delegate`](skills/vibe-delegate/SKILL.md) | [Mistral Vibe](https://github.com/mistralai/mistral-vibe) (`vibe`) | `accept-edits`; `--full-access` opt-in | `--plan-only` (`plan` agent) | `--resume-last`, `--session <id>` |
+| [`copilot-delegate`](skills/copilot-delegate/SKILL.md) | [GitHub Copilot CLI](https://docs.github.com/copilot/how-tos/copilot-cli) (`copilot`) | `--allow-all-tools` opt-in; headless auto-deny otherwise | `--read-only` (`--mode plan`) | `--resume-last`, `--session <id>` |
+| [`warp-delegate`](skills/warp-delegate/SKILL.md) | [Warp Agent CLI](https://docs.warp.dev/cli/) (`oz`) | full local tools — no sandbox, no permission modes [^none] | — [^none] | `--conversation <id>` |
+| [`zcode-delegate`](skills/zcode-delegate/SKILL.md) | [Z.AI ZCode](https://zcode.z.ai) (`zcode`) [^zcode] | `--mode yolo` | `--read-only` (`plan` mode) | `--resume-last`, `--session <id>` |
 
-[^none]: No CLI-enforced read-only mode. `touchedFiles` and the diff, not a flag, are the guarantee.
+[^commandcode]: Command Code's headless mode has two states and nothing between them: a `-p` run
+withholds the write, edit, and shell tools, and `--yolo` (alias `--dangerously-skip-permissions`)
+allows every tool anywhere the process can reach. `--permission-mode auto-accept` and `--tools-all`
+do **not** lift the write gate. So an implementation run is full-trust with no path restriction —
+the brief's path list is guidance, not containment. A worktree isolates the checkout, while a
+container or another OS-enforced sandbox is required when writes outside the target tree are
+unacceptable. `touchedFiles` is a review aid based on `git status`; it cannot show ignored files or
+writes outside the repository.
+
+[^none]: No CLI-enforced read-only mode. `touchedFiles` and the diff are what you review against, not
+a guarantee: they are post-run `git status` in the workspace, so they cannot show ignored files,
+reverted edits, or writes outside the repository.
 
 [^aider]: Aider is the one implementer here that commits by default. Its `--auto-commits` and
 `--dirty-commits` both default to `True`, the second of which commits your pre-existing uncommitted
@@ -86,6 +102,15 @@ is configurable through it.
 
 [^grok]: `grok` cannot be prevented from writing headlessly. The relay reports a tri-state
 `readOnlyViolation` tripwire for detected Git-visible changes; it does not enforce or attribute them.
+
+[^zcode]: ZCode ships its CLI **inside the desktop app** — there is no `zcode` on PATH, no npm
+package, and the public docs cover only the GUI. The relay resolves it from
+`--zcode-path`/`ZCODE_CLI`, then PATH, then the installed app bundle. Of ZCode's four documented
+modes only `plan` and `yolo` work headlessly: `build` and `edit` have no permission client there, so
+they block every write tool and exit 0 having changed nothing, and the relay rejects them rather
+than report that as success. ZCode offers `--disallowed-tools` but no `--allowed-tools`, so
+capability can be subtracted, never enumerated. Where `zcode login` fails with `OAuth response is
+not valid JSON`, the key comes from `ZCODE_API_KEY` / `ANTHROPIC_API_KEY` / `ZAI_API_KEY` instead.
 
 Each skill name links to its `SKILL.md`, which owns that implementer's prerequisites, flags, and
 caveats. Building one for another CLI? [Claim it first](../../issues?q=is%3Aissue+label%3Aimplementer),
@@ -235,11 +260,80 @@ Per skill — platform, CLI version, and what the run exercised:
 - `pi-delegate` — macOS: stdin brief delivery, explicit provider and model selection, JSON
   session/provider/model/usage capture, and a `--read-only` run leaving a clean tree. Write,
   `--session`, and `--resume-last` runs are contributor-reported.
+- `omp-delegate` — contract-tested, live run pending: stdin brief delivery, `omp --mode json`
+  argv (`--yolo`, `--tools read,grep,glob`, `--no-extensions --no-skills --no-rules`, `--thinking`),
+  session header / `message_end` parsing, `--approve` omitting the project-trust flags, `--continue`
+  resume, assistant `stopReason: error` reported as failed, `omp_unavailable`/127, and bounded
+  `--version` preflight. Native Windows launch is a native `omp.exe` (no `shell:true`); that path is
+  contract-tested via the smoke matrix's compiled fake, not against a live Oh My Pi install.
 - `qoder-delegate` — macOS, `qodercli` 1.0.47, by the contributor: Lite edit run, `accept_edits`,
   explicit model and 32768-token context window, no commit.
-- `codex-delegate`, `opencode-delegate`, `vibe-delegate` — contract-tested only: argument validation,
+- `commandcode-delegate` — macOS, `cmd` 1.26.0: **live edit run verified**. A relay dispatch against a
+  throwaway git repository had Command Code fix a remainder-dropping bug in a money-splitting function
+  and add three tests; the project gate was re-run independently by the orchestrator (2 tests before,
+  5 passing after), the diff matched the brief with no writes outside the two named files, and `HEAD`
+  was untouched — the relay does not commit, and the run did not either. A second dispatch with
+  `--session <id>` verified resume through the relay: a one-line delta brief amended exactly the comment
+  it named, with the session id from the first run. A `--read-only` dispatch verified the other
+  direction, returning `readOnlyViolation: false` on a clean tree. Also verified negatively: separate
+  live runs confirmed `--tools-all` and `--permission-mode auto-accept` leave the headless write gate
+  closed and only `--yolo` opens it.
+
+  Live running surfaced a CLI limitation the relay now handles. `cmd` ends a run with a `run_end` event
+  embedding the whole conversation, then exits with `process.exit`, discarding whatever is still queued
+  in its stdout pipe: both write runs lost their `result` line entirely (one cut ~8 KB into `run_end`,
+  the other losing its last ~780 events). So nothing load-bearing is read from that tail — `sessionId`
+  comes from `run_start`, the first line of the stream, and the report from the last `message_end` or
+  its streamed deltas — the event log is written in batches so the relay drains the pipe as fast as it
+  can, `resultLine` reports `complete`/`truncated`/`absent` so a consumer knows which fields are
+  trustworthy. A complete non-success result converts a zero child exit to relay exit 1, while a lost
+  result line falls back to the process exit code. Smoke cases pin that contract. On a long run the
+  report itself can land in the discarded region. The diff is the deliverable, and a thin report
+  means missing information, not a failed run.
+
+  Native Windows launch is contract-tested against the installed `cmdc.cmd` shape, including stdin
+  brief delivery and the `cmd.exe` collision guard. A live native Windows Command Code run remains
+  unverified; upstream recommends WSL for stable Windows use.
+- `warp-delegate` — macOS, `oz` 0.2026.05.27.15.44.stable_01: **live edit run verified**. A relay
+  dispatch against a throwaway git repository had Warp add a function plus four assertions across
+  two files; both project gates were re-run independently by the orchestrator, the diff matched the
+  brief, and `HEAD` was untouched. Verified end to end: version preflight, launch, ndjson parsing
+  (`run_started` → `runId`/`runUrl`, `conversation_started` → `conversationId`), report extraction
+  from `{"type":"agent","text":…}` events with `agent_reasoning` excluded, `touchedFiles`, and
+  `status: "completed"` / exit 0. A second dispatch with `--conversation` verified resume: a delta
+  brief saying only "the function you just added" — never naming it — produced exactly the right
+  edit, with `resumed: true` and the conversation id preserved. Also observed on a prior run:
+  `touchedFiles: []` on a clean tree and exit 1 → `status: "failed"`. Two caveats are documented in the skill rather than fixed,
+  because they are Warp's behaviour and not the relay's: `finalMessage` is the agent's full
+  narration rather than a distinct final-message event, and `--cwd` governed shell commands while
+  the agent's file tool resolved bare relative paths against `$HOME`. `--no-snapshot`, `--profile`,
+  `--skill`, and `--mcp` are contract-tested only.
+- `zcode-delegate` — Windows, `zcode` 0.16.1: read-only (`plan`) run leaving a clean tree with the
+  Git tripwire false; write run under `yolo` creating the briefed file and reporting it in
+  `touchedFiles`; `--session` resume with an attached delta brief, which recalled the earlier turn;
+  single-document `--json` parsing; `--version` preflight; discovery resolving the CLI from the app
+  bundle rather than PATH; and environment-variable auth under all three names ZCode accepts —
+  against an isolated home whose config carried no `apiKey`, a keyless run failed first, then
+  `ZAI_API_KEY`, `ZCODE_API_KEY`, and `ANTHROPIC_API_KEY` each completed the same read-only
+  dispatch. Contract-tested: `build`/`edit` rejection, the missing-CLI path, tolerance of the AI SDK
+  banner that ZCode can print on stdout ahead of the JSON (observed in direct CLI probes; exercised
+  in the suite by the fake), and the timeout matrix. The abort matrix is POSIX-only — Windows
+  delivers no catchable SIGTERM — so for this relay it first runs in CI. `zcode-delegate` is also
+  absent from the shared read-only tripwire scenario matrix, which runs `claude` and `grok` only —
+  its tripwire helpers are parity-enforced byte-identical, but no zcode-specific worktree-state run
+  is recorded. No macOS or Linux run is recorded.
+- `codex-delegate` — macOS, `codex` codex-cli 0.150.1: fresh `workspace-write` dispatch against a
+  throwaway repo created the briefed file and reported it in `touchedFiles`, with `status:
+  "completed"` and exit 0; a `--read-only` dispatch left the tree clean (`touchedFiles: []`) and
+  returned a `threadId`; a follow-up `--session <id>` resume against that thread was asked to recall
+  a word from the first turn without it being named again — the delta brief said only "the word you
+  picked a moment ago" — and it answered correctly, confirming the resumed turn saw prior context, not
+  just that the id was accepted. Contract-tested: argument validation,
   bounded version preflight, missing binary, result parsing, and whole-process-tree timeout/abort
-  cleanup. No end-to-end run is recorded here.
+  cleanup. No Windows or Linux run is recorded.
+- `opencode-delegate`, `vibe-delegate` — contract-tested only: argument validation, bounded version
+  preflight, missing binary, result parsing, and whole-process-tree timeout/abort cleanup. No
+  end-to-end run is recorded here.
 - `cline-delegate` — macOS, `cline` 3.0.52: current-binary unauthenticated plan probe reached
   `run_start` with the fixed positional instruction plus the real brief on stdin, accepted a
   provider-local model id, parsed the failing `run_result`, and left the tree clean. Contract-tested:
@@ -247,13 +341,21 @@ Per skill — platform, CLI version, and what the run exercised:
   `sessionId`/`finalPath`, bounded version preflight, missing binary, result parsing, and whole-process-tree
   timeout/abort cleanup. The contributor also reported a native Windows 3.0.51 edit run against the
   earlier positional-brief commit; that does not verify this exact stdin-based head on Windows.
+- `copilot-delegate` — Windows, `copilot` 1.0.78: `--read-only` plan-mode run completed with a clean
+  tree and captured session id; `--allow-all-tools` edit run created the requested file; the headless
+  auto-deny path was exercised live (denial detected from the data-wrapped event shape, run reported
+  failed with the `--allow-all-tools` hint); `--session <id>` and `--resume-last` resume runs executed
+  their delta briefs via the directive-wrapped `-p @<file>` prompt. Contract-tested: argv exactness
+  (including the resume directive), denial shape, `--read-only`/`--allow-all-tools` conflict
+  validation, bounded version preflight, missing binary, result parsing, and whole-process-tree
+  timeout/abort cleanup.
 - `delegate-setup` — contract-tested: discover JSON shape, config validate/write/load, whole-lane
   project overlay, global write without creating `.delegate/`, and `--lane` resolve / wrong-skill /
   flag-override against relays. The smoke suite runs live discovery against installed CLIs
   (versions vary by machine). Native Windows discover smoke not yet claimed.
 
 Not yet verified: native Windows launches for `claude`, exact-head `cline`, `grok`, `kimi`,
-`pi`, `qoder`, and `vibe` (`codex`/`opencode`/`grok` have contract-tested `.cmd` shim handling;
+`pi`, `qoder`, `vibe`, and `omp` (`codex`/`opencode`/`grok`/`commandcode` have contract-tested `.cmd` shim handling;
 Cursor serializes a pre-joined, quoted command; Qoder and Vibe target their documented native executables).
 Claude's own shell sandbox is unsupported on native Windows regardless of launch mechanics, and upstream
 Vibe officially targets UNIX. A native Linux `cursor-agent` run is unverified. The full delegate →
