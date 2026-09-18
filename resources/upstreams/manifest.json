@@ -36,7 +36,7 @@
       "id": "caveman",
       "repository": "JuliusBrussee/caveman",
       "branch": "main",
-      "pinnedCommit": "c2906c626be1d703b04e203d9f804a263e87f4ef",
+      "pinnedCommit": "542442bab314973709f95b85b1ac0b3f6f5b5dc6",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "d743a695e46d6decfeb48fb2a641913ff5ab9ac5",
+      "pinnedCommit": "5e952140659287106580d32f242ba71365a3862b",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-09-17T08:44:09.395Z"
+  "updatedAt": "2026-09-18T08:20:14.437Z"
 }
