@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "5e952140659287106580d32f242ba71365a3862b",
+      "pinnedCommit": "d4229c071c7ea3885b43e8a7739847300f618f13",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -127,7 +127,7 @@
       "id": "superpowers",
       "repository": "obra/superpowers",
       "branch": "main",
-      "pinnedCommit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+      "pinnedCommit": "5bf4e78011075bcfc0dc295f0724994cd123ee71",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -140,19 +140,19 @@
         },
         {
           "path": "README.md",
-          "sha256": "4cd0e751210f24a5e4788730e7b5bb145b4d03a2b2c71202721454481a5c5e81"
+          "sha256": "04fd40756d26d5f2132ddfbc5c3c35335b02bb456197308975f9d12eaa522382"
         },
         {
           "path": "skills/using-superpowers/SKILL.md",
-          "sha256": "30f2ab78e20ddc27ee7158ae8d4a2abe161c360981c7cc3548070913142d3dc3"
+          "sha256": "82c5c8866ad7f5dd4440ce66bd7806ba48a2f13771beae5cf112e53f08fe36ba"
         },
         {
           "path": "skills/writing-plans/SKILL.md",
-          "sha256": "48508f44bbfd7d24b029fbf3a314f3cd14c9615599059366e922f47b8dc08cf2"
+          "sha256": "0bc3d36590f7b2c323ed3ec18ff77e9f8ed57af42f5680a02b11a2d20de265cf"
         },
         {
           "path": "skills/executing-plans/SKILL.md",
-          "sha256": "c4c3d8b628c51114cd165fb8246fe02744cd8be180032328391252e653028d9b"
+          "sha256": "f38e8f2ddcf079f65493adc713c1fed78421dfaf5f4dbf6b3a6b2b1d95466e71"
         }
       ]
     },
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-09-18T08:20:14.437Z"
+  "updatedAt": "2026-09-19T08:07:49.281Z"
 }
