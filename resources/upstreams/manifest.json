@@ -11,7 +11,7 @@
       "id": "ponytail",
       "repository": "DietrichGebert/ponytail",
       "branch": "main",
-      "pinnedCommit": "c982cd411abb53323c4baa1baa3c2f020b8d0b08",
+      "pinnedCommit": "16352ac229eb08a9598dcae48fe9f2b342567d86",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -20,7 +20,7 @@
       "files": [
         {
           "path": "AGENTS.md",
-          "sha256": "b57f736a83ddab7111d752008c3e131a157e646a6b47c9eb223f076c494685a8"
+          "sha256": "b98b15e1d683ee205e124b52b8d330128593f4a87b545cf8185e2712cd1bb25f"
         },
         {
           "path": "LICENSE",
@@ -28,7 +28,7 @@
         },
         {
           "path": "skills/ponytail/SKILL.md",
-          "sha256": "1316a2f3f95741d2300b116fe0c2d81ce4a9568656ed0a62643f54aaf09957f2"
+          "sha256": "9badd22a32e19cb884e46dfa8d3aae82bb81dfa5484105b8b4f0262df823a509"
         }
       ]
     },
@@ -36,7 +36,7 @@
       "id": "caveman",
       "repository": "JuliusBrussee/caveman",
       "branch": "main",
-      "pinnedCommit": "aeb45e2f787c0757a8af383a291a280cb6aeb4c1",
+      "pinnedCommit": "81958ad82f2e2da4417778f81f8a3c838d81b798",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -53,7 +53,7 @@
         },
         {
           "path": "skills/caveman/SKILL.md",
-          "sha256": "34255a0215a7701eb83d508d03bc9560dc7bffbeb95a145ad2921ad2598a03bf"
+          "sha256": "415d43518f2b1a9498c15a445d4657117b129ee5e81b19454ce348439cc6672b"
         }
       ]
     },
@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "e1fa857a7f536b22760d48c1aa9ace41df0fd1dc",
+      "pinnedCommit": "c6a4c18f1d01a8bec241c618eb6dfea952508744",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -95,7 +95,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "49d99febbcdea0bac928ed3e7bdc3b70a1f90e8a13d5bfd19760b6f4fc561f4d"
+          "sha256": "f92c89ff5a9fd1487e956e1d850383bd7098b3ba8093841918a39f1d2b23e598"
         },
         {
           "path": "templates/constitution-template.md",
@@ -127,7 +127,7 @@
       "id": "superpowers",
       "repository": "obra/superpowers",
       "branch": "main",
-      "pinnedCommit": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "pinnedCommit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -140,7 +140,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "04fd40756d26d5f2132ddfbc5c3c35335b02bb456197308975f9d12eaa522382"
+          "sha256": "9b7be460027bf53c29f628eee72dceeebb83e52dd5e94a1b6f9828a64c579198"
         },
         {
           "path": "skills/using-superpowers/SKILL.md",
@@ -160,7 +160,7 @@
       "id": "gstack",
       "repository": "garrytan/gstack",
       "branch": "main",
-      "pinnedCommit": "74512c20a7aca72e722d46bcc6b3954c1677d9ee",
+      "pinnedCommit": "d258bcffb0cb7bda5f133f3e957f932d816d282f",
       "license": "MIT",
       "classification": "reference-workflow",
       "snapshotPolicy": "curated",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "96c3f41cf334d87670cb085f1fcf16f637293222",
+      "pinnedCommit": "a7158ac2f48ca646b4527341b76f930f2aeff87e",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -224,7 +224,7 @@
         },
         {
           "path": "server.json",
-          "sha256": "892d66197d3f3f9416987864d07bddd10bfaa897c4343a3547d7ff577974aa96"
+          "sha256": "32421f96a7f282e077512aa3c84f7254cfbae6207b387dce875d24ea00a7794a"
         }
       ]
     },
@@ -232,7 +232,7 @@
       "id": "delegate-skills",
       "repository": "amElnagdy/delegate-skills",
       "branch": "master",
-      "pinnedCommit": "6826b363085dcc80875372315fe7d208c4bf733f",
+      "pinnedCommit": "3aa72d681a79e2a9d09bd9a316353003ae1cb4a7",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -245,15 +245,15 @@
         },
         {
           "path": "README.md",
-          "sha256": "b71b3459a67cc2278559487eae59982a7b7fe218daf499ac3028a355e22cc512"
+          "sha256": "cc64242be0d2e732b05136cd1aab807279481882a4e2e585f96fc0f6953c4638"
         },
         {
           "path": "skills/codex-delegate/SKILL.md",
-          "sha256": "60aa857bc222202fae8a8eb7e1875ba9dec011f574d38f07b17e279e97ad2286"
+          "sha256": "25477cc004c99fd60db47711c2f7ef514628b972400d0907a879f82d11f04f9a"
         },
         {
           "path": "skills/opencode-delegate/SKILL.md",
-          "sha256": "4b1e6e50a885253c223838f2c80ee92f0388bf1ff0d179c02c728d654d77cdc1"
+          "sha256": "f9f754136c0acabb037465da167fe4787a2c332d0c44535da8976905b02c7711"
         }
       ]
     },
@@ -261,7 +261,7 @@
       "id": "agentmemory",
       "repository": "rohitg00/agentmemory",
       "branch": "main",
-      "pinnedCommit": "2a00e7b38fc4ae4e38af4134586be0bbe9612706",
+      "pinnedCommit": "6a182c410ed3858adacd57af141591d913d00aba",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -274,19 +274,19 @@
         },
         {
           "path": "README.md",
-          "sha256": "551e6ad42327f191570d37b7c72623d9e8605ce5a5c090f6f34bd453ce2ea139"
+          "sha256": "4a2b7338f5141f1eca8ad50dd570c273bacb85a42f2545a32cec55215bb4e1de"
         },
         {
           "path": "plugin/skills/remember/SKILL.md",
-          "sha256": "d9b6facf4cbecaa3385a53d26afeec755f59531ebd5a775fb2812b4f37476936"
+          "sha256": "78fb0b4c239a22e2675087e411dc5b5f32a913ddf749a3869d614f478140b4eb"
         },
         {
           "path": "plugin/skills/recall/SKILL.md",
-          "sha256": "430a2527d09ca6edc0f6ad36daccd32c723f87113a9c0d169ce469f989511743"
+          "sha256": "ba014b66f0ebb90539ff44affed7c1dd9a6f9ce8e5efabbff3ceeefdfb627ef4"
         },
         {
           "path": "plugin/skills/handoff/SKILL.md",
-          "sha256": "bf59c5bb44e86883159051fcc83ecb7d2a85b500512dbd9bd7cbce00b0565b4d"
+          "sha256": "e4ec7862811a6f83b769dad900c19915cc939c79afd0753651a6888670b2cd7a"
         }
       ]
     },
@@ -294,7 +294,7 @@
       "id": "impeccable",
       "repository": "pbakaus/impeccable",
       "branch": "main",
-      "pinnedCommit": "e103efe779e2dd01274dabae83531fef00bf2563",
+      "pinnedCommit": "6af45ac9a5eb8792f033d3242f52e99812fd91fa",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -307,11 +307,11 @@
         },
         {
           "path": "README.md",
-          "sha256": "4dfa2740321ca339244080e37f44721ea5d9cd3e15513d13cb1ac57beff7e29f"
+          "sha256": "256b85659e13ffd7f5aba978f83bc91677d7439967283744d71cb0b082bb81a3"
         },
         {
           "path": "plugin/skills/impeccable/SKILL.md",
-          "sha256": "a18a12b0fe210e1aae781df177eb9fda914767bd9e18f2575abd757905f42c76"
+          "sha256": "4bd38528ae7bb3ed11d655fd248669e37d925bf2316e975b7639f2126a9d56f5"
         }
       ]
     },
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-10-03T09:14:51.443Z"
+  "updatedAt": "2026-10-17T07:53:15.422Z"
 }
