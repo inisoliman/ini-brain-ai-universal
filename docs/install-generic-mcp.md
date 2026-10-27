@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For Generic MCP Clients
 
-Version: 3.3.0
+Version: 3.4.0
 
 Any stdio MCP-compatible client can use INI Brain AI Universal.
 
@@ -45,7 +45,7 @@ See the complete MCP tool list in [../README.md](../README.md#mcp-tools).
 
 ## Minimal Flow
 
-1. Call `ini_brain_auto_brief` at the start of a task.
+1. Verify `ini_brain_status` first, then call `ini_brain_auto_brief` for the task. For no-roots hosts pass the current project `workspace` on every call, including after switching projects.
 2. Call `ini_brain_get_context` before editing.
 3. Call `ini_brain_search_memory` when prior decisions may matter.
 4. Call `ini_brain_save_memory` after important discoveries.

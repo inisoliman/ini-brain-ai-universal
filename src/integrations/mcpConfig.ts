@@ -1,4 +1,9 @@
-import { McpServerConfig } from '../core/types';
+import { McpServerConfig, OpenCodeMcpConfig } from '../core/types';
+
+/** OpenCode uses its native mcp map and executable/arguments array. */
+export function buildOpenCodeMcpConfig(serverScript: string): OpenCodeMcpConfig {
+  return { type: 'local', command: ['node', serverScript], enabled: true };
+}
 
 export function buildMcpServerConfig(root: string, serverScript: string): McpServerConfig {
   void root;

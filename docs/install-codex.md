@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For Codex
 
-Version: 3.3.0
+Version: 3.4.0
 
 Codex can use INI Brain through two layers:
 
@@ -39,7 +39,7 @@ args = ["C:/path/to/ini-brain-ai-universal/dist/mcp/server.js"]
 startup_timeout_sec = 120
 ```
 
-Do not set `INI_BRAIN_WORKSPACE` for a global Codex install unless you intentionally want to pin INI Brain to one project. Without that variable, INI Brain resolves the active project from the MCP process working directory and known workspace environment variables.
+Do not set `INI_BRAIN_WORKSPACE` for a global Codex install unless you intentionally want to pin INI Brain to one project. Codex may start the server outside the project. INI Brain uses the client workspace root when the client provides it, then the process working directory, and never binds to a `.brain` folder in the user home directory. Open Codex from the project root when the client does not advertise that root.
 
 ## Automatic Startup Protocol
 

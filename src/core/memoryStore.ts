@@ -23,7 +23,8 @@ export class MemoryStore {
     pinned?: boolean;
     origin?: string;
   }): Promise<MemoryEntry> {
-    const memories = await this.readAll();
+    if (!input.content.trim()) throw new Error('Memory content must not be empty.');
+    return this.transaction(memories => {
     const now = new Date().toISOString();
     const entry: MemoryEntry = {
       id: `mem_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -42,25 +43,26 @@ export class MemoryStore {
       accessCount: 0
     };
     memories.push(entry);
-    await this.writeAll(memories);
-    return entry;
+    return { entries: memories, result: entry };
+    });
   }
 
   async search(query: string, limit = 10): Promise<MemorySearchResult[]> {
-    const queryTokens = tokenize(query);
-    const now = new Date().toISOString();
-    const results = (await this.readAll())
-      .filter(entry => !isExpired(entry, now) || entry.pinned)
-      .map(entry => scoreEntry(entry, queryTokens))
-      .filter(result => result.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
-    if (results.length) {
+    return this.transaction(entries => {
+      const queryTokens = tokenize(query);
+      const now = new Date().toISOString();
+      const results = entries
+        .filter(entry => !isExpired(entry, now) || entry.pinned)
+        .map(entry => scoreEntry(entry, queryTokens))
+        .filter(result => result.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit);
       const ids = new Set(results.map(result => result.entry.id));
-      const updated = (await this.readAll()).map(entry => ids.has(entry.id) ? { ...entry, accessCount: entry.accessCount + 1, updatedAt: new Date().toISOString() } : entry);
-      await this.writeAll(updated);
-    }
-    return results;
+      return {
+        entries: results.length ? entries.map(entry => ids.has(entry.id) ? { ...entry, accessCount: entry.accessCount + 1, updatedAt: now } : entry) : undefined,
+        result: results
+      };
+    });
   }
 
   async buildContext(task: string, budgetChars = 5000): Promise<string> {
@@ -83,7 +85,7 @@ export class MemoryStore {
   }
 
   async replaceAll(entries: MemoryEntry[]): Promise<void> {
-    await this.writeAll(entries.map((entry, index) => normalizeMemoryEntry(entry, index)).filter(isPresent));
+    await this.transaction(() => ({ entries: validateEntries(entries), result: undefined }));
   }
 
   async buildProfile(): Promise<ProjectMemoryProfile> {
@@ -98,18 +100,58 @@ export class MemoryStore {
     };
   }
 
-  private async readAll(): Promise<MemoryEntry[]> {
+  /** Read, transform and atomically commit under the shared exclusive lock. */
+  async transaction<T>(update: (entries: MemoryEntry[]) => { entries?: MemoryEntry[]; result: T }): Promise<T> {
+    await fs.mkdir(path.dirname(this.file), { recursive: true });
+    const lock = `${this.file}.lock`;
+    const deadline = Date.now() + 5000;
+    let handle: fs.FileHandle;
+    for (;;) {
+      try {
+        handle = await fs.open(lock, 'wx', 0o600);
+        break;
+      } catch (error) {
+        const code = (error as NodeJS.ErrnoException).code;
+        // Windows may report delete-pending exclusive-create contention as EPERM.
+        if (code !== 'EEXIST' && !(process.platform === 'win32' && (code === 'EPERM' || code === 'EACCES'))) throw error;
+        if (Date.now() >= deadline) throw new Error('Memory store lock contention: stop all writers before recovering an abandoned memories.json.lock.');
+        await new Promise(resolve => setTimeout(resolve, 15 + Math.floor(Math.random() * 20)));
+      }
+    }
     try {
-      const parsed = JSON.parse(await fs.readFile(this.file, 'utf8')) as MemoryEntry[];
-      return Array.isArray(parsed) ? parsed.map(normalizeMemoryEntry).filter(isPresent) : [];
-    } catch {
-      return [];
+      await handle.writeFile(JSON.stringify({ pid: process.pid, createdAt: new Date().toISOString() }));
+      const outcome = update(await this.readAll());
+      if (outcome.entries !== undefined) await this.writeAll(validateEntries(outcome.entries));
+      return outcome.result;
+    } finally {
+      // Never age-evict locks: even a very old lock can have a live owner.
+      try { await handle.close(); } finally { await fs.unlink(lock); }
     }
   }
 
+  private async readAll(): Promise<MemoryEntry[]> {
+    let text: string;
+    try {
+      text = await fs.readFile(this.file, 'utf8');
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      throw error;
+    }
+    return validateEntries(JSON.parse(text));
+  }
+
   private async writeAll(entries: MemoryEntry[]): Promise<void> {
-    await fs.mkdir(path.dirname(this.file), { recursive: true });
-    await fs.writeFile(this.file, `${JSON.stringify(entries, null, 2)}\n`, 'utf8');
+    const temp = `${this.file}.${process.pid}.${Math.random().toString(36).slice(2)}.tmp`;
+    const handle = await fs.open(temp, 'wx', 0o600);
+    try {
+      await handle.writeFile(`${JSON.stringify(entries, null, 2)}\n`, 'utf8');
+      await handle.sync();
+      await handle.close();
+      await fs.rename(temp, this.file);
+    } finally {
+      await handle.close();
+      await fs.unlink(temp).catch(error => { if (error.code !== 'ENOENT') throw error; });
+    }
   }
 }
 
@@ -186,8 +228,13 @@ function cleanOrigin(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim() ? value.trim().slice(0, 120) : undefined;
 }
 
-function isPresent<T>(value: T | null): value is T {
-  return value !== null;
+function validateEntries(value: unknown): MemoryEntry[] {
+  if (!Array.isArray(value)) throw new Error('Invalid memory store: expected an array. Original data was not changed.');
+  return value.map((entry, index) => {
+    const normalized = normalizeMemoryEntry(entry, index);
+    if (!normalized) throw new Error(`Invalid memory entry at index ${index}. Original data was not changed.`);
+    return normalized;
+  });
 }
 
 function countValues(values: string[]): Array<[string, number]> {

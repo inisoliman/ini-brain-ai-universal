@@ -1,12 +1,13 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { readJsonFile, writeJsonFile } from '../core/jsonUtils';
+import { buildOpenCodeMcpConfig } from './mcpConfig';
 
 export interface AutoMcpInstallOptions {
   serverScript: string;
   homeDir?: string;
   appDataDir?: string;
   platform?: NodeJS.Platform;
+  clients?: string[];
 }
 
 export interface AutoMcpInstallResult {
@@ -62,6 +63,13 @@ function perEditor(ctx: InstallContext, extensionId: string, settingsFile: strin
 }
 
 const CLIENTS: ClientDescriptor[] = [
+  {
+    id: 'opencode', kind: 'json', vscodeFamily: false,
+    candidates: ctx => {
+      const dir = path.join(ctx.homeDir, '.config', 'opencode');
+      return [{ anchor: dir, configPath: path.join(dir, 'opencode.json') }];
+    }
+  },
   {
     id: 'codex',
     kind: 'toml',
@@ -123,8 +131,14 @@ export async function autoInstallMcpClients(options: AutoMcpInstallOptions): Pro
     appDataDir: options.appDataDir ?? process.env.APPDATA ?? path.join(homeDir, 'AppData', 'Roaming'),
   };
   const results: AutoMcpInstallResult[] = [];
+  if (options.clients?.includes('zadloop')) results.push({ client: 'zadloop', status: 'skipped', configPath: '', message: 'Automatic installation unsupported. Use the ZadLoop manual command/args export.' });
   for (const client of CLIENTS) {
+    if (options.clients && !options.clients.includes(client.id)) continue;
     const candidates = client.candidates(ctx);
+    if (client.id === 'opencode') {
+      const candidate = candidates[0];
+      if (await pathExists(`${candidate.configPath}c`)) candidate.configPath += 'c';
+    }
     const handledPaths = new Set<string>();
     for (const candidate of candidates) {
       if (handledPaths.has(candidate.configPath)) continue;
@@ -155,35 +169,106 @@ async function installCandidate(
 }
 
 async function installToml(client: string, configPath: string, serverScript: string): Promise<AutoMcpInstallResult> {
-  const current = await fs.readFile(configPath, 'utf8').catch(error => {
-    if (hasCode(error, 'ENOENT')) return '';
+  const original = await fs.readFile(configPath, 'utf8').catch(error => {
+    if (hasCode(error, 'ENOENT')) return undefined;
     throw error;
   });
+  const current = original ?? '';
   const block = [
     `[mcp_servers.${SERVER_KEY}]`,
     'command = "node"',
     `args = [${JSON.stringify(serverScript)}]`,
     'startup_timeout_sec = 120',
   ].join('\n');
-  const withoutExisting = current
-    .replace(/(?:^|\r?\n)\[mcp_servers\.ini-brain-ai\][\s\S]*?(?=\r?\n\[|$)/g, '')
-    .trimEnd();
-  const next = `${withoutExisting}${withoutExisting ? '\n\n' : ''}${block}\n`;
+  // No TOML parser ships in the runtime. Validate a conservative subset and
+  // refuse complex syntax unchanged rather than rewriting a user's document.
+  validateSimpleToml(current);
+  const section = /(^|\r?\n)(\[mcp_servers\.ini-brain-ai\]\s*\r?\n)([\s\S]*?)(?=\r?\n\[|$)/.exec(current);
+  let next: string;
+  if (section) {
+    let body = section[3];
+    for (const [key, value] of [['command', '"node"'], ['args', `[${JSON.stringify(serverScript)}]`]]) {
+      const line = new RegExp(`^[ \t]*${key}\\s*=.*$`, 'm');
+      body = line.test(body) ? body.replace(line, `${key} = ${value}`) : `${body.trimEnd()}\n${key} = ${value}\n`;
+    }
+    next = current.slice(0, section.index) + section[1] + section[2] + body + current.slice(section.index + section[0].length);
+  } else next = `${current.trimEnd()}${current.trim() ? '\n\n' : ''}${block}\n`;
+  validateSimpleToml(next);
   if (next === current) return unchanged(client, configPath);
-  await fs.writeFile(configPath, next, 'utf8');
+  await atomicConfigWrite(configPath, original, next);
   return installed(client, configPath);
 }
 
 async function installJson(client: ClientDescriptor, configPath: string, serverScript: string): Promise<AutoMcpInstallResult> {
-  const current = await readJsonFile<Record<string, unknown>>(configPath, {});
-  const currentServers = isRecord(current.mcpServers) ? current.mcpServers : {};
-  const entry: Record<string, unknown> = client.vscodeFamily
+  if (configPath.endsWith('.jsonc')) throw new Error('JSONC automatic merge unsupported in the dependency-free runtime; manually merge the exported native MCP config. Original file unchanged.');
+  const original = await fs.readFile(configPath, 'utf8').catch(error => { if (hasCode(error, 'ENOENT')) return undefined; throw error; });
+  const current: unknown = original === undefined ? {} : JSON.parse(original.replace(/^\uFEFF/, ''));
+  if (!isRecord(current)) throw new Error('Invalid config: expected an object. Original unchanged.');
+  const key = client.id === 'opencode' ? 'mcp' : 'mcpServers';
+  if (key in current && !isRecord(current[key])) throw new Error(`Invalid ${key}: expected an object. Original unchanged.`);
+  const servers = (current[key] || {}) as Record<string, unknown>;
+  if (SERVER_KEY in servers && !isRecord(servers[SERVER_KEY])) throw new Error('Invalid INI Brain server entry. Original unchanged.');
+  const existing = (servers[SERVER_KEY] || {}) as Record<string, unknown>;
+  const defaults: Record<string, unknown> = client.id === 'opencode' ? { ...buildOpenCodeMcpConfig(serverScript) } : client.vscodeFamily
     ? { command: 'node', args: [serverScript], disabled: false, autoApprove: [] }
     : { command: 'node', args: [serverScript] };
-  const next = { ...current, mcpServers: { ...currentServers, [SERVER_KEY]: entry } };
+  const entry = client.id === 'opencode'
+    ? { ...defaults, ...existing, type: 'local', command: ['node', serverScript] }
+    : { ...defaults, ...existing, command: 'node', args: [serverScript] };
+  const next = { ...current, [key]: { ...servers, [SERVER_KEY]: entry } };
   if (JSON.stringify(next) === JSON.stringify(current)) return unchanged(client.id, configPath);
-  await writeJsonFile(configPath, next);
+  await atomicConfigWrite(configPath, original, `${JSON.stringify(next, null, 2)}\n`);
   return installed(client.id, configPath);
+}
+
+function validateSimpleToml(text: string): void {
+  let section = '';
+  const keys = new Set<string>();
+  const sections = new Set<string>();
+  for (const raw of text.replace(/^\uFEFF/, '').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    if (/^\[[A-Za-z0-9_.-]+\]$/.test(line)) {
+      if (raw !== line) throw new Error('Indented or padded TOML table headers require manual merge. Original unchanged.');
+      section = line;
+      if (sections.has(section)) throw new Error('Duplicate TOML section; merge manually. Original unchanged.');
+      sections.add(section); continue;
+    }
+    const assignment = /^([A-Za-z0-9_-]+)\s*=\s*(.+)$/.exec(line);
+    if (!assignment || keys.has(`${section}/${assignment[1]}`)) throw new Error('Invalid or complex TOML; merge manually. Original unchanged.');
+    keys.add(`${section}/${assignment[1]}`);
+    const value = assignment[2];
+    // Deliberately accept only the JSON/TOML intersection, not arbitrary JSON.
+    try {
+      if (/[\x00-\x08\x0b-\x1f\x7f]/.test(value)) throw new Error();
+      if (/^'[^']*'$/.test(value)) continue;
+      const scalar = (item: unknown): boolean => typeof item === 'boolean' ||
+        (typeof item === 'number' && Number.isFinite(item)) ||
+        (typeof item === 'string' && !/[\x00-\x08\x0b-\x1f\x7f\uD800-\uDFFF]/.test(item));
+      // JSON permits escaped slash, which TOML does not; Unicode escapes need a
+      // real TOML parser to validate code points, so refuse rather than rewrite.
+      if (/\\(?:\/|u)/.test(value)) throw new Error();
+      const parsed: unknown = JSON.parse(value);
+      if (!(Array.isArray(parsed) ? parsed.every(scalar) : scalar(parsed))) throw new Error();
+    } catch { throw new Error('Unsupported TOML value; merge manually. Original unchanged.'); }
+  }
+}
+
+async function atomicConfigWrite(file: string, original: string | undefined, next: string): Promise<void> {
+  const lock = await fs.open(`${file}.ini-brain.lock`, 'wx', 0o600);
+  const temp = `${file}.${process.pid}.${Math.random().toString(36).slice(2)}.tmp`;
+  try {
+    const current = await fs.readFile(file, 'utf8').catch(error => { if (hasCode(error, 'ENOENT')) return undefined; throw error; });
+    if (current !== original) throw new Error('Config changed during installation; retry after reviewing it.');
+    if (original !== undefined) await fs.copyFile(file, `${file}.${Date.now()}.${Math.random().toString(36).slice(2)}.bak`, 1);
+    const handle = await fs.open(temp, 'wx', 0o600);
+    try { await handle.writeFile(next, 'utf8'); await handle.sync(); } finally { await handle.close(); }
+    await fs.rename(temp, file);
+  } finally {
+    await fs.unlink(temp).catch(error => { if (!hasCode(error, 'ENOENT')) throw error; });
+    await lock.close();
+    await fs.unlink(`${file}.ini-brain.lock`);
+  }
 }
 
 async function pathExists(target: string): Promise<boolean> {

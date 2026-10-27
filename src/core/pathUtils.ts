@@ -64,7 +64,8 @@ export function isIgnoredSegment(segment: string): boolean {
 }
 
 export function isIgnoredPath(file: string): boolean {
-  return normalizePath(file).split('/').some(isIgnoredSegment);
+  const normalized = normalizePath(file);
+  return normalized.split('/').some(isIgnoredSegment) || /(?:^|\/)(?:\.kilo|\.claude|\.codex|\.cursor)\/worktrees(?:\/|$)/.test(normalized);
 }
 
 export function isTextLike(file: string): boolean {

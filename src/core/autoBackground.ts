@@ -28,7 +28,7 @@ export class AutoBackground {
   private static readonly registry = new Map<string, AutoBackground>();
   private rescanTimer: NodeJS.Timeout | null = null;
   private watchers: fs.FSWatcher[] = [];
-  private busy = false;
+  private scanInFlight: Promise<void> | null = null;
   private lastScan = 0;
 
   private constructor(private readonly workspace: string) {}
@@ -48,6 +48,7 @@ export class AutoBackground {
    * scan when `.brain` is missing or older than 24h.
    */
   async ensureFresh(maxAgeMs = 24 * 60 * 60 * 1000): Promise<{ scanned: boolean; reason: string }> {
+    if (this.scanInFlight) await this.scanInFlight;
     const metaPath = path.join(this.workspace, '.brain', 'metadata.json');
     let needScan = false;
     let reason = 'fresh';
@@ -64,7 +65,7 @@ export class AutoBackground {
 
     if (!needScan) return { scanned: false, reason };
 
-    void this.rescan().catch(error => console.error('[INI Brain MCP] auto-scan failed', error));
+    await this.rescan();
     return { scanned: true, reason };
   }
 
@@ -106,17 +107,19 @@ export class AutoBackground {
     }, RESCAN_DEBOUNCE_MS);
   }
 
-  async rescan(): Promise<void> {
-    if (this.busy) return;
-    this.busy = true;
-    try {
-      const scan = await new ProjectScanner(this.workspace).scan();
-      const brain = await new BrainStore(this.workspace).writeScan(scan);
-      await new AgentGuideGenerator(this.workspace).generate(brain);
-      this.lastScan = Date.now();
-      console.error(`[INI Brain MCP] background scan complete: ${scan.stats.indexedFiles} files indexed for ${this.workspace}`);
-    } finally {
-      this.busy = false;
-    }
+  rescan(): Promise<void> {
+    if (this.scanInFlight) return this.scanInFlight;
+    this.scanInFlight = (async () => {
+      try {
+        const scan = await new ProjectScanner(this.workspace).scan();
+        const brain = await new BrainStore(this.workspace).writeScan(scan);
+        await new AgentGuideGenerator(this.workspace).generate(brain);
+        this.lastScan = Date.now();
+        console.error(`[INI Brain MCP] background scan complete: ${scan.stats.indexedFiles} files indexed for ${this.workspace}`);
+      } finally {
+        this.scanInFlight = null;
+      }
+    })();
+    return this.scanInFlight;
   }
 }

@@ -31,13 +31,13 @@ const SIMILARITY_THRESHOLD = 0.74;
 
 export async function compactMemories(root: string, options: MemoryCompactionOptions = {}): Promise<MemoryCompactionResult> {
   const store = new MemoryStore(root);
-  const before = await store.listAll();
-  const now = options.now || new Date().toISOString();
-  const active = before.filter(entry => !shouldRemoveExpired(entry, now));
-  const deduped = mergeDuplicates(active);
-  const summary = buildCompactionResult(before, deduped, Boolean(options.dryRun), now);
-  if (!options.dryRun && summary.wouldChange) await store.replaceAll(deduped);
-  return summary;
+  return store.transaction(before => {
+    const now = options.now || new Date().toISOString();
+    const active = before.filter(entry => !shouldRemoveExpired(entry, now));
+    const deduped = mergeDuplicates(active);
+    const summary = buildCompactionResult(before, deduped, Boolean(options.dryRun), now);
+    return { entries: !options.dryRun && summary.wouldChange ? deduped : undefined, result: summary };
+  });
 }
 
 export async function getMemoryStats(root: string, now = new Date().toISOString()): Promise<MemoryStats> {

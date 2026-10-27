@@ -178,7 +178,64 @@ function runUntrustedWorkspaceCheck() {
       process.exit(1);
     }
     console.log('MCP untrusted-workspace check passed.');
+    runClientRootCheck();
   }, 1500);
+}
+
+function runClientRootCheck() {
+  const fs = require('fs');
+  const os = require('os');
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'ini-client-home-'));
+  const project = path.join(home, 'work', 'fresh-project');
+  fs.mkdirSync(path.join(home, '.brain'), { recursive: true });
+  fs.writeFileSync(path.join(home, 'AGENTS.md'), '# home\n', 'utf8');
+  fs.mkdirSync(path.join(project, '.git'), { recursive: true });
+  fs.writeFileSync(path.join(project, 'package.json'), '{"name":"fresh-project"}\n', 'utf8');
+  fs.writeFileSync(path.join(project, 'README.md'), '# fresh\n', 'utf8');
+  const childRoot = spawn(process.execPath, [server], {
+    cwd: home,
+    env: { ...process.env, INI_BRAIN_WORKSPACE: '', PWD: '', INIT_CWD: '', WORKSPACE: '', USERPROFILE: home, HOME: home },
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
+  let out = '';
+  let err = '';
+  childRoot.stdout.on('data', chunk => { out += chunk.toString('utf8'); });
+  childRoot.stderr.on('data', chunk => { err += chunk.toString('utf8'); });
+  const rootUri = `file:///${project.replace(/\\/g, '/')}`;
+  childRoot.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: { roots: { listChanged: true } }, clientInfo: { name: 'root-client', version: '1' } } })}\n`);
+  childRoot.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' })}\n`);
+  const started = Date.now();
+  const timer = setInterval(() => {
+    const request = out.trim().split(/\r?\n/).map(line => { try { return JSON.parse(line); } catch { return null; } }).find(message => message && message.method === 'roots/list');
+    if (request) {
+      clearInterval(timer);
+      childRoot.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: request.id, result: { roots: [{ uri: rootUri, name: 'fresh-project' }] } })}\n`);
+      childRoot.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'ini_brain_status', arguments: {} } })}\n`);
+      childRoot.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'ini_brain_generate_agent_guide', arguments: { workspace: project } } })}\n`);
+    } else if (Date.now() - started > 2000) {
+      clearInterval(timer);
+    }
+  }, 50);
+  setTimeout(() => {
+    clearInterval(timer);
+    childRoot.kill();
+    const statusText = parseResponse(out, 2)?.result?.content?.[0]?.text;
+    const payload = statusText ? JSON.parse(statusText) : null;
+    if (!payload?.workspace || path.resolve(payload.workspace).toLowerCase() !== project.toLowerCase()) {
+      console.error(out);
+      console.error(err);
+      console.error('MCP smoke test failed: client root was not used instead of the home directory.');
+      process.exit(1);
+    }
+    if (!fs.existsSync(path.join(project, '.brain', 'metadata.json'))) {
+      console.error(out);
+      console.error(err);
+      console.error('MCP smoke test failed: a new project conversation did not create .brain inside the project.');
+      process.exit(1);
+    }
+    console.log('MCP client-root check passed.');
+    process.exit(0);
+  }, 4000);
 }
 
 function parseResponse(output, id) {

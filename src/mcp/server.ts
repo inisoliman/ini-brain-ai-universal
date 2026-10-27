@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as fs from 'fs/promises';
+import * as os from 'os';
 import * as path from 'path';
 import { AgentGuideGenerator } from '../core/agentGuide';
 import { AutoBackground } from '../core/autoBackground';
@@ -15,9 +16,9 @@ import { graphTools } from './tools/graphTools';
 import { methodologyTools } from './tools/methodologyTools';
 import { savingsTools } from './tools/savingsTools';
 import { smartSetupTools } from './tools/smartSetupTools';
-import { isTrustedWorkspace, resolveWorkspace } from './workspace';
+import { fileUriToDirectory, isSafeExplicitWorkspace, isTrustedWorkspace, isUserHome, resolveWorkspace } from './workspace';
 
-const SERVER_VERSION = '3.3.0';
+const SERVER_VERSION = '3.4.0';
 
 interface DetectedClient {
   name: string;
@@ -26,6 +27,16 @@ interface DetectedClient {
 }
 
 let detectedClient: DetectedClient = detectClientFromEnvironment();
+let clientWorkspaceRoot: string | undefined;
+let clientRootsUnresolved = false;
+
+const REQUEST_WORKSPACE = Symbol('requestWorkspace');
+interface RequestWorkspace {
+  readonly workspace: string;
+  readonly allowed: boolean;
+  readonly trusted: boolean;
+}
+type RequestArgs = Record<string, unknown> & { [REQUEST_WORKSPACE]?: Readonly<RequestWorkspace> };
 
 function detectClientFromEnvironment(): DetectedClient {
   const env = process.env;
@@ -36,6 +47,13 @@ function detectClientFromEnvironment(): DetectedClient {
 }
 
 function noteInitializeClient(params: Record<string, unknown>): void {
+  const capabilities = params.capabilities;
+  clientAdvertisedRoots = Boolean(
+    capabilities && typeof capabilities === 'object' && (capabilities as Record<string, unknown>).roots
+  );
+  clientWorkspaceRoot = undefined;
+  clientRootsUnresolved = clientAdvertisedRoots;
+  if (Array.isArray(params.roots)) noteClientRoots({ roots: params.roots });
   const info = params.clientInfo;
   if (info && typeof info === 'object') {
     const record = info as Record<string, unknown>;
@@ -55,6 +73,27 @@ function noteInitializeClient(params: Record<string, unknown>): void {
   }
 }
 
+let clientAdvertisedRoots = false;
+
+function clientAdvertisesRoots(): boolean {
+  return clientAdvertisedRoots;
+}
+
+function noteClientRoots(result: unknown): void {
+  clientWorkspaceRoot = undefined;
+  clientRootsUnresolved = true;
+  if (!result || typeof result !== 'object') return;
+  const roots = (result as Record<string, unknown>).roots;
+  // Multiple advertised projects are ambiguous even if only one currently exists.
+  if (!Array.isArray(roots) || roots.length !== 1) return;
+  const uri = roots[0]?.uri;
+  const directory = typeof uri === 'string' ? fileUriToDirectory(uri) : undefined;
+  if (directory && !isUserHome(directory) && isSafeExplicitWorkspace(directory)) {
+    clientWorkspaceRoot = directory;
+    clientRootsUnresolved = false;
+  }
+}
+
 const GOLDEN_PROMPT = [
   'INI Brain automatic protocol for every new conversation and coding task:',
   '1. Call ini_brain_status first. Verify that its workspace is the user\'s current project and report whether .brain exists. If the workspace is wrong, stop and resolve it before editing.',
@@ -65,8 +104,9 @@ const GOLDEN_PROMPT = [
   '6. Use ini_brain_explain on a file before changing it, and ini_brain_impact on the changed file list before finalizing.',
   '7. After finishing, call ini_brain_save_memory to persist durable decisions, fixes, or workflow insights.',
   'For new projects or large features, run the Spec-Kit flow automatically: /constitution -> /specify -> /clarify -> /plan -> /tasks -> /implement. For small fixes, use the lighter INI Brain context workflow.',
-  'These instructions are supplied automatically by MCP. Do not ask the user to paste a startup prompt manually.',
-  'A background scan keeps .brain/ and AGENTS.md fresh automatically. You never need to ask the user to run a scan.'
+  'For desktop hosts without project roots/cwd (including no-roots ZadLoop), pass the current conversation project as workspace on EVERY tool call, including status and memory. Repeat status after switching projects; never reuse another conversation workspace.',
+  'These instructions are supplied automatically by MCP. Do not ask the user to paste a startup prompt manually. Model compliance depends on the client.',
+  'Background refresh runs only for a safe resolved project when enabled; unresolved project operations fail closed.'
 ].join('\n');
 
 const JSON_RPC_VERSION = '2.0';
@@ -84,6 +124,7 @@ interface JsonRpcRequest {
   id?: string | number | null;
   method?: string;
   params?: Record<string, unknown>;
+  result?: unknown;
 }
 
 interface JsonRpcResponse {
@@ -130,7 +171,7 @@ const EXTRA_TOOL_LIST = Object.entries(EXTRA_TOOLS).map(([name, tool]) => ({
 }));
 
 const TOOLS = [
-  { name: 'ini_brain_auto_brief', description: 'AUTO-CALL THIS FIRST in every new task. Loads AGENTS.md, compact context, decisions, recent memories and the INI Brain protocol so the agent can plan before editing.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string', description: 'Optional current user task for memory matching.' } } }, annotations: readOnlyAnnotations() },
+  { name: 'ini_brain_auto_brief', description: 'Call after ini_brain_status verifies the workspace in every new task. Loads AGENTS.md, compact context, decisions, recent memories and the INI Brain protocol so the agent can plan before editing.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string', description: 'Optional current user task for memory matching.' } } }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_status', description: 'Show workspace and INI Brain status.', inputSchema: { type: 'object', properties: workspaceProperty() }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_get_context', description: 'Build compact task context from project brain and runtime memory. Call before editing.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), task: { type: 'string' }, budgetChars: { type: 'number' } }, required: ['task'] }, annotations: readOnlyAnnotations() },
   { name: 'ini_brain_search_memory', description: 'Search local runtime memory.', inputSchema: { type: 'object', properties: { ...workspaceProperty(), query: { type: 'string' }, limit: { type: 'number' } }, required: ['query'] }, annotations: readOnlyAnnotations() },
@@ -151,27 +192,19 @@ const TOOLS = [
 class IniBrainMcpServer {
   private inputBuffer = Buffer.alloc(0);
   private transportMode: 'headers' | 'lines' = 'lines';
+  private rootsSequence = 0;
+  private rootsRequestId: string | number | null = null;
+  private rootsWait: Promise<void> | null = null;
+  private settleRootsWait: (() => void) | null = null;
 
   async run(): Promise<void> {
     process.stdin.on('data', chunk => this.onData(Buffer.from(chunk)));
     process.stdin.on('error', error => console.error('[INI Brain MCP] stdin error', error));
-    const workspace = getWorkspace({});
-    console.error(`[INI Brain MCP] running locally for ${workspace}`);
-    // Background bootstrap: keep .brain/ and AGENTS.md fresh without user action.
-    // Never scan a foreign directory: when the resolved workspace has no project
-    // markers (client launched the server outside the project) background work
-    // stays off until a tool call passes an explicit, trusted workspace.
-    const auto = AutoBackground.for(workspace);
-    if (!autoBackgroundDisabled() && isTrustedWorkspace(workspace)) {
-      auto.ensureFresh().then(result => {
-        if (result.scanned) console.error(`[INI Brain MCP] background scan triggered (${result.reason})`);
-        auto.start();
-      }).catch(error => console.error('[INI Brain MCP] bootstrap error', error));
-    } else if (!isTrustedWorkspace(workspace)) {
-      console.error('[INI Brain MCP] workspace has no project markers; background scan disabled until a tool call provides the real project root.');
-    }
-    process.on('SIGINT', () => { auto.stop(); process.exit(0); });
-    process.on('SIGTERM', () => { auto.stop(); process.exit(0); });
+    // Client roots are not known at startup. Refresh only inside a resolved
+    // project-scoped call; never keep a process-global timer tied to an old root.
+    console.error('[INI Brain MCP] ready; project refresh deferred until a scoped tool call.');
+    process.on('SIGINT', () => process.exit(0));
+    process.on('SIGTERM', () => process.exit(0));
   }
 
   private onData(chunk: Buffer): void {
@@ -211,10 +244,24 @@ class IniBrainMcpServer {
   }
 
   private async handleMessage(request: JsonRpcRequest): Promise<void> {
-    if (!request.id && request.method?.startsWith('notifications/')) return;
+    if (!request.id && request.method?.startsWith('notifications/')) {
+      if (request.method === 'notifications/initialized' && clientAdvertisesRoots()) this.requestRoots();
+      if (request.method === 'notifications/roots/list_changed' && clientAdvertisesRoots()) this.requestRoots();
+      return;
+    }
     const id = request.id ?? null;
     try {
       if (request.jsonrpc && request.jsonrpc !== JSON_RPC_VERSION) throw new McpError(ErrorCode.InvalidRequest, 'Only JSON-RPC 2.0 is supported');
+      if (request.id !== undefined && request.id !== null && request.method === undefined) {
+        if (this.rootsRequestId !== null && request.id === this.rootsRequestId) {
+          noteClientRoots(request.result);
+          this.rootsRequestId = null;
+          this.settleRootsWait?.();
+          this.rootsWait = null;
+          this.settleRootsWait = null;
+        }
+        return;
+      }
       if (!request.method) throw new McpError(ErrorCode.InvalidRequest, 'method is required');
       this.writeResponse({ jsonrpc: JSON_RPC_VERSION, id, result: await this.dispatch(request.method, request.params || {}) });
     } catch (error) {
@@ -236,10 +283,27 @@ class IniBrainMcpServer {
     if (method === 'tools/list') return { tools: TOOLS };
     if (method !== 'tools/call') throw new McpError(ErrorCode.MethodNotFound, `Unknown method: ${method}`);
     const name = typeof params.name === 'string' ? params.name : '';
-    const args = (params.arguments || {}) as Record<string, unknown>;
+    const args: RequestArgs = { ...((params.arguments || {}) as Record<string, unknown>) };
+    if (this.rootsWait && typeof args.workspace !== 'string') {
+      await Promise.race([
+        this.rootsWait,
+        new Promise(resolve => setTimeout(resolve, 1500))
+      ]);
+    }
     // Make sure context is fresh before any tool runs — but only for trusted workspaces.
     const ws = getWorkspace(args);
-    if (!autoBackgroundDisabled() && isTrustedWorkspace(ws)) void AutoBackground.for(ws).ensureFresh().catch(() => undefined);
+    const resolution = Object.freeze({
+      workspace: ws,
+      allowed: workspaceAllowed(args, ws),
+      trusted: isTrustedWorkspace(ws) && (!clientRootsUnresolved || typeof args.workspace === 'string')
+    });
+    Object.defineProperty(args, REQUEST_WORKSPACE, { value: resolution });
+    const diagnostic = name === 'ini_brain_status' || name === 'ini_brain_auto_brief';
+    if (!diagnostic && !resolution.allowed) {
+      throw new McpError(ErrorCode.InvalidParams, 'No safe unambiguous project workspace. Pass this conversation\'s project directory as workspace on EVERY tool call.');
+    }
+    // Status is diagnostic only: do not create global registries or project files.
+    if (!diagnostic && !autoBackgroundDisabled() && resolution.allowed) await AutoBackground.for(ws).ensureFresh();
 
     switch (name) {
       case 'ini_brain_auto_brief': return text(await autoBrief(args), false);
@@ -265,6 +329,22 @@ class IniBrainMcpServer {
     }
   }
 
+  private requestRoots(): void {
+    clientWorkspaceRoot = undefined;
+    clientRootsUnresolved = true;
+    this.settleRootsWait?.();
+    const id = `roots-${++this.rootsSequence}`;
+    this.rootsRequestId = id;
+    this.rootsWait = new Promise(resolve => { this.settleRootsWait = resolve; });
+    const body = Buffer.from(JSON.stringify({ jsonrpc: JSON_RPC_VERSION, id, method: 'roots/list' }), 'utf8');
+    if (this.transportMode === 'lines') {
+      process.stdout.write(`${body.toString('utf8')}\n`);
+      return;
+    }
+    process.stdout.write(`Content-Length: ${body.length}\r\n\r\n`);
+    process.stdout.write(body);
+  }
+
   private writeResponse(response: JsonRpcResponse): void {
     const body = Buffer.from(JSON.stringify(response), 'utf8');
     if (this.transportMode === 'lines') {
@@ -278,13 +358,15 @@ class IniBrainMcpServer {
 
 async function status(args: Record<string, unknown>): Promise<Record<string, unknown>> {
   const workspace = getWorkspace(args);
-  const trusted = isTrustedWorkspace(workspace);
+  const trusted = (args as RequestArgs)[REQUEST_WORKSPACE]?.trusted ?? (isTrustedWorkspace(workspace) && (!clientRootsUnresolved || typeof args.workspace === 'string'));
   const profile = trusted ? await new MemoryStore(workspace).buildProfile() : { totalMemories: 0 };
+  const known = trusted ? [] : await listKnownProjects();
   return {
     workspace,
     workspaceTrusted: trusted,
     ...(trusted ? {} : {
-      hint: 'The resolved path has no project markers (.brain, AGENTS.md, .git, package.json, ...). The MCP client launched the server outside the project. Call tools with the "workspace" argument set to the real project root, or set INI_BRAIN_WORKSPACE in the client MCP config.'
+      hint: 'The resolved path has no project markers (.brain, AGENTS.md, .git, package.json, ...). The MCP client launched the server outside the project. Call tools with the "workspace" argument set to the real project root, or set INI_BRAIN_WORKSPACE in the client MCP config.',
+      ...(known.length ? { knownProjects: known } : {})
     }),
     client: detectedClient,
     serverVersion: SERVER_VERSION,
@@ -294,6 +376,51 @@ async function status(args: Record<string, unknown>): Promise<Record<string, unk
     memories: profile.totalMemories,
     generatedAt: new Date().toISOString()
   };
+}
+
+/**
+ * Every workspace this server has legitimately served before, newest first.
+ *
+ * A stdio client that does not implement MCP `roots` — ZadLoop sends
+ * `capabilities: {}` — gives the server no way to learn the current
+ * conversation's folder, so the server resolves the host's install directory
+ * instead. Recording each explicitly named, trusted workspace lets the server
+ * offer the real projects back: when it cannot resolve one itself, the hint
+ * carries these paths so the agent can re-call a tool with the right
+ * `workspace` argument instead of guessing.
+ *
+ * The file lives under the user home, never inside a project or an application
+ * directory, and holds only paths the user already opened.
+ */
+function projectRegistryFile(): string {
+  return path.join(process.env.USERPROFILE || process.env.HOME || os.homedir(), '.ini-brain', 'projects.json');
+}
+
+async function listKnownProjects(): Promise<string[]> {
+  try {
+    const parsed = JSON.parse(await fs.readFile(projectRegistryFile(), 'utf8')) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      .filter(entry => isTrustedWorkspace(entry))
+      .slice(0, 20);
+  } catch {
+    return [];
+  }
+}
+
+export async function rememberProject(workspace: string): Promise<void> {
+  if (!isTrustedWorkspace(workspace)) return;
+  const file = projectRegistryFile();
+  try {
+    const existing = await listKnownProjects();
+    const resolved = path.resolve(workspace);
+    const next = [resolved, ...existing.filter(entry => path.resolve(entry) !== resolved)].slice(0, 50);
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, `${JSON.stringify(next, null, 2)}\n`, 'utf8');
+  } catch {
+    // A registry failure must never break a tool call.
+  }
 }
 
 async function getContext(args: Record<string, unknown>): Promise<string> {
@@ -357,7 +484,7 @@ async function suggestSkills(args: Record<string, unknown>): Promise<Record<stri
 async function autoBrief(args: Record<string, unknown>): Promise<string> {
   const workspace = getWorkspace(args);
   const task = typeof args.task === 'string' && args.task.trim() ? args.task : 'general project understanding';
-  const trusted = isTrustedWorkspace(workspace);
+  const trusted = (args as RequestArgs)[REQUEST_WORKSPACE]?.trusted ?? (isTrustedWorkspace(workspace) && (!clientRootsUnresolved || typeof args.workspace === 'string'));
   const auto = AutoBackground.for(workspace);
   const fresh = trusted && !autoBackgroundDisabled()
     ? await auto.ensureFresh().catch(() => ({ scanned: false, reason: 'error' }))
@@ -377,8 +504,19 @@ async function autoBrief(args: Record<string, unknown>): Promise<string> {
   lines.push(`Connected MCP client: ${detectedClient.name}${detectedClient.version ? ' ' + detectedClient.version : ''}`);
   lines.push(`Task: ${task}`);
   if (!trusted) {
+    const knownProjects = await listKnownProjects();
     lines.push('');
-    lines.push('WARNING: this path has no project markers, so it is not a real project root. Background scanning is disabled here. Re-call this tool with the "workspace" argument set to the user\'s actual project folder before relying on any context below.');
+    lines.push('WARNING: no project was resolved for this call. The path below is NOT a project root:');
+    lines.push(`  ${workspace}`);
+    lines.push('This usually means the MCP client runs one server process for the whole application and this client did not report the conversation folder (a client without the MCP `roots` capability). Do NOT treat the path above as the project. Do NOT read or write project memory there.');
+    if (knownProjects.length) {
+      lines.push('');
+      lines.push('Known projects this server served before, newest first:');
+      for (const project of knownProjects) lines.push(`  ${project}`);
+      lines.push('Use the one that is this conversation\'s project.');
+    }
+    lines.push('');
+    lines.push('Required action: re-call this tool with the "workspace" argument set to this conversation\'s own project folder, then repeat the call for every other ini_brain tool in this session. Context below is unusable until then.');
     lines.push('');
   }
   lines.push(`Background scan: ${fresh.scanned ? 'started (' + fresh.reason + ')' : 'fresh'}`);
@@ -469,15 +607,25 @@ async function impact(args: Record<string, unknown>): Promise<string> {
   return new InsightBuilder().buildImpact(brain, files).markdown;
 }
 
-function getWorkspace(args: Record<string, unknown>): string {
-  return resolveWorkspace({ explicitWorkspace: typeof args.workspace === 'string' ? args.workspace : undefined });
+function getWorkspace(args: RequestArgs): string {
+  if (args[REQUEST_WORKSPACE]) return args[REQUEST_WORKSPACE].workspace;
+  return resolveWorkspace({
+    explicitWorkspace: typeof args.workspace === 'string' ? args.workspace : undefined,
+    clientWorkspace: clientWorkspaceRoot
+  });
+}
+
+/** Explicit selection permits empty projects, but never bypasses unsafe-path checks. */
+function workspaceAllowed(args: Record<string, unknown>, workspace: string): boolean {
+  if (typeof args.workspace === 'string') return isSafeExplicitWorkspace(workspace);
+  return !clientRootsUnresolved && isTrustedWorkspace(workspace);
 }
 
 function workspaceProperty(): Record<string, unknown> {
   return {
     workspace: {
       type: 'string',
-      description: 'Optional project root override. Usually omitted because INI Brain auto-detects the active workspace.'
+      description: 'Current conversation project directory. Required on EVERY call when the host supplies no project roots/cwd, or multiple roots; never reuse another conversation selection.'
     }
   };
 }

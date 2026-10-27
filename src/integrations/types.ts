@@ -1,4 +1,4 @@
-import { IntegrationTarget, McpServerConfig } from '../core/types';
+import { IntegrationTarget, McpServerConfig, OpenCodeMcpConfig } from '../core/types';
 
 export interface IntegrationAdapter {
   target: IntegrationTarget;
@@ -6,6 +6,6 @@ export interface IntegrationAdapter {
   description: string;
   docsPath: string;
   supportsAutoInstall: boolean;
-  buildConfig(root: string, serverScript: string): McpServerConfig;
+  buildConfig(root: string, serverScript: string): McpServerConfig | OpenCodeMcpConfig | { command: string; args: string[] };
   installInstructions(root: string, serverScript: string): string;
 }

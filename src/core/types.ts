@@ -97,7 +97,14 @@ export interface OnboardingState {
   reason: string;
 }
 
-export type IntegrationTarget = 'vscode' | 'codex' | 'cline' | 'kilo-code' | 'antigravity' | 'generic-mcp';
+export type IntegrationTarget = 'vscode' | 'codex' | 'cline' | 'kilo-code' | 'antigravity' | 'opencode' | 'zadloop' | 'generic-mcp';
+
+export interface OpenCodeMcpConfig {
+  type: 'local';
+  command: string[];
+  enabled: boolean;
+  environment?: Record<string, string>;
+}
 
 export interface McpServerConfig {
   command: string;

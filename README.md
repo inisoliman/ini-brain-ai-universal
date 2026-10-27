@@ -1,8 +1,8 @@
-﻿# INI Brain AI Universal
+# INI Brain AI Universal
 
 Local-first AI productivity platform for VS Code and MCP clients. INI Brain scans a workspace, builds a durable `.brain/` knowledge base, generates `AGENTS.md`, exposes focused project context through MCP, and helps multiple coding agents share the same workflow, memories, quality guards, project map, and code-intelligence tools.
 
-Current version: **3.3.0**.
+Current version: **3.4.0**.
 
 Repository: [github.com/inisoliman/ini-brain-ai-universal](https://github.com/inisoliman/ini-brain-ai-universal)
 
@@ -66,7 +66,7 @@ cd ini-brain-ai-universal
 powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1
 ```
 
-The installer verifies Node.js, runs `npm install` and `npm run compile`, then writes MCP configuration for Codex, Claude Desktop, and Cline. The VS Code extension additionally auto-detects and configures Claude Code, Gemini CLI, Cursor, Kilo Code, and Roo Code when those clients are present.
+The installer verifies Node.js, installs dependencies only when missing, builds, then safely configures detected selected Codex, Claude Desktop, Cline and OpenCode clients. Select targets with `-Clients opencode` or a PowerShell array. The VS Code extension also detects Claude Code, Gemini CLI, Cursor, Kilo Code and Roo Code. Existing servers, custom env/options and permissions are preserved, originals are backed up, and malformed configs are refused unchanged. JSONC and complex TOML require a manual merge rather than a lossy rewrite. ZadLoop is selectable for a verified manual command/args export; automatic profile merge is unsupported. See [3.4.0 compatibility and Arabic quick start](docs/release-3.4.0.md), [OpenCode](docs/install-opencode.md), and [ZadLoop](docs/install-zadloop.md).
 
 Optional and skip flags:
 
@@ -238,7 +238,7 @@ See [Upstream Vault and Permanent Backups](docs/upstream-vault.md) for the compl
 
 ## Automatic Agent Protocol
 
-Compatible MCP clients receive INI Brain startup instructions automatically from the server during initialization. Users should not paste a startup prompt into every new conversation.
+Compatible MCP clients receive compact INI Brain startup instructions during initialization; model compliance is not guaranteed. Users should not need to paste a startup prompt into every conversation. Hosts without project roots/cwd (including the observed ZadLoop handshake) must pass the current project's `workspace` on EVERY tool call. Repeat status after switching projects; unresolved/unsafe calls fail closed and no last explicit workspace sticks.
 
 The automatic protocol asks the agent to:
 
@@ -268,13 +268,13 @@ npm run package
 The VSIX output is:
 
 ```text
-ini-brain-ai-universal-3.3.0.vsix
+ini-brain-ai-universal-3.4.0.vsix
 ```
 
 Install in VS Code:
 
 ```powershell
-code --install-extension .\ini-brain-ai-universal-3.3.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.4.0.vsix --force
 ```
 
 ## Safety Model

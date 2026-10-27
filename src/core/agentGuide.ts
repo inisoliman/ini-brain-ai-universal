@@ -173,6 +173,7 @@ function buildWorkflow(skills: SkillDefinition[]): string {
     '## 1. Intake',
     '- If MCP is available, call `ini_brain_status` and verify the workspace first.',
     '- Call `ini_brain_auto_brief` once for the task, then `ini_brain_get_context` before editing.',
+    '- If the host supplies no project roots/cwd, pass this conversation project as `workspace` on EVERY INI Brain call. Repeat status after project switches; never reuse another conversation selection.',
     '- If setup guidance is useful, show `ini_brain_smart_setup_plan`; never apply it without explicit user approval.',
     '- Read the request and current project context.',
     '- Read AGENTS.md and `.brain/compact_context.md`.',

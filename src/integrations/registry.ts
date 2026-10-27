@@ -1,5 +1,5 @@
 import { IntegrationAdapter } from './types';
-import { buildMcpServerConfig } from './mcpConfig';
+import { buildMcpServerConfig, buildOpenCodeMcpConfig } from './mcpConfig';
 
 export function getIntegrationAdapters(): IntegrationAdapter[] {
   return [
@@ -8,6 +8,8 @@ export function getIntegrationAdapters(): IntegrationAdapter[] {
     adapter('cline', 'Cline', 'Use Cline MCP settings plus .cline and .clinerules generated skills.', 'docs/install-cline.md', true),
     adapter('kilo-code', 'Kilo Code', 'Use Kilo Code MCP settings plus .kilo generated skills and commands.', 'docs/install-kilo-code.md', true),
     adapter('antigravity', 'Antigravity', 'Use generic MCP configuration and project instruction files where supported.', 'docs/install-antigravity.md', false),
+    adapter('opencode', 'OpenCode', 'Native OpenCode MCP config, project skills and shared root AGENTS.md.', 'docs/install-opencode.md', true),
+    adapter('zadloop', 'ZadLoop', 'Manual MCP command/args export; pass workspace on every call. Automatic file installation unsupported.', 'docs/install-zadloop.md', false),
     adapter('generic-mcp', 'Generic MCP Client', 'Use copyable JSON config for any stdio MCP-compatible client.', 'docs/install-generic-mcp.md', false)
   ];
 }
@@ -23,9 +25,18 @@ function adapter(target: IntegrationAdapter['target'], displayName: string, desc
     description,
     docsPath,
     supportsAutoInstall,
-    buildConfig: buildMcpServerConfig,
+    buildConfig: (root, script) => target === 'opencode' ? buildOpenCodeMcpConfig(script) : target === 'zadloop' ? { command: 'node', args: [script] } : buildMcpServerConfig(root, script),
     installInstructions(root: string, serverScript: string): string {
-      const config = JSON.stringify({ mcpServers: { 'ini-brain-ai': buildMcpServerConfig(root, serverScript) } }, null, 2);
+      if (target === 'zadloop') return [
+        '# ZadLoop manual MCP setup',
+        'Automatic global file merge is unsupported: no stable active-profile merge location has been verified.',
+        'Add a local stdio MCP server using the client plugin/settings interface:',
+        `command: node\nargs: ${JSON.stringify([serverScript])}`,
+        'Verified dsh-mcp-client plugin fields: serverName: ini-brain, transport: stdio, command: node, args as above.',
+        'Use the shared root AGENTS.md; no ZadLoop-specific skills folder is assumed.',
+        'Call ini_brain_status first, then ini_brain_auto_brief and ini_brain_get_context. Pass this conversation\'s explicit workspace on EVERY call; repeat after switching projects.'
+      ].join('\n\n');
+      const config = JSON.stringify(target === 'opencode' ? { mcp: { 'ini-brain-ai': buildOpenCodeMcpConfig(serverScript) } } : { mcpServers: { 'ini-brain-ai': buildMcpServerConfig(root, serverScript) } }, null, 2);
       return [
         `# ${displayName} Integration`,
         '',
@@ -40,7 +51,7 @@ function adapter(target: IntegrationAdapter['target'], displayName: string, desc
         'Recommended agent instruction:',
         '',
         '```md',
-        'Before editing, call ini_brain_get_context for my task. Search memory when previous decisions may matter. Save durable findings with ini_brain_save_memory after finishing.',
+        'Call ini_brain_status first, then ini_brain_auto_brief and ini_brain_get_context for the task. When no project roots/cwd are supplied, pass this conversation project as workspace on EVERY call and repeat status after switching projects. Save durable findings after finishing.',
         '```'
       ].join('\n');
     }

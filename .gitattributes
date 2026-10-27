@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Snapshot hashes are upstream byte hashes; checkout must preserve their LF bytes.
+resources/upstreams/** text eol=lf
