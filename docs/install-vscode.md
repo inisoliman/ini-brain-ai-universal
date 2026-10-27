@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For VS Code
 
-Version: 3.4.0
+Version: 3.4.1
 
 ## From Source
 
@@ -10,7 +10,7 @@ cd ini-brain-ai-universal
 npm install
 npm run compile
 npm run package
-code --install-extension .\ini-brain-ai-universal-3.4.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.4.1.vsix --force
 ```
 
 Reload VS Code after installation.
@@ -49,6 +49,6 @@ Run **INI Brain: Settings** or **INI Brain: Configure AI Provider** to set:
 
 1. انسخ المستودع من GitHub.
 2. شغل `npm install` ثم `npm run compile` ثم `npm run package`.
-3. ثبت ملف `ini-brain-ai-universal-3.4.0.vsix` داخل VS Code.
+3. ثبت ملف `ini-brain-ai-universal-3.4.1.vsix` داخل VS Code.
 4. عند أول تفعيل، الإضافة تدمج MCP تلقائياً في Codex وClaude Desktop وClaude Code وGemini CLI وCursor وCline وKilo Code وRoo Code إذا وجدت إعداداتهم.
 5. مفتاح API اختياري ويتم حفظه في VS Code SecretStorage وليس داخل ملفات المشروع.

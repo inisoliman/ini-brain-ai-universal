@@ -2,7 +2,7 @@
 
 Local-first AI productivity platform for VS Code and MCP clients. INI Brain scans a workspace, builds a durable `.brain/` knowledge base, generates `AGENTS.md`, exposes focused project context through MCP, and helps multiple coding agents share the same workflow, memories, quality guards, project map, and code-intelligence tools.
 
-Current version: **3.4.0**.
+Current version: **3.4.1**.
 
 Repository: [github.com/inisoliman/ini-brain-ai-universal](https://github.com/inisoliman/ini-brain-ai-universal)
 
@@ -67,6 +67,42 @@ powershell -ExecutionPolicy Bypass -File .\scripts\install-all.ps1
 ```
 
 The installer verifies Node.js, installs dependencies only when missing, builds, then safely configures detected selected Codex, Claude Desktop, Cline and OpenCode clients. Select targets with `-Clients opencode` or a PowerShell array. The VS Code extension also detects Claude Code, Gemini CLI, Cursor, Kilo Code and Roo Code. Existing servers, custom env/options and permissions are preserved, originals are backed up, and malformed configs are refused unchanged. JSONC and complex TOML require a manual merge rather than a lossy rewrite. ZadLoop is selectable for a verified manual command/args export; automatic profile merge is unsupported. See [3.4.0 compatibility and Arabic quick start](docs/release-3.4.0.md), [OpenCode](docs/install-opencode.md), and [ZadLoop](docs/install-zadloop.md).
+
+## ZadLoop / DeepSeek Harness (الإعداد اليدوي)
+
+يستخدم ZadLoop (DeepSeek Harness) إضافة `@deepseek-ai/dsh-mcp-client` لتشغيل خوادم MCP. الحزمة المثبَّتة داخل ZadLoop موثوقة كمرجع للحقول المدعومة، لكن الإعداد نفسه يدوي لأن الدمج التلقائي في الملف الشخصي غير مدعوم. الخطوات التالية مُتحقَّق منها على الجهاز المضيف.
+
+1. **أغلق تطبيق ZadLoop تماماً** قبل أي تعديل. الملف الحيّ للمسات الشخصية هو `%APPDATA%\ZadLoop\harness\profiles\<profile>\cordis.yml` (عادةً يكون `root` فارغاً `[]`)، والملف الذي يُعدَّل فعلياً هو `cordis.patch.yml` في نفس المجلد. لا تعدّل ملفات ZadLoop الأخرى.
+
+2. **انسخ `cordis.patch.yml` احتياطياً أولاً** إلى ملف مثل `cordis.patch.yml.bak`. الاسترجاع لاحقاً يتم بإعادة هذا النسخة مع إغلاق ZadLoop.
+
+3. استبدل **فقط** إدخال `ini-brain` الموجود مسبقاً (إدخال `- insert:` واحد بالمعرف `mcp-ini-brain` و`name: '@deepseek-ai/dsh-mcp-client'`): أزل الإدخال القديم وألصق الإدخال الصحيح بدلاً منه — بلا تكرار لـ `serverName: ini_brain` أو `namespace ini_brain` — مع الإبقاء على كل الإعدادات الأخرى كما هي دون مساس، ومنها `personaSuffix` الموجود في `dsh-system-prompt` الذي يطلب من النموذج تمرير مسار مشروع المحادثة في كل استدعاء:
+
+   ```yaml
+   - insert:
+       - id: mcp-ini-brain
+         name: '@deepseek-ai/dsh-mcp-client'
+         config:
+           serverName: ini_brain
+           transport: stdio
+           command: node
+           args: ['C:/path/to/ini-brain-ai-universal/dist/mcp/server.js']
+           toolCallTimeoutMs: 120000
+   ```
+
+4. **صحّح مسار `args`:** تثبيت VSIX جديد لا يحدّث مسار `args` المُعدّ يدوياً. المسار يجب أن يشير إلى نسخة checkout المبنية (`dist/mcp/server.js`) أو إلى مجلد الإضافة المثبتة حديثاً، لا إلى مجلد إضافة قديمة مثل `...-3.3.0`. احذف أيضاً أي متغير بيئة `INI_BRAIN_WORKSPACE` في الإدخال لو كان يشير إلى مجلد تطبيق ZadLoop، لأنه يجعل الخادم يعمل على مجلد التطبيق بدل مشروعك.
+
+5. `startupTimeoutMs` ليست حقلاً مدعوماً في `@deepseek-ai/dsh-mcp-client`، بينما `toolCallTimeoutMs` مدعوم وموثق — لا تضف `startupTimeoutMs`.
+
+6. أعد تشغيل ZadLoop، افتح محادثة جديدة، ثم تحقق بأمر التشخيص:
+
+   ```powershell
+   node scripts/doctor-zadloop.cjs --server "C:/path/to/ini-brain-ai-universal/dist/mcp/server.js" --workspace "C:/path/to/your-project" --expect-version 3.4.1
+   ```
+
+   النتيجة المتوقعة: `Result: OK` ورمز خروج 0. للتراجع: أغلق ZadLoop واستعد نسخة `cordis.patch.yml` الاحتياطية.
+
+ملاحظة: ZadLoop لا يرسل مسارات المشروع (roots) في المصافحة، لذا كل استدعاء أداة على هذا الجهاز يجب أن يمرر `workspace` صريحاً بمشروع المحادثة. التفاصيل الكاملة في [docs/install-zadloop.md](docs/install-zadloop.md).
 
 Optional and skip flags:
 
@@ -268,13 +304,13 @@ npm run package
 The VSIX output is:
 
 ```text
-ini-brain-ai-universal-3.4.0.vsix
+ini-brain-ai-universal-3.4.1.vsix
 ```
 
 Install in VS Code:
 
 ```powershell
-code --install-extension .\ini-brain-ai-universal-3.4.0.vsix --force
+code --install-extension .\ini-brain-ai-universal-3.4.1.vsix --force
 ```
 
 ## Safety Model

@@ -62,9 +62,12 @@ function auditPublicDocs() {
   }
 
   // VSIX filenames referenced in docs must match the current package version,
-  // regardless of which file type (md/html) mentions them.
+  // regardless of which file type (md/html) mentions them. Internal evidence
+  // ledgers under docs/superpowers are exempt: they record the exact historical
+  // artifact names and hashes of past passes and are excluded from the package.
   const currentVersion = JSON.parse(read('package.json')).version;
   for (const doc of docs) {
+    if (doc.startsWith('docs/superpowers/')) continue;
     const body = read(doc);
     for (const match of body.matchAll(/ini-brain-ai-universal-(\d+\.\d+\.\d+)\.vsix/g)) {
       if (match[1] !== currentVersion) fail(`${doc}: stale VSIX version ${match[1]} (current ${currentVersion})`);

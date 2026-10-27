@@ -2,7 +2,7 @@
   "name": "ini-brain-ai-universal",
   "displayName": "INI Brain AI Universal",
   "description": "Local-first AI productivity platform: project memory, token savings (Caveman+Ponytail), Spec-Driven Development, knowledge graph, and universal adapter for Claude/Codex/Cline/Kilo Code/Roo Code/Cursor/Windsurf/Antigravity/Gemini/Copilot/OpenCode/Kimi/Kiro and any MCP client.",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "publisher": "ini-brain",
   "license": "MIT",
   "engines": {
@@ -257,6 +257,7 @@
     "watch": "tsc -watch -p ./",
     "test:workspace": "node scripts/workspace-detection-smoke.cjs",
     "test:mcp-config": "node scripts/mcp-config-smoke.cjs",
+    "smoke:doctor-zadloop": "node scripts/doctor-zadloop-smoke.cjs",
     "smoke:json": "node scripts/json-bom-smoke.cjs",
     "smoke:mcp": "node scripts/mcp-smoke.cjs",
     "smoke:memory": "node scripts/memory-smoke.cjs",
@@ -273,7 +274,7 @@
     "smoke:auto-mcp": "node scripts/auto-mcp-installer-smoke.cjs",
     "smoke:mcp-instructions": "node scripts/mcp-instructions-smoke.cjs",
     "audit:public": "node scripts/public-release-audit.cjs",
-    "smoke:all": "npm run test:workspace && npm run test:mcp-config && node scripts/memory-reliability-smoke.cjs && node scripts/mcp-isolation-smoke.cjs && node scripts/integration-reliability-smoke.cjs && node scripts/installer-safety-smoke.cjs && node scripts/scanner-worktrees-smoke.cjs && npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater && npm run smoke:upstream-vault && npm run smoke:code-intelligence && npm run smoke:workflows && npm run smoke:engineering-workflow && npm run smoke:install-behavior && npm run smoke:smart-setup && npm run smoke:guide && npm run smoke:auto-mcp && npm run smoke:mcp-instructions",
+    "smoke:all": "npm run test:workspace && npm run test:mcp-config && npm run smoke:doctor-zadloop && node scripts/memory-reliability-smoke.cjs && node scripts/mcp-isolation-smoke.cjs && node scripts/integration-reliability-smoke.cjs && node scripts/installer-safety-smoke.cjs && node scripts/scanner-worktrees-smoke.cjs && npm run smoke:json && npm run smoke:mcp && npm run smoke:memory && npm run smoke:savings && npm run smoke:adapters && npm run smoke:updater && npm run smoke:upstream-vault && npm run smoke:code-intelligence && npm run smoke:workflows && npm run smoke:engineering-workflow && npm run smoke:install-behavior && npm run smoke:smart-setup && npm run smoke:guide && npm run smoke:auto-mcp && npm run smoke:mcp-instructions",
     "package": "vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
   },

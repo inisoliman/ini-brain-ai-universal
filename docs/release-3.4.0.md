@@ -2,7 +2,7 @@
 
 ## البدء السريع
 
-1. ابنِ المشروع بـ `npm.cmd run compile` ثم `npm.cmd run package` وثبّت `ini-brain-ai-universal-3.4.0.vsix`.
+1. ابنِ المشروع بـ `npm.cmd run compile` ثم `npm.cmd run package` وثبّت `ini-brain-ai-universal-3.4.1.vsix`.
 2. افتح مجلد مشروعك، ثم اختر **INI Brain: Install Integrations** وحدد OpenCode أو ZadLoop أو عميلك. OpenCode له إعداد `mcp` أصلي؛ ZadLoop يقدم إعداداً يدوياً موثقاً ولا يكتب إعدادات عامة تلقائياً.
 3. شغّل `ini_brain_status` أولاً وتأكد أن `workspace` هو المشروع المقصود، ثم `ini_brain_auto_brief` للمهمة، ثم `ini_brain_get_context` قبل التعديل.
 4. في ZadLoop أو أي مضيف لا يرسل جذر المشروع، مرر `workspace` المطلق في **كل** استدعاء، بما فيه الذاكرة والحالة. عند الانتقال من A إلى B غيّر الوسيط وأعد فحص الحالة؛ لا يوجد اختيار سابق لاصق.

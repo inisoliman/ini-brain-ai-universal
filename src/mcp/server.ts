@@ -18,7 +18,7 @@ import { savingsTools } from './tools/savingsTools';
 import { smartSetupTools } from './tools/smartSetupTools';
 import { fileUriToDirectory, isSafeExplicitWorkspace, isTrustedWorkspace, isUserHome, resolveWorkspace } from './workspace';
 
-const SERVER_VERSION = '3.4.0';
+const SERVER_VERSION = '3.4.1';
 
 interface DetectedClient {
   name: string;

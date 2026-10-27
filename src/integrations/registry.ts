@@ -30,11 +30,23 @@ function adapter(target: IntegrationAdapter['target'], displayName: string, desc
       if (target === 'zadloop') return [
         '# ZadLoop manual MCP setup',
         'Automatic global file merge is unsupported: no stable active-profile merge location has been verified.',
-        'Add a local stdio MCP server using the client plugin/settings interface:',
-        `command: node\nargs: ${JSON.stringify([serverScript])}`,
-        'Verified dsh-mcp-client plugin fields: serverName: ini-brain, transport: stdio, command: node, args as above.',
+        'Live profile: %APPDATA%/ZadLoop/harness/profiles/<profile>/cordis.yml (root usually []); edit cordis.patch.yml in the same folder with the app closed. Back it up first.',
+        'Replace ONLY the existing ini-brain insert entry (no duplicate serverName/namespace ini_brain) and keep every other setting, including the dsh-system-prompt personaSuffix:',
+        [
+          '- insert:',
+          '    - id: mcp-ini-brain',
+          "      name: '@deepseek-ai/dsh-mcp-client'",
+          '      config:',
+          '        serverName: ini_brain',
+          '        transport: stdio',
+          '        command: node',
+          `        args: ${JSON.stringify([serverScript])}`,
+          '        toolCallTimeoutMs: 120000'
+        ].join('\n'),
+        'Notes: installing the VSIX does not update an independently configured args path (point it at the built checkout or the newly installed extension folder, not a stale ...-3.3.0 folder); remove an INI_BRAIN_WORKSPACE env that resolves to the app directory; startupTimeoutMs is not a supported dsh-mcp-client field while toolCallTimeoutMs is.',
+        `Verify after restart, in a new conversation: node scripts/doctor-zadloop.cjs --server ${serverScript} --workspace <your project> --expect-version 3.4.1 (expect exit 0).`,
         'Use the shared root AGENTS.md; no ZadLoop-specific skills folder is assumed.',
-        'Call ini_brain_status first, then ini_brain_auto_brief and ini_brain_get_context. Pass this conversation\'s explicit workspace on EVERY call; repeat after switching projects.'
+        'Pass this conversation\'s explicit workspace on EVERY call; ZadLoop sends no project roots. Repeat after switching projects.'
       ].join('\n\n');
       const config = JSON.stringify(target === 'opencode' ? { mcp: { 'ini-brain-ai': buildOpenCodeMcpConfig(serverScript) } } : { mcpServers: { 'ini-brain-ai': buildMcpServerConfig(root, serverScript) } }, null, 2);
       return [

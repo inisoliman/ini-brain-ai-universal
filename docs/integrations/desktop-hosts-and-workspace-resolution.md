@@ -1,6 +1,6 @@
 # Desktop Hosts And Workspace Resolution
 
-Version: 3.4.0
+Version: 3.4.1
 
 Release 3.4.0: project-dependent calls fail closed for unsafe or unresolved roots; multiple advertised projects require per-call `workspace`. Only the matching pending `roots/list` response is accepted, and roots changes invalidate the old selection immediately. Explicit nonexistent paths never fall back. Explicit safe empty project directories may initialize; home/application directories may not. Status is diagnostic and does not create an index. The prior known-project registry is read-only compatibility data, never automatic project selection or automatic global writes.
 

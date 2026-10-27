@@ -1,6 +1,6 @@
 # OpenCode integration
 
-Version: 3.4.0
+Version: 3.4.1
 
 Build with `npm run compile`. In VS Code select **INI Brain: Install Integrations → OpenCode** to copy native instructions. The source installer targets detected clients; select explicitly with `-Clients opencode` in PowerShell. No global workspace pin is added.
 

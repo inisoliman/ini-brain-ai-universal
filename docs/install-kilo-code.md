@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For Kilo Code
 
-Version: 3.4.0
+Version: 3.4.1
 
 ## Build
 

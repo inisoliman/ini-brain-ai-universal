@@ -1,6 +1,6 @@
 # Install INI Brain AI Universal For Codex
 
-Version: 3.4.0
+Version: 3.4.1
 
 Codex can use INI Brain through two layers:
 
