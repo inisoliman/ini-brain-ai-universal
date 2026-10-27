@@ -11,7 +11,7 @@ description: >-
 license: MIT
 compatibility: Requires the `codex` CLI (OpenAI Codex) installed and authenticated, Node 18+, and git. The orchestrating agent must be able to run shell commands and read files. Shell examples assume bash/zsh (macOS/Linux, or Git Bash/WSL on Windows).
 metadata:
-  version: 0.1.0
+  version: 0.5.0
 ---
 
 # Codex Delegate
@@ -64,7 +64,10 @@ orchestrators use that same directory — if unsure where it landed, run
 ```bash
 node "<skill-dir>/scripts/relay.mjs" --brief brief.txt --cd /path/to/repo
 # read-only (review/diagnosis, no edits):   add --read-only
-# continue the previous Codex session:      add --resume-last  (send only the delta brief)
+# isolated review (skip ambient MCP/user config): add --ignore-user-config
+# continue the exact Codex session:         add --session <threadId>  (from result.json; send only the delta brief)
+# fallback when no thread id is available:  add --resume-last
+# hard time limit (watchdog):               add --timeout 2h  (default: off; implementation runs routinely need 1-2h)
 # see all options:                          node .../relay.mjs --help
 ```
 
@@ -86,7 +89,8 @@ when it returns:
   a `result.json` with status `codex_unavailable`.)
 
 Do not trust progress trackers over reality: a run is finished when `result.json` is written and the
-process has exited. Read the working tree, not a status line.
+process has exited. Read the working tree, not a status line. The implementer's full report is
+the `finalMessage` field in `result.json` (also printed in full on stdout between the report markers).
 
 ### 4. Review — do not trust the self-report
 
@@ -108,8 +112,18 @@ Because Codex's sandbox cannot reliably write `.git` (it varies by version, OS, 
 orchestrator commits.** Only after the gates pass and the diff holds:
 
 - Commit the verified work yourself, with a clear message.
-- If it needs changes, send a delta brief with `--resume-last` (don't restate the whole task) and
-  review again.
+- If it needs changes, send a delta brief with `--session <threadId>` from the prior `result.json`
+  (use `--resume-last` only when no thread id is available), and review again.
+
+## Read-only second opinions
+
+The relay doubles as a clean way to get an adversarial second opinion with no write risk: dispatch
+`--read-only` with a brief that lists the agreed points, then each contested point with both
+positions, and ask Codex to defend or concede each — deliverable in its final message, touching no
+files. Any delegation skill whose implementer offers a read-only mode supports the same use, but
+check how hard that mode's guarantee is first: Codex's sandbox enforces it, while Grok's is
+best-effort and only flagged after the fact (`readOnlyViolation`) — for those implementers,
+verify `touchedFiles` came back empty instead of assuming no edits.
 
 ## Authorization model
 
@@ -120,6 +134,23 @@ non-blocking nitpicks rather than silently keeping them) and **stop for scope ch
 completion needs going beyond the brief, ask — don't expand the mandate yourself). The full treatment
 is in [references/review-and-land.md](references/review-and-land.md).
 
+## If you have the openai-codex plugin
+
+The official openai-codex Claude Code plugin is excellent and **complementary** — `codex-delegate`
+builds on the same `codex` CLI, it doesn't replace the plugin. They point in different directions:
+
+- The plugin's `codex:codex-rescue` agent is a **forwarder**: it hands one task to Codex and returns
+  the output. It deliberately does not poll, review, or commit.
+- The plugin's review command and stop-review gate run the **inverse** direction: **Codex reviews your work**.
+- `codex-delegate` is the **orchestration loop in the other direction**: *you* drive Codex to
+  implement across one task or a queue, and *you* review and land each result. That loop — brief →
+  dispatch → poll → review → commit, with the orchestrator owning the commit — is what the plugin
+  leaves to you, and what this skill encodes.
+
+If you have the plugin installed, its companion CLI is an optional alternative dispatch backend; the
+bundled `relay.mjs` is the default because it adds no install of its own beyond the `codex` binary
+(Node and `git`, which the relay also needs, are prerequisites for every skill here).
+
 ## References
 
 - [references/writing-the-brief.md](references/writing-the-brief.md) — how to write a brief Codex can
@@ -127,6 +158,6 @@ is in [references/review-and-land.md](references/review-and-land.md).
 - [references/dispatch-and-poll.md](references/dispatch-and-poll.md) — `relay.mjs` flags, the
   `result.json` contract, backgrounding per orchestrator, and recovery when a run misbehaves.
 - [references/review-and-land.md](references/review-and-land.md) — the review checklist, the commit
-  boundary, and the rework cycle via `--resume-last`.
+  boundary, and the exact-session rework cycle.
 - [references/multi-task-queues.md](references/multi-task-queues.md) — running a sequential queue:
   carrying constraints forward, progress tracking, and the end-of-run coherence check.
