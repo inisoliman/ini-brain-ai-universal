@@ -73,6 +73,7 @@ Skip setup when you want one implementer or one-off dials. Pick the skill for a 
 | [`cursor-delegate`](skills/cursor-delegate/SKILL.md) | [Cursor Agent](https://cursor.com/cli) (`cursor-agent`) | `--force`; `--no-force` withholds command approval | `--read-only` (plan mode) | `--resume-last`, `--session <id>` |
 | [`grok-delegate`](skills/grok-delegate/SKILL.md) | Grok Build (`grok`) | workspace-scoped; `--full-access` opt-in | `--read-only` — best-effort [^grok] | `--resume-last`, `--session <id>` |
 | [`kimi-delegate`](skills/kimi-delegate/SKILL.md) | [Kimi Code](https://moonshotai.github.io/kimi-code/en/) (`kimi`) | `auto permission mode`, always | — [^none] | `--resume-last`, `--session <id>` |
+| [`muse-delegate`](skills/muse-delegate/SKILL.md) | Muse Code (`muse`) | `--disable-approval` (sandbox on); not `--yolo` [^muse] | `--read-only` (`--disable-write` + `--disable-shell`) | `--session <id>` (no headless `--resume-last`) |
 | [`opencode-delegate`](skills/opencode-delegate/SKILL.md) | [OpenCode](https://opencode.ai) (`opencode`) | agent `build` (`--model` required) | `--read-only` (agent `plan`) | `--resume-last`, `--session <id>` |
 | [`pi-delegate`](skills/pi-delegate/SKILL.md) | [Pi](https://github.com/earendil-works/pi-mono) (`pi`) | full local tools — no sandbox, no permission modes [^none]; project trust opt-in | `--read-only` (`read,grep,find,ls`) | `--resume-last`, `--session <id>` |
 | [`omp-delegate`](skills/omp-delegate/SKILL.md) | [Oh My Pi](https://github.com/can1357/oh-my-pi) (`omp`) | `--yolo` (`tools.approvalMode: yolo`); project `.omp` extras off unless `--approve` | `--read-only` (`read,grep,glob`) | `--resume-last`, `--session <id>` |
@@ -103,6 +104,11 @@ is configurable through it.
 [^grok]: `grok` cannot be prevented from writing headlessly. The relay reports a tri-state
 `readOnlyViolation` tripwire for detected Git-visible changes; it does not enforce or attribute them.
 
+[^muse]: Write `muse exec` keeps Muse's sandbox on and passes `--disable-approval` so a headless run
+cannot hang on a tool-approval prompt. `--read-only` adds `--disable-write` and `--disable-shell`.
+`--yolo` is not the default and is not exposed. Upstream's launcher is Darwin/Linux only. Headless
+resume is `--session-id`; `muse resume` is TUI-only.
+
 [^zcode]: ZCode ships its CLI **inside the desktop app** — there is no `zcode` on PATH, no npm
 package, and the public docs cover only the GUI. The relay resolves it from
 `--zcode-path`/`ZCODE_CLI`, then PATH, then the installed app bundle. Of ZCode's four documented
@@ -115,6 +121,20 @@ not valid JSON`, the key comes from `ZCODE_API_KEY` / `ANTHROPIC_API_KEY` / `ZAI
 Each skill name links to its `SKILL.md`, which owns that implementer's prerequisites, flags, and
 caveats. Building one for another CLI? [Claim it first](../../issues?q=is%3Aissue+label%3Aimplementer),
 then see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Optional Codex waiting support
+
+Install [codex-background](skills/codex-background/SKILL.md) alongside the selected delegate skills
+when Codex is the orchestrator. It is a separate installation; codex-delegate does not install
+or configure it automatically. If its MCP tools are missing, Codex runs the skill's
+`scripts/bootstrap.mjs` (after telling you it will update `$CODEX_HOME/config.toml`, with a backup);
+you can run it yourself with `node <skill-dir>/scripts/bootstrap.mjs`. It registers the installed
+`*-delegate` skills, writes the registry and the MCP server entry, and asks you to restart Codex. One
+pending MCP request captures logs locally and returns a single completion; the selected skill still
+owns permissions, results, review and landing.
+Claude's background Bash workflow stays unchanged. See
+[configuration and recovery](skills/codex-background/references/configuration.md). Local protocol
+fixtures cover the waiting boundary; they do not measure Codex Desktop token usage.
 
 ## Install
 
@@ -212,6 +232,12 @@ This package is intentionally inspectable:
 - Those scripts make no network calls of their own, read or write no credentials, send no telemetry, and
   have no dependencies (Node built-ins only). Relays launch an implementer CLI and `git`, plus the
   platform process launcher/termination utility where a Windows shim or process-tree kill requires one.
+  The optional `codex-background` utility adds a local stdio MCP server around registered
+  existing relays, with no npm dependencies or network calls of its own. Its `bootstrap.mjs` writes
+  `$CODEX_HOME/config.toml` (a backup is made first) and the registry only when you or Codex run it,
+  and registers just the `*-delegate` skills found next to it. Its provider-independent
+  ownership supervisor uses a compiled subreaper on Linux and inbox PowerShell plus kernel job
+  APIs on Windows. Linux requires /usr/bin/cc and procfs; other hosts fail setup explicitly.
   Discover may invoke installed CLIs for `--version` / model list probes (those CLIs may contact their
   own services). Read the script before you run it.
 - None of the relays ever commit — committing is always the orchestrator's job, after review.
@@ -242,17 +268,35 @@ Per skill — platform, CLI version, and what the run exercised:
   `readOnly` true, `readOnlyViolation` false; argument validation for a bad `--effort` value and for
   `--read-only` combined with `--dangerously-skip-permissions`, both exiting 2; resume by
   `--conversation` with a delta brief. macOS, `agy` 1.0.16: headless edit run, `--print=` delivery,
-  absolute `--add-dir` workspace pin.
+  absolute `--add-dir` workspace pin. `--stall-timeout` is contract-tested, live stall pending: a fake
+  whose log keeps growing without `streamGenerateContent` lines reports `stalled`, steady generation
+  calls split across writes keep a run alive, and the watchdog is off unless passed; run on native
+  Windows against the compiled fake.
 - `claude-delegate` — macOS, `claude` 2.1.220: write run under `acceptEdits`; plan mode refusing an
   edit, with the Git tripwire true on a violation and false on a clean run;
   `--session`/`--resume-last` resume; `claude_unavailable`/127 and usage errors exiting 2 without a
   result file; deny rules and the shell sandbox blocking `git commit`, `git push`, `git -C <dir> push`,
   a nested `claude`, and a `$HOME` write.
   macOS, `claude` 2.1.271: `--autocompact` argument handling only. The installed CLI accepted `auto`, `400k`, `1M`, `200`, and `200000` and rejected `auto2`, `50k`, `2m`, `99`, `1000001`, and `0` with exit 1, each observed through `claude --autocompact <value> --help`, which validates the option and exits before any model call; `claude` 2.1.220 rejects the option itself with `unknown option '--autocompact'`, which is the documented 2.1.221 floor. The relay's pass-through, resume re-pass, and `result.json` record are contract-tested against the smoke matrix; no delegated run has been dispatched with `--autocompact` set.
+  Windows 11, native, `claude` 2.1.274 through the npm `claude.cmd` shim, launched from Windows
+  PowerShell 5.1 with an `--out-dir` containing a space: write run under `acceptEdits` editing one
+  file and creating another, with `git status` run through the pre-approved PowerShell tool and a
+  `git commit` attempt denied by the relay's deny rule (`permission_denied` with
+  `decision_reason_type: "rule"` in the event stream, `HEAD` untouched); `--session` resume whose
+  delta brief referred only to "the notes file you created a moment ago" and was applied correctly;
+  `--read-only` plan-mode run ordered to write two files over an already-dirty tree, which wrote
+  nothing and reported `readOnlyViolation: false` with the dirty files byte-identical; a 45s
+  `--timeout` firing on a run blocked in a foreground `ping` grandchild, reporting `timeout` and
+  exit 1 with no `ping`, `cmd`, or `claude` process left behind; `claude_unavailable`/127 writing a
+  result file, and usage errors exiting 2 without one. The runs used `--model haiku`. Not run on
+  Windows: a directly spawned `claude.exe`, the abort path, and a read-only violation. Claude's shell
+  sandbox is unsupported there, so the write profile's PowerShell is not isolated.
 - `cursor-delegate` — Windows, `cursor-agent` 2026.07.23-e383d2b: write run under `--force`; plan-mode
   `--read-only` touching nothing; `--session <id>` resume applying a delta brief; usage errors exiting
   2. A maintainer-run native macOS plan-mode smoke against the same version captured model, session,
-  and usage with no touched files.
+  and usage with no touched files. `--stall-timeout` is contract-tested; the live hang it targets was
+  observed on Linux with `cursor-agent` 2026.10.01-e373342 (two runs silent after `thinking`
+  `completed`, never exiting).
 - `grok-delegate` — macOS, `grok` 0.2.101: streaming-json report capture, file-based brief delivery,
   resume; read-only is best-effort by measurement, hence the violation flag.
   Contributor-run native Windows check with `grok` 1.0.13: a no-edit dispatch using
@@ -350,6 +394,16 @@ Per skill — platform, CLI version, and what the run exercised:
   the same binary ran normally outside it. No Store `pwsh` is installed here, so the shell-launch
   form of that denial (`0xC0070005` on every command) rests on the report in issue #116. No Linux
   run is recorded.
+- `muse-delegate` — macOS, Muse Code 1.4.7: a fresh write dispatch against a throwaway repo
+  created only the briefed file (`touchedFiles` reported exactly it, `status: "completed"`, exit 0,
+  a `sessionId` captured); a `--session <id>` continuation in that same session appended the briefed
+  line; a `--read-only` dispatch answered from the tree and left it byte-identical; and an
+  `--provider echo` dispatch completed end to end. Contract-tested: argv exactness (`muse exec`
+  with `--disable-approval` / `--disable-write` / `--disable-shell`, no `--yolo`, `--session-id`,
+  `--resume-last` rejected), exit 0 without `run.terminal.completed` reported `failed`, bounded
+  version preflight, missing binary, the bounded `stderrTail` over a flooded stderr, and
+  whole-process-tree timeout/abort cleanup. Upstream's launcher is UNIX-only. No Windows or Linux
+  run is recorded.
 - `opencode-delegate`, `vibe-delegate` — contract-tested only: argument validation, bounded version
   preflight, missing binary, result parsing, and whole-process-tree timeout/abort cleanup. No
   end-to-end run is recorded here.
@@ -373,17 +427,18 @@ Per skill — platform, CLI version, and what the run exercised:
   flag-override against relays. The smoke suite runs live discovery against installed CLIs
   (versions vary by machine). Native Windows discover smoke not yet claimed.
 
-Not yet verified: native Windows launches for `claude`, exact-head `cline`, `grok`, `kimi`,
+Not yet verified: native Windows launches for a directly spawned `claude.exe` (the npm `claude.cmd`
+shim path has a run above), exact-head `cline`, `grok`, `kimi`, `muse`,
 `pi`, `qoder`, `vibe`, and `omp` (`codex`/`opencode`/`grok`/`commandcode` have contract-tested `.cmd` shim handling;
 Cursor serializes a pre-joined, quoted command; Qoder and Vibe target their documented native executables).
-Claude's own shell sandbox is unsupported on native Windows regardless of launch mechanics, and upstream
-Vibe officially targets UNIX. A native Linux `cursor-agent` run is unverified. The full delegate →
+Claude's own shell sandbox is unsupported on native Windows regardless of launch mechanics, upstream
+Vibe officially targets UNIX, and Muse's upstream launcher is UNIX-only. A native Linux `cursor-agent` run is unverified. The full delegate →
 review → commit loop is designed for and run on Claude Code; other orchestrators (Cursor, …) are
 designed-for but unproven.
 
 ## Repository shape
 
-Implementer skills share one shape; the setup utility has a different one:
+Implementer skills share one shape; the utilities have different ones:
 
 ```text
 skills/
@@ -395,6 +450,18 @@ skills/
 │       ├── dispatch-and-poll.md
 │       ├── review-and-land.md
 │       └── multi-task-queues.md
+├── codex-background/
+│   ├── SKILL.md
+│   ├── scripts/
+│   │   ├── bootstrap.mjs
+│   │   ├── bootstrap.test.mjs
+│   │   ├── server.mjs
+│   │   ├── server.test.mjs
+│   │   ├── supervisor.mjs
+│   │   ├── linux-owner.c
+│   │   ├── windows-job.ps1
+│   │   └── windows-job.cs
+│   └── references/configuration.md
 └── delegate-setup/
     ├── SKILL.md
     ├── scripts/

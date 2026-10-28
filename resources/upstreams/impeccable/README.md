@@ -1,6 +1,6 @@
 # Impeccable
 
-Design guidance for AI coding agents. 1 skill, 24 commands, live browser iteration, and 61 deterministic detector rules for AI-generated frontend design.
+Design guidance for AI coding agents. 1 skill, 24 commands, live browser iteration, and 62 deterministic detector rules for AI-generated frontend design.
 
 > **Quick start:** From your project root, run `npx impeccable install`, then run `/impeccable init` inside your AI coding tool. Full docs: [impeccable.style](https://impeccable.style).
 
@@ -13,7 +13,7 @@ Every model trained on the same SaaS templates. Skip the guidance and you get th
 Impeccable adds:
 - **One setup flow.** `/impeccable init` records durable product truth in `PRODUCT.md`, so later commands know the audience, purpose, operating context, constraints, voice, and evidence without confusing those facts with surface-level visual direction.
 - **24 commands.** A shared design vocabulary with your AI: `polish`, `audit`, `critique`, `distill`, `animate`, `bolder`, `quieter`, and more.
-- **61 deterministic detector rules** plus LLM-only critique checks. The CLI and browser extension run the deterministic rules with no LLM and no API key.
+- **62 deterministic detector rules** plus LLM-only critique checks. The CLI and browser extension run the deterministic rules with no LLM and no API key.
 
 ## What's Included
 
@@ -106,7 +106,7 @@ From the root of your project, run:
 npx impeccable install
 ```
 
-This shows the harness folders or installed CLIs it detected (for example `~/.claude`, `~/.codex`, `~/.grok`, `~/.hermes`, `~/.veto`, or project-local `.cursor`), lets you keep the detected set or customize providers, then asks whether to install into the current project or globally. Use `--providers=claude,codex,cursor,grok,hermes,veto` and `--scope=project|global` to skip those choices in scripts. On Claude Code, Cursor, Codex, GitHub Copilot, and Grok Build, it also installs the provider-native hook manifest for the current project. Veto receives the packaged skill under `~/.veto/skills/` and does not run native Impeccable edit hooks. Works with Cursor, Claude Code, Gemini CLI, Codex CLI, Grok Build, Hermes Agent, Veto, and every other supported tool. Reload your harness afterward.
+This shows the harness folders or installed CLIs it detected (for example `~/.claude`, `~/.codex`, `~/.grok`, `~/.hermes`, `~/.veto`, or project-local `.cursor`), lets you keep the detected set or customize providers, then asks whether to install into the current project or globally. Use `--providers=claude,codex,replit,cursor,grok,hermes,veto` and `--scope=project|global` to skip those choices in scripts. On Claude Code, Cursor, Codex, GitHub Copilot, and Grok Build, it also installs the provider-native hook manifest for the current project. Veto receives the packaged skill under `~/.veto/skills/` and does not run native Impeccable edit hooks. Works with Cursor, Claude Code, Gemini CLI, Codex CLI, Replit Agent, Grok Build, Hermes Agent, Veto, and every other supported tool. Reload your harness afterward.
 
 To refresh an existing install, run:
 
@@ -129,7 +129,7 @@ git add .gitmodules .impeccable .claude .cursor
 git commit -m "Add Impeccable skills"
 ```
 
-Use the providers your project needs, for example `claude`, `cursor`, `gemini`, `codex`, `github`, `grok`, `hermes`, `opencode`, `pi`, `qoder`, `trae`, `trae-cn`, `rovo-dev`, `vibe`, or `veto`. The command links individual skill folders from `.impeccable/dist/universal/` and leaves existing real skill directories untouched unless you pass `--force`.
+Use the providers your project needs, for example `claude`, `cursor`, `gemini`, `codex`, `github`, `grok`, `devin`, `hermes`, `opencode`, `pi`, `qoder`, `trae`, `trae-cn`, `rovo-dev`, `vibe`, or `veto`. The command links individual skill folders from `.impeccable/dist/universal/` and leaves existing real skill directories untouched unless you pass `--force`.
 
 To update later:
 
@@ -206,6 +206,16 @@ cp -r dist/dsh/.dsh/skills/* "${DSH_HOME:-$HOME/.dsh}/skills/"
 ```
 
 The CLI honors `DSH_HOME` only when it resolves inside your home directory (or to home itself); otherwise it uses `~/.dsh`. An outside-home manual copy is not managed by `impeccable install/update`.
+
+**Devin:**
+```bash
+# Project-specific (Devin web, CLI, and Desktop all read .devin/skills/)
+cp -r dist/devin/.devin your-project/
+
+# Or global (Devin CLI and Desktop; use %APPDATA%\devin\skills on Windows)
+mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/devin/skills"
+cp -r dist/devin/.devin/skills/* "${XDG_CONFIG_HOME:-$HOME/.config}/devin/skills/"
+```
 
 **Hermes Agent:**
 ```bash
@@ -391,17 +401,33 @@ The block is wrapped in `# impeccable-ignore-start` / `# impeccable-ignore-end` 
 - `.impeccable/surfaces/*.md` (route- or artifact-specific strategy and direction contracts)
 - `.impeccable/critique/*.md` (review reports)
 
+Impeccable also keeps its own `.gitignore` in the folders that hold decision-round state: `.impeccable/questions/` and `.impeccable/mocks/worlds/` ignore everything in them, and `.impeccable/build/` ignores `state.json`. That keeps new runtime files out of commits even in a project without the block above. A `.gitignore` cannot untrack a file git already tracks, though: when one of these files was committed earlier, the next roll prints a one-time notice with the fix, `git rm -r --cached .impeccable/questions` (plus any other folder it names), and writes its roll record to an untracked file until then.
+
 If an ephemeral file (a screenshot, `config.local.json`) was committed before you added the block, `.gitignore` will not untrack it automatically. Run `git rm --cached <path>` to stop tracking it without deleting your local copy.
+
+## Telemetry
+
+When a new design starts, the skill asks the roll API at impeccable.style to deal a hand of visual worlds from the catalog. That request is the feature, so it always happens. Unless you opt out, it also feeds an anonymous record of which hand was shown and which card won, which is how the catalog learns what works.
+
+What is sent, on the roll request and on the choice that follows it:
+
+- the roll key (a random value per decision round), scope (direction or surface), visitor mode, and re-roll round
+- the catalog revision the hand came from, and on the choice the kind of card that won (assigned, pick, challenger, canon, or a re-roll), its catalog id when a catalog world won, and its position on the page
+- the client version, whether the choice came from the decision page or the agent, and a random id for that choice so a report sent twice is counted once
+
+Never sent: your project's name, files, code, PRODUCT.md, or the names of the directions your agent wrote. Committed files such as surface briefs record only a seed reference, a hash of the roll key under a random salt kept in `~/.impeccable/seed-salt`, never the key itself. If no salt can be kept on a machine, the brief records no seed at all rather than a weaker hash. Roll keys are 128 random bits. If you pass your own short key with `--from`, its reference is easy to guess, so do not rely on it to keep that key private.
+
+To turn it off, run `npx impeccable telemetry off` (stored in `~/.impeccable/config.json`), or set `DO_NOT_TRACK=1` or `IMPECCABLE_NO_TELEMETRY=1`. A project can opt everyone out with `"telemetry": false` in `.impeccable/config.json`. `npx impeccable telemetry status` shows the current state. Opted out, the roll still works and the API is told not to record it. Details: https://impeccable.style/privacy
 
 ## Design hook
 
-On Claude Code, GitHub Copilot, Codex, Cursor, and Grok Build, `npx impeccable install` and `npx impeccable update` install a provider-native hook manifest along with the skill payload. The hook runs the Impeccable design detector on direct UI file edits and surfaces findings back into the agent flow. Claude Code, GitHub Copilot, and Codex surface findings after the edit (and run a deeper pass on Stop where supported). Grok Build scans after the edit to warm Stop, then surfaces on Stop; PostToolUse stdout never reaches the model. Cursor blocks bad proposed writes before they land.
+On Claude Code, GitHub Copilot, Codex, Cursor, and Grok Build, `npx impeccable install` and `npx impeccable update` install a provider-native hook manifest along with the skill payload. The hook runs the Impeccable design detector on direct UI file edits and surfaces findings back into the agent flow. Claude Code, GitHub Copilot, Codex, and Cursor surface findings after the edit (and run a deeper pass on Stop where supported). Grok Build scans after the edit to warm Stop, then surfaces on Stop; PostToolUse stdout never reaches the model.
 
 Installed hook surfaces:
 
 - Claude Code: `.claude/settings.local.json` (gitignored, machine-local) runs `${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/impeccable hook`. A hook moved into the shared `settings.json` is honored in place.
 - GitHub Copilot: `.github/hooks/impeccable.json` (committed, shared by the Copilot CLI and the cloud agent) runs `.github/skills/impeccable/scripts/impeccable hook`. The Copilot CLI activates it once the file is on the repository's default branch and the folder is trusted.
-- Cursor: `.cursor/hooks.json` runs `.cursor/skills/impeccable/scripts/impeccable hook-before-edit`.
+- Cursor: `.cursor/hooks.json` runs `.cursor/skills/impeccable/scripts/impeccable hook` on `postToolUse` for file writes. Projects set up with the older `preToolUse` write gate keep working; `npx impeccable update` moves them to the post-edit hook.
 - Codex: `.codex/hooks.json` runs `.agents/skills/impeccable/scripts/impeccable hook`, with a `commandWindows` sibling that calls `impeccable.cmd` for cmd.exe.
 - Grok Build: `.grok/hooks/impeccable.json` runs `.grok/skills/impeccable/scripts/impeccable hook`. Requires `/hooks-trust` or `--trust`. Findings reach the model on Stop, not after each edit.
 
@@ -417,7 +443,7 @@ For debugging, set `hook.auditLog` in `.impeccable/config.json` to a path (or th
 
 ## Build path: comp-first or code-first
 
-When a new surface gets designed, Impeccable either generates a full-fidelity comp first and builds to match it, or builds straight in code with the ambition written into a development-only direction contract in the surface brief and checked at the finish. Comp-first composes bolder and takes longer; code-first is leaner and faster. `/impeccable init` asks once and records the answer as `buildPath` in `.impeccable/config.json`:
+When a new surface gets designed, Impeccable either generates a full-fidelity comp first and builds to match it, or builds straight in code with the ambition written into a development-only direction contract in the surface brief and checked at the finish. Comp-first composes bolder and takes longer; code-first is leaner and faster. The choice covers landing pages and showcase surfaces. App screens and documents are built code-first either way, because they come out better built than pictured. `/impeccable init` asks once and records the answer as `buildPath` in `.impeccable/config.json`:
 
 ```json
 { "buildPath": "comp" }
@@ -457,15 +483,17 @@ npx impeccable detect src/                   # scan a directory
 npx impeccable detect index.html             # scan an HTML file
 npx impeccable detect https://example.com    # scan a URL (uses an installed Chrome, Chromium, or Edge)
 npx impeccable detect --json .               # CI-friendly JSON output
+npx impeccable detect --github src/          # GitHub Actions annotations on stdout
+npx impeccable detect --list-rules           # catalog of detector rule ids, names, and descriptions
 npx impeccable detect --no-config src/       # raw scan, ignoring project config/context
 npx impeccable ignores list                  # show detector ignores
 npx impeccable ignores add-file "src/legacy/**"
 npx impeccable ignores add-value overused-font Inter --reason "Brand font"
 ```
 
-The detector catches 61 deterministic issues across AI slop (side-tab borders, purple gradients, bounce easing, dark glows) and general design quality (line length, cramped padding, small touch targets, skipped headings, and more).
+The detector catches 62 deterministic issues across AI slop (side-tab borders, purple gradients, bounce easing, dark glows) and general design quality (line length, cramped padding, small touch targets, skipped headings, and more).
 
-Human-readable findings are diagnostics written to stderr, so redirect them with `2> findings.txt`. Use `--json` for machine-readable results on stdout. Exit `0` means the scan completed without primary findings, exit `2` means it completed with primary findings, and exit `1` means at least one requested target could not be scanned; operational failure takes precedence for a partial multi-target scan. URL scans inspect the rendered DOM, computed layout, and accessible linked stylesheets; browser security still prevents reading cross-origin CSS without CORS. A clean detector run is evidence, not proof of visual or accessibility quality: it does not replace inspecting the rendered experience across relevant viewports.
+Human-readable findings are diagnostics written to stderr, so redirect them with `2> findings.txt`. Use `--json` for machine-readable results on stdout, or `--github` for GitHub Actions annotations (one workflow command per finding). GitHub displays at most 10 annotations of each type per step and 50 per job, and the rest stay in the log; findings from the HTML engine may carry no line number, so they annotate the file. `--list-rules` prints the detector catalog to stdout and does not scan. Exit `0` means the scan completed without primary findings, exit `2` means it completed with primary findings, and exit `1` means at least one requested target could not be scanned; operational failure takes precedence for a partial multi-target scan. URL scans inspect the rendered DOM, computed layout, and accessible linked stylesheets; browser security still prevents reading cross-origin CSS without CORS. A clean detector run is evidence, not proof of visual or accessibility quality: it does not replace inspecting the rendered experience across relevant viewports.
 
 By default, `detect` respects the same `.impeccable/config.json` and `.impeccable/config.local.json` detector config as the design hook: `detector.ignoreRules`, `detector.ignoreFiles`, `detector.ignoreValues`, and `detector.designSystem.enabled`. Hook lifecycle settings such as `hook.enabled` only affect automatic hook execution.
 
@@ -478,6 +506,7 @@ Full detector docs: [impeccable.style/docs/detector](https://impeccable.style/do
 - [Cursor](https://cursor.com)
 - [Claude Code](https://claude.ai/code)
 - [GitHub Copilot](https://github.com/features/copilot)
+- [Devin](https://devin.ai)
 - [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - [Codex CLI](https://github.com/openai/codex)
