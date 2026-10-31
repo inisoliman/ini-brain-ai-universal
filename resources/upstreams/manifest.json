@@ -11,7 +11,7 @@
       "id": "ponytail",
       "repository": "DietrichGebert/ponytail",
       "branch": "main",
-      "pinnedCommit": "09c434ab73ca43761c5d8b0c5d341926c2fba710",
+      "pinnedCommit": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "222a973f8b8794366680c043fb935a31f71902af",
+      "pinnedCommit": "7370e592f3cd9c06e5b698983957e227c75b30e2",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -160,7 +160,7 @@
       "id": "gstack",
       "repository": "garrytan/gstack",
       "branch": "main",
-      "pinnedCommit": "6f27f0c269cb33ad60b300ec10df63c2b9f296ba",
+      "pinnedCommit": "89f203300498596cfcee37017f9966af9b0ebc3a",
       "license": "MIT",
       "classification": "reference-workflow",
       "snapshotPolicy": "curated",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "820cd02307e960d84d4746cc47e7c83d0a5f8c72",
+      "pinnedCommit": "9faa3e5c060b22ce581a74f836b998ad2edfcc95",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -261,7 +261,7 @@
       "id": "agentmemory",
       "repository": "rohitg00/agentmemory",
       "branch": "main",
-      "pinnedCommit": "76db6ac6c090efe9c1fa07bcde1618e816717c10",
+      "pinnedCommit": "c6c476d2905926727fa5848a134d7a3b38a7fa98",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -274,7 +274,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "59d9f57d5ce4c0e5ca4d240ebf2e4c25a3b0d907e89a2aa255031e995c77351b"
+          "sha256": "4a2330cdbd6dc4851b7716b9a6efd127b2c9115610a379ed5db66e8449a12884"
         },
         {
           "path": "plugin/skills/remember/SKILL.md",
@@ -294,7 +294,7 @@
       "id": "impeccable",
       "repository": "pbakaus/impeccable",
       "branch": "main",
-      "pinnedCommit": "8409a564d1baee90b2dde4f7a8f06288838e3921",
+      "pinnedCommit": "b7a89176e4e87422b40f98adabceb051dbb5448b",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -307,7 +307,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "89796aaeaffd8a10fd8efa426ab385886a5afb148de1b23a4b4797e89fdf584e"
+          "sha256": "f42abb6c9f674eb4bde7ee6e6bc6584a186987a87d0589420b5393b03eaf64e8"
         },
         {
           "path": "plugin/skills/impeccable/SKILL.md",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-10-28T09:48:00.263Z"
+  "updatedAt": "2026-10-31T09:45:26.334Z"
 }
