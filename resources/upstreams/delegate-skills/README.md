@@ -73,6 +73,7 @@ Skip setup when you want one implementer or one-off dials. Pick the skill for a 
 | [`cursor-delegate`](skills/cursor-delegate/SKILL.md) | [Cursor Agent](https://cursor.com/cli) (`cursor-agent`) | `--force`; `--no-force` withholds command approval | `--read-only` (plan mode) | `--resume-last`, `--session <id>` |
 | [`grok-delegate`](skills/grok-delegate/SKILL.md) | Grok Build (`grok`) | workspace-scoped; `--full-access` opt-in | `--read-only` — best-effort [^grok] | `--resume-last`, `--session <id>` |
 | [`kimi-delegate`](skills/kimi-delegate/SKILL.md) | [Kimi Code](https://moonshotai.github.io/kimi-code/en/) (`kimi`) | `auto permission mode`, always | — [^none] | `--resume-last`, `--session <id>` |
+| [`mcode-delegate`](skills/mcode-delegate/SKILL.md) | [MiniMax Code](https://agent.minimax.io/docs/cli/quick-start) (`mcode`) | `--permission smart`; `full` opt-in; no sandbox [^mcode] | `--read-only` — advisory prompt + tripwire [^mcode] | `--session <id>` |
 | [`muse-delegate`](skills/muse-delegate/SKILL.md) | Muse Code (`muse`) | `--disable-approval` (sandbox on); not `--yolo` [^muse] | `--read-only` (`--disable-write` + `--disable-shell`) | `--session <id>` (no headless `--resume-last`) |
 | [`opencode-delegate`](skills/opencode-delegate/SKILL.md) | [OpenCode](https://opencode.ai) (`opencode`) | agent `build` (`--model` required) | `--read-only` (agent `plan`) | `--resume-last`, `--session <id>` |
 | [`pi-delegate`](skills/pi-delegate/SKILL.md) | [Pi](https://github.com/earendil-works/pi-mono) (`pi`) | full local tools — no sandbox, no permission modes [^none]; project trust opt-in | `--read-only` (`read,grep,find,ls`) | `--resume-last`, `--session <id>` |
@@ -91,6 +92,13 @@ the brief's path list is guidance, not containment. A worktree isolates the chec
 container or another OS-enforced sandbox is required when writes outside the target tree are
 unacceptable. `touchedFiles` is a review aid based on `git status`; it cannot show ignored files or
 writes outside the repository.
+
+[^mcode]: `mcode exec` has no sandbox and no read-only or plan setting for a headless run. Its
+default `smart` policy already approves writes and deletions without a prompt (a live probe's `rm`
+ran with no confirmation), so the brief and a clean tree are the scope. The relay's `--read-only`
+appends a system prompt forbidding edits and then runs the Git-visible tripwire: a change is
+detected after the run, not prevented. The relay refuses `--permission off`, whose effect is
+undocumented.
 
 [^none]: No CLI-enforced read-only mode. `touchedFiles` and the diff are what you review against, not
 a guarantee: they are post-run `git status` in the workspace, so they cannot show ignored files,
@@ -121,20 +129,6 @@ not valid JSON`, the key comes from `ZCODE_API_KEY` / `ANTHROPIC_API_KEY` / `ZAI
 Each skill name links to its `SKILL.md`, which owns that implementer's prerequisites, flags, and
 caveats. Building one for another CLI? [Claim it first](../../issues?q=is%3Aissue+label%3Aimplementer),
 then see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Optional Codex waiting support
-
-Install [codex-background](skills/codex-background/SKILL.md) alongside the selected delegate skills
-when Codex is the orchestrator. It is a separate installation; codex-delegate does not install
-or configure it automatically. If its MCP tools are missing, Codex runs the skill's
-`scripts/bootstrap.mjs` (after telling you it will update `$CODEX_HOME/config.toml`, with a backup);
-you can run it yourself with `node <skill-dir>/scripts/bootstrap.mjs`. It registers the installed
-`*-delegate` skills, writes the registry and the MCP server entry, and asks you to restart Codex. One
-pending MCP request captures logs locally and returns a single completion; the selected skill still
-owns permissions, results, review and landing.
-Claude's background Bash workflow stays unchanged. See
-[configuration and recovery](skills/codex-background/references/configuration.md). Local protocol
-fixtures cover the waiting boundary; they do not measure Codex Desktop token usage.
 
 ## Install
 
@@ -232,12 +226,6 @@ This package is intentionally inspectable:
 - Those scripts make no network calls of their own, read or write no credentials, send no telemetry, and
   have no dependencies (Node built-ins only). Relays launch an implementer CLI and `git`, plus the
   platform process launcher/termination utility where a Windows shim or process-tree kill requires one.
-  The optional `codex-background` utility adds a local stdio MCP server around registered
-  existing relays, with no npm dependencies or network calls of its own. Its `bootstrap.mjs` writes
-  `$CODEX_HOME/config.toml` (a backup is made first) and the registry only when you or Codex run it,
-  and registers just the `*-delegate` skills found next to it. Its provider-independent
-  ownership supervisor uses a compiled subreaper on Linux and inbox PowerShell plus kernel job
-  APIs on Windows. Linux requires /usr/bin/cc and procfs; other hosts fail setup explicitly.
   Discover may invoke installed CLIs for `--version` / model list probes (those CLIs may contact their
   own services). Read the script before you run it.
 - None of the relays ever commit — committing is always the orchestrator's job, after review.
@@ -422,6 +410,13 @@ Per skill — platform, CLI version, and what the run exercised:
   (including the resume directive), denial shape, `--read-only`/`--allow-all-tools` conflict
   validation, bounded version preflight, missing binary, result parsing, and whole-process-tree
   timeout/abort cleanup.
+- `mcode-delegate` — macOS, `mcode` 0.6.13: **live edit run verified**. A `--read-only` relay dispatch
+  against a throwaway git repository diagnosed a planted bug and returned `readOnlyViolation: false`
+  with no touched files. A second dispatch resumed that session with `--session <id>` and `--effort
+  low` and fixed the bug: a one-line diff in the named file, `HEAD` untouched. Live failure paths
+  verified too: an `--effort` the model does not offer (mcode exit 2, no `exec.completed`) and an
+  unavailable `--model` (exit 4, `execStatus: failed`) both report `status: failed` with the cause.
+  Windows `mcode.cmd` shim launch is contract-tested only.
 - `delegate-setup` — contract-tested: discover JSON shape, config validate/write/load, whole-lane
   project overlay, global write without creating `.delegate/`, and `--lane` resolve / wrong-skill /
   flag-override against relays. The smoke suite runs live discovery against installed CLIs
@@ -429,7 +424,7 @@ Per skill — platform, CLI version, and what the run exercised:
 
 Not yet verified: native Windows launches for a directly spawned `claude.exe` (the npm `claude.cmd`
 shim path has a run above), exact-head `cline`, `grok`, `kimi`, `muse`,
-`pi`, `qoder`, `vibe`, and `omp` (`codex`/`opencode`/`grok`/`commandcode` have contract-tested `.cmd` shim handling;
+`pi`, `qoder`, `vibe`, and `omp` (`codex`/`opencode`/`grok`/`commandcode`/`mcode` have contract-tested `.cmd` shim handling;
 Cursor serializes a pre-joined, quoted command; Qoder and Vibe target their documented native executables).
 Claude's own shell sandbox is unsupported on native Windows regardless of launch mechanics, upstream
 Vibe officially targets UNIX, and Muse's upstream launcher is UNIX-only. A native Linux `cursor-agent` run is unverified. The full delegate →
@@ -438,7 +433,7 @@ designed-for but unproven.
 
 ## Repository shape
 
-Implementer skills share one shape; the utilities have different ones:
+Implementer skills share one shape; the setup utility has a different one:
 
 ```text
 skills/
@@ -450,18 +445,6 @@ skills/
 │       ├── dispatch-and-poll.md
 │       ├── review-and-land.md
 │       └── multi-task-queues.md
-├── codex-background/
-│   ├── SKILL.md
-│   ├── scripts/
-│   │   ├── bootstrap.mjs
-│   │   ├── bootstrap.test.mjs
-│   │   ├── server.mjs
-│   │   ├── server.test.mjs
-│   │   ├── supervisor.mjs
-│   │   ├── linux-owner.c
-│   │   ├── windows-job.ps1
-│   │   └── windows-job.cs
-│   └── references/configuration.md
 └── delegate-setup/
     ├── SKILL.md
     ├── scripts/
