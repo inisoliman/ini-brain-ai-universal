@@ -36,7 +36,7 @@
       "id": "caveman",
       "repository": "JuliusBrussee/caveman",
       "branch": "main",
-      "pinnedCommit": "3dc497a7f858c774d6e15b25e8c6120ef3a0eda8",
+      "pinnedCommit": "a192894723a8f47e7f504c7b5041967ff1f18e55",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -45,7 +45,7 @@
       "files": [
         {
           "path": "AGENTS.md",
-          "sha256": "283e73644f729f00199089f93da78009ad7af61a65a6671c555914217e6b4785"
+          "sha256": "417e9b2e75c33fbd8d4d5074ff4f02be2a1ad65cefbdbb0948cb7051804ec0ee"
         },
         {
           "path": "LICENSE",
@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "f29319d550d1f05404f7184b92e995600ca2293f",
+      "pinnedCommit": "a4d571229e164e440f8950cac034607bae7b7518",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -160,7 +160,7 @@
       "id": "gstack",
       "repository": "garrytan/gstack",
       "branch": "main",
-      "pinnedCommit": "f0cd9f8c4b453c1eadd714e4149174ee01179eae",
+      "pinnedCommit": "cc0896560abbaeed0b1df4157900fd2f50f76d66",
       "license": "MIT",
       "classification": "reference-workflow",
       "snapshotPolicy": "curated",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "6d34ca15bd51c5e01bf4e645718e8a4ff8d19e81",
+      "pinnedCommit": "1111d9a9e1380a0429ef2250f63223706af6289a",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -232,7 +232,7 @@
       "id": "delegate-skills",
       "repository": "amElnagdy/delegate-skills",
       "branch": "master",
-      "pinnedCommit": "7f8ae3435e5bc68a54efdca9f67797e905845562",
+      "pinnedCommit": "48b53d33b53ef260de76c3d2c1313e2c62a24820",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -249,7 +249,7 @@
         },
         {
           "path": "skills/codex-delegate/SKILL.md",
-          "sha256": "67896d61833b2f6602ad9d45f79214190425f0184fc78e85042c95b70f860200"
+          "sha256": "996a883bfeec645f009a31accc45d4e2ad245ce8f81174600c28202f7d3f7d23"
         },
         {
           "path": "skills/opencode-delegate/SKILL.md",
@@ -261,7 +261,7 @@
       "id": "agentmemory",
       "repository": "rohitg00/agentmemory",
       "branch": "main",
-      "pinnedCommit": "77ebca5785e5e296169ddc8989e7459682b34574",
+      "pinnedCommit": "5c9e2e698bda138dcb7de50ee4dd3260ee4fb8eb",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -274,7 +274,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "a9cea68adc15c01a52c42fa03b7a4564bc46dd9f781c5d05a1069816694c0048"
+          "sha256": "ce5f1ed3ddca1b79d29502fc0123fd7286ae71e5a41ab07ca7be4dc9f22e34a0"
         },
         {
           "path": "plugin/skills/remember/SKILL.md",
@@ -294,7 +294,7 @@
       "id": "impeccable",
       "repository": "pbakaus/impeccable",
       "branch": "main",
-      "pinnedCommit": "c1e0e5492fbb524f5df84d635ecfae7dc438ec45",
+      "pinnedCommit": "b49177d32788f2dc585c42831d845dacf1ebed2c",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -307,11 +307,11 @@
         },
         {
           "path": "README.md",
-          "sha256": "ea40f8d0688237a4a23ea575513bec409b8f2d10ab72d1b4c016dbf44830351d"
+          "sha256": "24ae9abcfbf91338ea6ae6b8ba9e3686e097f7638f99acabb7f7fa803a9c0a04"
         },
         {
           "path": "plugin/skills/impeccable/SKILL.md",
-          "sha256": "07336fc855b26edc34d2c211d3f91f8a32398221bf7e2c952a8e9c631c5f46bd"
+          "sha256": "100b6f87922805c3b5d5c33c26dc520a1846ec6414237a4a5b6ac1706efcd100"
         }
       ]
     },
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-11-11T11:07:52.161Z"
+  "updatedAt": "2026-11-21T11:18:08.484Z"
 }
