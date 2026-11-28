@@ -69,7 +69,7 @@
   <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tags/light/stat-tools.svg"><img src="assets/tags/stat-tools.svg" alt="54 MCP tools" height="38" /></picture>
   <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tags/light/stat-hooks.svg"><img src="assets/tags/stat-hooks.svg" alt="12 auto hooks" height="38" /></picture>
   <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tags/light/stat-deps.svg"><img src="assets/tags/stat-deps.svg" alt="0 external DBs" height="38" /></picture>
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tags/light/stat-tests.svg"><img src="assets/tags/stat-tests.svg" alt="4,700+ tests passing" height="38" /></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tags/light/stat-tests.svg"><img src="assets/tags/stat-tests.svg" alt="5,100+ tests passing" height="38" /></picture>
 </p>
 
 <p align="center">
@@ -84,6 +84,7 @@
   <a href="#benchmarks">Benchmarks</a> &bull;
   <a href="#vs-competitors">vs Competitors</a> &bull;
   <a href="#works-with-every-agent">Agents</a> &bull;
+  <a href="#architecture">Architecture</a> &bull;
   <a href="#how-it-works">How It Works</a> &bull;
   <a href="#mcp-server">MCP</a> &bull;
   <a href="#real-time-viewer">Viewer</a> &bull;
@@ -305,6 +306,26 @@ agentmemory works with any agent that supports hooks, MCP, or REST API. All agen
 
 <p align="center">
   <sub>Works with <strong>any</strong> agent that speaks MCP or HTTP. One server, memories shared across all of them.</sub>
+</p>
+
+---
+
+<h2 id="architecture">Architecture</h2>
+
+One local server sits between your agents and your memory. Each lane runs locally by default; the dashed line marks what you opt into.
+
+<p align="center">
+  <img src="assets/diagrams/architecture.svg" alt="agentmemory architecture: coding agents reach one local server through hooks, MCP and REST. Capture, recall and store each run locally by default, and each optional provider is turned on by its own environment variable." width="100%" />
+</p>
+
+Every tool call goes through the write path; every new session reads back through hybrid search within a token budget.
+
+<p align="center">
+  <img src="assets/diagrams/pipeline.svg" alt="Memory pipeline: PostToolUse captures, filters, stores, compresses and indexes each tool call. Stop and SessionEnd write summaries. SessionStart builds a profile, runs hybrid search within a token budget and can inject context." width="100%" />
+</p>
+
+<p align="center">
+  <img src="assets/diagrams/stack.svg" alt="agentmemory as layers: your agents, hooks, MCP and REST, the agentmemory server, four memory tiers, three recall streams, and the file state store on your machine." width="80%" />
 </p>
 
 ---
@@ -533,7 +554,7 @@ agentmemory connect copilot-cli
 copilot plugin install rohitg00/agentmemory:plugin
 ```
 
-`agentmemory connect copilot-cli` merges `mcpServers.agentmemory` into `~/.copilot/mcp-config.json` (or `$COPILOT_HOME/mcp-config.json` when `COPILOT_HOME` is set) and preserves existing servers. On native Windows this is the only automated `connect` adapter; configure every other native Windows agent manually. WSL `connect` is supported only when the target agent is installed in that same WSL environment. Copilot picks up the MCP server on next launch or after `/mcp`. Install the plugin as well when you want the full hook/skill experience.
+`agentmemory connect copilot-cli` merges `mcpServers.agentmemory` into `~/.copilot/mcp-config.json` (or `$COPILOT_HOME/mcp-config.json` when `COPILOT_HOME` is set) and preserves existing servers. WSL `connect` is supported only when the target agent is installed in that same WSL environment. Copilot picks up the MCP server on next launch or after `/mcp`. Install the plugin as well when you want the full hook/skill experience.
 
 ### Cursor
 
@@ -595,6 +616,17 @@ hermes memory status
 In `hermes memory setup`, select AgentMemory and enter the server URL and its secret. Hermes Desktop can install it from the link `hermes://plugin/install?catalog=agentmemory`. The catalog installs the commit that Hermes reviewed, so it can lag the latest npm release.
 
 `agentmemory connect hermes` installs the provider and the bundled skills from the installed package instead. Add `--with-mcp` for the full MCP tool set. Full guide: [`integrations/hermes/`](integrations/hermes/).
+
+### Orca (plugin panel)
+
+The Orca plugin adds an agentmemory panel to Orca's sidebar: server status and memory counts, the latest memories of the focused workspace, search, quick saves, Send to agent, and links that open a memory's files and the viewer inside Orca.
+
+```bash
+npx -y @agentmemory/agentmemory@latest
+orca plugin install https://github.com/rohitg00/agentmemory/tree/main/integrations/orca
+```
+
+Capture comes from each agent's own connection, so run `agentmemory connect <agent>` for the agents you launch in Orca. For an agent you cannot connect, turn on the plugin's Capture agent tool calls setting. Full guide: [`integrations/orca/`](integrations/orca/).
 
 ### Other agents
 
@@ -690,7 +722,7 @@ npm install && npm run build && npm start
 
 agentmemory runs on Windows 10/11. WSL2 follows the Linux path and can install the pinned engine automatically. Native Windows also installs the pinned iii-engine v0.25.1 automatically: the CLI downloads the Windows ZIP, verifies its SHA-256 and extracts `iii.exe` into `%USERPROFILE%\.agentmemory\bin`. If that fails, download the matching archive from the [iii v0.25.1 release page](https://github.com/iii-hq/iii/releases/tag/iii%2Fv0.25.1), verify its checksum, and extract `iii.exe` into the same directory.
 
-Native Windows automated MCP wiring supports only `agentmemory connect copilot-cli`. For other native Windows agents, use the manual MCP block from [Other agents](#other-agents). Run `connect` inside WSL only when the target agent is installed in that same WSL environment.
+`agentmemory connect <agent>` works on native Windows. It writes the MCP server as `cmd /c npx -y @agentmemory/mcp`, because Windows cannot start `npx` without a shell, and it writes hook script paths as absolute paths with forward slashes, either quoted or passed as a separate argument, so a home folder with spaces is safe. Antigravity hooks cannot use quoted paths. When the install path has spaces, `connect antigravity --with-hooks` uses the Windows short (8.3) path. If the short path is not available, it prints the hook JSON to paste by hand, and the MCP wiring still applies. Run `connect` inside WSL only when the target agent is installed in that same WSL environment.
 
 **Standalone MCP only (no engine).** If you only need MCP tools and do not need the REST API, viewer, or runtime services:
 
@@ -769,13 +801,15 @@ Agent instructions and memory files remain useful for stable project guidance. A
 
 ### Memory Pipeline
 
+The [architecture diagrams](#architecture) show the same flow.
+
 ```text
 PostToolUse hook fires
   -> Stable event ID, durable capture inbox, offline spool when unavailable
   -> Privacy filter (strip secrets, API keys)
-  -> Store raw observation
-  -> Synthetic compression by default
-     (LLM-written compression only with a provider + AGENTMEMORY_AUTO_COMPRESS=true)
+  -> Build and store a searchable synthetic observation
+  -> Optional LLM compression of retained source
+     (requires a provider + AGENTMEMORY_AUTO_COMPRESS=true; empty source is skipped)
   -> Vector embedding when an embedding provider is active
   -> Index in BM25, plus vectors when enabled
 
@@ -802,7 +836,7 @@ Modeled on how human brains process memory, including sleep consolidation.
 | **Semantic** | Extracted facts and patterns | "What I know" |
 | **Procedural** | Workflows and decision patterns | "How to do it" |
 
-Memories decay over time (Ebbinghaus curve). Frequently accessed memories strengthen. Stale memories auto-evict. Contradictions are detected and resolved.
+Memories decay over time (Ebbinghaus curve). Frequently accessed memories strengthen. Stale memories auto-evict. Auto-forget checks contradictions only between memories with the same agent scope, excluding pairs with different explicit projects; an unscoped project can still be compared with a scoped one.
 
 ### What Gets Captured
 
@@ -919,6 +953,8 @@ Three tool surfaces, smallest to largest: `AGENTMEMORY_TOOLS=core` trims visibil
 
 </details>
 
+`memory_save` accepts `concepts` and `files` as comma-separated strings or arrays of strings. Use `sourceObservationIds` (an array) to attach observation provenance and `ttlDays` (a positive number of days, including fractions) to set expiry. Invalid lists, non-positive TTLs and unrepresentable expiry dates are rejected. These fields also work through `POST /agentmemory/remember` and standalone MCP. In the standalone local fallback, expired memories are pruned during recall, smart search and export, with a deletion audit entry.
+
 <details>
 <summary>Extended tools (54 total, the default surface)</summary>
 
@@ -934,7 +970,7 @@ Three tool surfaces, smallest to largest: `AGENTMEMORY_TOOLS=core` trims visibil
 | `memory_team_feed` | Recent shared items |
 | `memory_audit` | Audit trail of operations |
 | `memory_governance_delete` | Delete with audit trail |
-| `memory_snapshot_create` | Git-versioned snapshot |
+| `memory_snapshot_create` | Git-versioned snapshot; state read failures return an error instead of saving an incomplete snapshot |
 | `memory_action_create` | Create work items with dependencies |
 | `memory_action_update` | Update action status |
 | `memory_frontier` | Unblocked actions ranked by priority |
@@ -1063,7 +1099,7 @@ agentmemory sends session content to an LLM only after you select a provider wit
 | OpenRouter | `AGENTMEMORY_LLM_PROVIDER=openrouter` + `OPENROUTER_API_KEY` | Any model |
 | OpenAI API | `AGENTMEMORY_LLM_PROVIDER=openai` + `OPENAI_API_KEY` | Default `gpt-5.6-luna`, override with `OPENAI_MODEL` |
 | **Local (Ollama / LM Studio / vLLM / llama.cpp)** | `AGENTMEMORY_LLM_PROVIDER=openai` + `OPENAI_API_KEY=local` + `OPENAI_BASE_URL=http://localhost:11434/v1` (Ollama) or `http://localhost:1234/v1` (LM Studio) + `OPENAI_MODEL=<your model>` | Anything OpenAI-API-compatible. Zero cost, runs on your hardware. See [Local models](#local-models-ollama--lm-studio--vllm) below. |
-| Claude subscription fallback | `AGENTMEMORY_ALLOW_AGENT_SDK=true` | Opt-in only. Spawns `@anthropic-ai/claude-agent-sdk` sessions; it used to cause unbounded Stop-hook recursion, so it is no longer the default. |
+| Claude subscription fallback | `AGENTMEMORY_ALLOW_AGENT_SDK=true` | Opt-in only. Spawns `@anthropic-ai/claude-agent-sdk` sessions; it used to cause unbounded Stop-hook recursion, so it is no longer the default. If an LLM provider key is also present and `AGENTMEMORY_LLM_PROVIDER` is unset, agentmemory does not pick either one and runs zero-LLM until you add `AGENTMEMORY_LLM_PROVIDER=<provider>` or `AGENTMEMORY_LLM_PROVIDER=agent-sdk`. A key claimed by `EMBEDDING_PROVIDER` does not count. |
 
 ### Local models (Ollama / LM Studio / vLLM)
 
@@ -1217,6 +1253,7 @@ EMBEDDING_PROVIDER=local
 
 # Disable scheduled auto-forget and lesson/insight decay
 # AUTO_FORGET_ENABLED=false
+# AUTO_FORGET_INTERVAL_MS=3600000 (60000–2147483647 ms; invalid values use 3600000)
 # LESSON_DECAY_ENABLED=false
 # INSIGHT_DECAY_ENABLED=false
 ```
@@ -1227,7 +1264,7 @@ The complete reference is [`.env.example`](.env.example), including provider cre
 
 <h2 id="api"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/tags/light/section-api.svg"><img src="assets/tags/section-api.svg" alt="API" height="32" /></picture></h2>
 
-147 endpoints on port `3111`. The REST API binds to `127.0.0.1` by default. Protected endpoints require `Authorization: Bearer <secret>`, and mesh sync endpoints require an explicitly set `AGENTMEMORY_SECRET` on both peers.
+148 endpoints on port `3111`. The REST API binds to `127.0.0.1` by default. Protected endpoints require `Authorization: Bearer <secret>`, and mesh sync endpoints require an explicitly set `AGENTMEMORY_SECRET` on both peers.
 
 **Authentication is on by default.** When `AGENTMEMORY_SECRET` is not set (in the shell or in `~/.agentmemory/.env`), the CLI generates a random secret on first start and stores it at `~/.agentmemory/secret`, mirrored to the selected data directory as `secret`, with mode `0600` (the platform-specific default data directory is described above). Bundled clients read the canonical secret first when they talk to a local server: the CLI, the viewer, the hooks under `plugin/scripts`, the MCP server and the `@agentmemory/mcp` shim, the configs written by `agentmemory connect`, and the bundled OpenCode, Pi, OpenClaw, Hermes and filesystem-watcher integrations. The stored secret is only sent to loopback URLs (`localhost`, `127.0.0.0/8`, `::1`). An explicit `AGENTMEMORY_SECRET` always wins, and remote clients need the secret set in their environment. Repository-based Docker self-host deployments and the `deploy/` entrypoints generate and export their own secret. To call the API by hand:
 
@@ -1313,7 +1350,7 @@ curl -X POST http://localhost:3111/agentmemory/graph/compact -H "Authorization: 
 ```bash
 npm run dev               # Hot reload
 npm run build             # Production build
-npm test                  # 4,700+ tests
+npm test                  # 5,100+ tests
 npm run test:integration  # API tests (requires running services)
 ```
 

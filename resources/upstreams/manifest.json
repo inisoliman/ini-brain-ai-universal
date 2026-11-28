@@ -11,7 +11,7 @@
       "id": "ponytail",
       "repository": "DietrichGebert/ponytail",
       "branch": "main",
-      "pinnedCommit": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
+      "pinnedCommit": "ebd8654c2c627f721eb8f9c0d1bd4090a29f9e10",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -36,7 +36,7 @@
       "id": "caveman",
       "repository": "JuliusBrussee/caveman",
       "branch": "main",
-      "pinnedCommit": "3dc497a7f858c774d6e15b25e8c6120ef3a0eda8",
+      "pinnedCommit": "e74a11ccdb38b98d15c9f9545787c907dd15f0ab",
       "license": "MIT",
       "classification": "runtime-skill",
       "snapshotPolicy": "curated",
@@ -45,7 +45,7 @@
       "files": [
         {
           "path": "AGENTS.md",
-          "sha256": "283e73644f729f00199089f93da78009ad7af61a65a6671c555914217e6b4785"
+          "sha256": "f564b7bedb52d4a376d823421089d9bf61973ff61ab7656ce04864497fe7323c"
         },
         {
           "path": "LICENSE",
@@ -82,7 +82,7 @@
       "id": "spec-kit",
       "repository": "github/spec-kit",
       "branch": "main",
-      "pinnedCommit": "f29319d550d1f05404f7184b92e995600ca2293f",
+      "pinnedCommit": "f2010547121b3351e4923fe467205079e4593a32",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -160,7 +160,7 @@
       "id": "gstack",
       "repository": "garrytan/gstack",
       "branch": "main",
-      "pinnedCommit": "f0cd9f8c4b453c1eadd714e4149174ee01179eae",
+      "pinnedCommit": "586e51b10e41149bfe4cea36fac4f3b5e17174f3",
       "license": "MIT",
       "classification": "reference-workflow",
       "snapshotPolicy": "curated",
@@ -211,7 +211,7 @@
       "id": "codebase-memory-mcp",
       "repository": "DeusData/codebase-memory-mcp",
       "branch": "main",
-      "pinnedCommit": "6d34ca15bd51c5e01bf4e645718e8a4ff8d19e81",
+      "pinnedCommit": "559abf7aea57dfbfa07a40052c908a69b9e7bf05",
       "license": "MIT",
       "classification": "runtime-engine",
       "snapshotPolicy": "curated",
@@ -232,7 +232,7 @@
       "id": "delegate-skills",
       "repository": "amElnagdy/delegate-skills",
       "branch": "master",
-      "pinnedCommit": "7f8ae3435e5bc68a54efdca9f67797e905845562",
+      "pinnedCommit": "48b53d33b53ef260de76c3d2c1313e2c62a24820",
       "license": "MIT",
       "classification": "runtime-workflow",
       "snapshotPolicy": "curated",
@@ -249,7 +249,7 @@
         },
         {
           "path": "skills/codex-delegate/SKILL.md",
-          "sha256": "67896d61833b2f6602ad9d45f79214190425f0184fc78e85042c95b70f860200"
+          "sha256": "996a883bfeec645f009a31accc45d4e2ad245ce8f81174600c28202f7d3f7d23"
         },
         {
           "path": "skills/opencode-delegate/SKILL.md",
@@ -261,7 +261,7 @@
       "id": "agentmemory",
       "repository": "rohitg00/agentmemory",
       "branch": "main",
-      "pinnedCommit": "77ebca5785e5e296169ddc8989e7459682b34574",
+      "pinnedCommit": "d2913a0b1e22ebd6128da01854334f471bcb83cf",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -274,7 +274,7 @@
         },
         {
           "path": "README.md",
-          "sha256": "a9cea68adc15c01a52c42fa03b7a4564bc46dd9f781c5d05a1069816694c0048"
+          "sha256": "8600ade46f342e3093bd70e7d26d4c63a1b2c9bde92be2a62df7640998cd6634"
         },
         {
           "path": "plugin/skills/remember/SKILL.md",
@@ -294,7 +294,7 @@
       "id": "impeccable",
       "repository": "pbakaus/impeccable",
       "branch": "main",
-      "pinnedCommit": "c1e0e5492fbb524f5df84d635ecfae7dc438ec45",
+      "pinnedCommit": "2fc5e1459efbbf06d92c7306517c286bf12490cf",
       "license": "Apache-2.0",
       "classification": "reference",
       "snapshotPolicy": "curated",
@@ -307,11 +307,11 @@
         },
         {
           "path": "README.md",
-          "sha256": "ea40f8d0688237a4a23ea575513bec409b8f2d10ab72d1b4c016dbf44830351d"
+          "sha256": "8660d4dd9c2c4335fd52759411a68a07db13265df20c654083d868d86543e38e"
         },
         {
           "path": "plugin/skills/impeccable/SKILL.md",
-          "sha256": "07336fc855b26edc34d2c211d3f91f8a32398221bf7e2c952a8e9c631c5f46bd"
+          "sha256": "53ab5783012b5ecdd1b63fabfabbf980056efe4758ed77d9d6230710ebd7986a"
         }
       ]
     },
@@ -319,7 +319,7 @@
       "id": "guard-skills",
       "repository": "amElnagdy/guard-skills",
       "branch": "master",
-      "pinnedCommit": "ffa26036b7b5e77b20b5d679304a703b6fd1a43d",
+      "pinnedCommit": "95a54f2e366aafa0c2fd5fb7ee7e9c18e6779bee",
       "license": "MIT",
       "classification": "quality-guard",
       "snapshotPolicy": "curated",
@@ -340,7 +340,7 @@
         },
         {
           "path": "skills/test-guard/SKILL.md",
-          "sha256": "77aeeb60d5cd12f075b358c3a99b49aba5eaf012fa8f3e217d1ed6983922e9b0"
+          "sha256": "51950f6bc2a81dc465e7bdde9d6a3c9b5361188be1438d59bb7891b65cd268a2"
         },
         {
           "path": "skills/docs-guard/SKILL.md",
@@ -349,5 +349,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-11-11T11:07:52.161Z"
+  "updatedAt": "2026-11-28T11:56:51.926Z"
 }
